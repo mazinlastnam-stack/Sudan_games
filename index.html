@@ -11,105 +11,252 @@
         body { font-family: 'Cairo', sans-serif; background: #0f172a; color: white; scroll-behavior: smooth; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .tab-btn.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; }
-        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar { height: 4px; width: 4px; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        
+        .horizontal-scroll {
+            display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scroll-snap-type: x mandatory;
+        }
+        .promo-card {
+            flex: 0 0 80%; scroll-snap-align: start;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; padding: 15px;
+        }
+        .promo-card img { width: 100%; border-radius: 15px; margin-bottom: 10px; height: 150px; object-fit: cover; }
+        
         .toast { 
             position: fixed; bottom: 20px; right: 20px; background: #1e293b; 
             border-right: 4px solid #3b82f6; padding: 12px 20px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999;
-            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999; animation: slideIn 0.3s ease;
         }
         @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body class="pb-20">
 
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
 
-    <header class="p-6 text-center bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+    <header class="p-4 text-center bg-slate-900 border-b border-slate-800 sticky top-0 z-50 flex justify-between items-center">
         <h1 class="text-2xl font-black italic text-blue-500">SUDAN GAMES</h1>
+        <div class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full border border-blue-500/20">متصل الآن</div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6">
         
-        <!-- Tabs -->
         <div class="flex justify-around glass rounded-xl p-2 sticky top-20 z-40">
             <button onclick="showSection('store')" id="tab-store" class="tab-btn active p-2 font-bold text-sm">المتجر</button>
             <button onclick="showSection('cart')" id="tab-cart" class="tab-btn p-2 font-bold text-sm relative">
-                السلة 
-                <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                السلة <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
             </button>
             <button onclick="showSection('history')" id="tab-history" class="tab-btn p-2 font-bold text-sm">طلباتي</button>
             <button onclick="showSection('support')" id="tab-support" class="tab-btn p-2 font-bold text-sm">الدعم</button>
         </div>
 
-        <!-- قسم المتجر -->
-        <section id="store" class="section-content space-y-4">
-            <!-- بطاقة الطلب -->
-            <div class="glass p-6 rounded-3xl space-y-4">
-                <h2 class="text-lg font-bold border-r-4 border-blue-500 pr-3">طلب شحن جديد</h2>
-                <input type="text" id="player_id" placeholder="ID اللاعب" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="tel" id="phone" placeholder="رقم واتساب (مثال: 249912345678)" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-left" dir="ltr">
-                
+        <section id="store" class="section-content space-y-6">
+            <div class="horizontal-scroll">
+                <div class="promo-card">
+                    <i class="fab fa-whatsapp text-green-400 text-2xl mb-2"></i>
+                    <h3 class="font-bold text-blue-400">قناة الواتساب</h3>
+                    <p class="text-xs text-slate-400 mt-1">تابع العروض الشهرية والمسابقات وجوائز الـ ID.</p>
+                </div>
+                <div class="promo-card">
+                    <i class="fas fa-bolt text-yellow-400 text-2xl mb-2"></i>
+                    <h3 class="font-bold text-blue-400">سرعة خرافية</h3>
+                    <p class="text-xs text-slate-400 mt-1">شحن جواهر فري فاير و UC ببجي خلال 15 دقيقة.</p>
+                </div>
+            </div>
+
+            <div class="glass p-6 rounded-3xl space-y-4 border-t-2 border-blue-500">
+                <h2 class="text-lg font-bold pr-2 border-r-4 border-blue-500">طلب شحن جديد</h2>
+                <input type="text" id="player_id" placeholder="ID اللاعب" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                <input type="tel" id="phone" placeholder="رقم واتساب (مثال: 2499...)" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-left" dir="ltr">
                 <div class="grid grid-cols-2 gap-2">
-                    <select id="game" onchange="updatePacks()" class="p-4 rounded-xl bg-slate-800 text-sm">
+                    <select id="game" onchange="updatePacks()" class="p-4 rounded-xl bg-slate-800 text-sm outline-none">
                         <option value="" disabled selected>اللعبة</option>
                         <option value="Free Fire">Free Fire</option>
                         <option value="PUBG Mobile">PUBG</option>
                     </select>
-                    <select id="pack" class="p-4 rounded-xl bg-slate-800 text-sm">
+                    <select id="pack" class="p-4 rounded-xl bg-slate-800 text-sm outline-none">
                         <option value="">الباقة</option>
                     </select>
                 </div>
-                <button onclick="addToCart()" class="w-full py-4 bg-blue-600 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-900/20">
+                <button onclick="addToCart()" class="w-full py-4 bg-blue-600 rounded-xl font-bold hover:bg-blue-500 transition-all active:scale-95">
                     <i class="fas fa-cart-plus ml-2"></i> إضافة للسلة
                 </button>
             </div>
-            
-            <!-- بطاقات ترويجية (معدلة) -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-4 rounded-2xl text-center">
-                    <i class="fas fa-whatsapp text-2xl text-green-400 mb-2"></i>
-                    <h3 class="font-bold text-sm">قناة الواتساب</h3>
-                    <p class="text-xs text-slate-400">تابع العروض الحصرية</p>
-                </div>
-                <div class="glass p-4 rounded-2xl text-center">
-                    <i class="fas fa-bolt text-2xl text-yellow-400 mb-2"></i>
-                    <h3 class="font-bold text-sm">شحن فوري</h3>
-                    <p class="text-xs text-slate-400">خلال 15 دقيقة</p>
-                </div>
-                <div class="glass p-4 rounded-2xl text-center col-span-2 flex justify-around">
-                    <span class="text-xs"><i class="fas fa-shield-alt text-blue-400 ml-1"></i> شحن مضمون</span>
-                    <span class="text-xs"><i class="fas fa-clock text-blue-400 ml-1"></i> دعم 24/7</span>
-                    <span class="text-xs"><i class="fas fa-star text-blue-400 ml-1"></i> موثوق</span>
-                </div>
-            </div>
 
-            <!-- الاكثر شراءً (يمكن تحدثه لاحقاً) -->
-            <div class="glass p-4 rounded-2xl">
-                <h3 class="font-bold mb-3"><i class="fas fa-fire text-orange-500 ml-2"></i>الأكثر شراءً</h3>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-slate-800 p-2 rounded-lg">💎 310 جواهر</div>
-                    <div class="bg-slate-800 p-2 rounded-lg">💎 583 جواهر</div>
-                    <div class="bg-slate-800 p-2 rounded-lg">📅 باقة شهرية</div>
-                    <div class="bg-slate-800 p-2 rounded-lg">⚡ 325 UC</div>
+            <div class="space-y-3">
+                <h2 class="text-lg font-bold pr-2 border-r-4 border-blue-500">الألعاب المتوفرة</h2>
+                <div class="horizontal-scroll">
+                    <div class="promo-card">
+                        <img src="f31054399c0c2604548ba7dfdced2a62.jpg" alt="Free Fire">
+                        <h3 class="font-bold text-blue-400">فري فاير</h3>
+                        <p class="text-xs text-slate-400">شحن رسمي وفوري عبر الأي دي.</p>
+                    </div>
+                    <div class="promo-card">
+                        <img src="f31054399c0c2604548ba7dfdced2a62.jpg" alt="PUBG">
+                        <h3 class="font-bold text-blue-400">ببجي موبايل</h3>
+                        <p class="text-xs text-slate-400">شحن شدات ببجي بأفضل الأسعار.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- قسم السلة -->
         <section id="cart" class="section-content hidden space-y-4">
+            <h2 class="text-lg font-bold">🛒 سلة المشتريات</h2>
             <div id="cart-items" class="space-y-3"></div>
             <div class="glass p-6 rounded-3xl space-y-4">
                 <div class="flex justify-between font-bold text-xl">
                     <span>الإجمالي:</span>
                     <span class="text-green-400" id="total-price">0 SDG</span>
                 </div>
-                <button onclick="checkout()" id="checkout-btn" class="w-full py-4 bg-green-600 rounded-xl font-bold disabled:opacity-50">
-                    <i class="fas fa-check-double ml-2"></i> إتمام وإرسال الطلب 
-                </button>
-                <button onclick="clearCart()" class="w-full py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">
+                <button onclick="checkout()" id="checkout-btn" class="w-full py-4 bg-green-600 rounded-xl font-bold">إتمام وإرسال الطلب</button>
+                <button onclick="clearCart()" class="w-full py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">تفريغ السلة</button>
+            </div>
+        </section>
+
+        <section id="history" class="section-content hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold">📋 سجل الطلبات</h2>
+                <button onclick="clearHistory()" class="text-[10px] text-red-400 bg-red-400/10 px-2 py-1 rounded">مسح السجل</button>
+            </div>
+            <div id="history-list" class="space-y-3"></div>
+        </section>
+
+        <section id="support" class="section-content hidden space-y-4">
+            <div class="glass p-6 rounded-3xl text-center space-y-3">
+                <h2 class="text-lg font-bold mb-4">الدعم الفني والارتباط</h2>
+                <a href="https://wa.me/249115169965" class="flex items-center justify-center gap-3 w-full py-3 bg-green-600 rounded-xl font-bold text-white hover:bg-green-500 transition">
+                   <i class="fab fa-whatsapp"></i> واتساب
+                </a>
+                <a href="tel:+249115169965" class="flex items-center justify-center gap-3 w-full py-3 bg-blue-600 rounded-xl font-bold text-white hover:bg-blue-500 transition">
+                    <i class="fas fa-phone"></i> اتصال هاتفي
+                </a>
+                <a href="#" class="flex items-center justify-center gap-3 w-full py-3 bg-sky-600 rounded-xl font-bold text-white hover:bg-sky-500 transition">
+                    <i class="fab fa-telegram"></i> تيجلرام
+                </a>
+                <a href="#" class="flex items-center justify-center gap-3 w-full py-3 bg-blue-800 rounded-xl font-bold text-white hover:bg-blue-700 transition">
+                    <i class="fab fa-facebook"></i> فيسبوك
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const _0x4f = ["ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ==", "ODQ5NjUyNTYxOQ=="];
+        const getT = () => atob(_0x4f[0]);
+        const getC = () => atob(_0x4f[1]);
+
+        const packsData = {
+            "Free Fire": [
+                { name: "💎 50 جواهر", price: 1800 }, { name: "💎 110 جواهر", price: 3500 },
+                { name: "💎 231 جواهر", price: 7000 }, { name: "💎 310 جواهر", price: 14000 }
+            ],
+            "PUBG Mobile": [
+                { name: "⚡ 60 UC", price: 1200 }, { name: "⚡ 325 UC", price: 4500 }
+            ]
+        };
+
+        let cart = JSON.parse(localStorage.getItem('sg_cart') || '[]');
+        let history = JSON.parse(localStorage.getItem('sg_history') || '[]');
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'border-red-500' : 'border-green-500'}`;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle text-red-400' : 'fa-check-circle text-green-400'} ml-2"></i>${message}`;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        window.updatePacks = function() {
+            const game = document.getElementById('game').value;
+            const packSelect = document.getElementById('pack');
+            packSelect.innerHTML = '<option value="" disabled selected>الباقة</option>';
+            if(packsData[game]) {
+                packsData[game].forEach((p, idx) => {
+                    let opt = document.createElement('option');
+                    opt.value = idx; opt.textContent = `${p.name} - ${p.price} SDG`;
+                    packSelect.appendChild(opt);
+                });
+            }
+        };
+
+        window.showSection = function(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('tab-' + id).classList.add('active');
+            if (id === 'history') renderHistory();
+            if (id === 'cart') updateCartUI();
+        };
+
+        window.addToCart = function() {
+            const id = document.getElementById('player_id').value;
+            const phone = document.getElementById('phone').value;
+            const game = document.getElementById('game').value;
+            const pIdx = document.getElementById('pack').value;
+            if (!id || !phone || !game || pIdx === "") { showToast("أكمل البيانات", "error"); return; }
+            cart.push({ id, phone, game, pack: packsData[game][pIdx].name, price: packsData[game][pIdx].price, timestamp: new Date().toLocaleString('ar-EG') });
+            updateCartUI();
+            showToast("تمت الإضافة للسلة");
+        };
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalSpan = document.getElementById('total-price');
+            const countSpan = document.getElementById('cart-count');
+            if(!container) return;
+            container.innerHTML = '';
+            let sum = 0;
+            cart.forEach((item, idx) => {
+                sum += item.price;
+                container.innerHTML += `<div class="glass p-4 rounded-2xl flex justify-between items-center"><div><p class="font-bold text-sm text-blue-400">${item.game}</p><p class="text-xs">${item.pack} - ${item.id}</p></div><button onclick="removeFromCart(${idx})" class="text-red-500"><i class="fas fa-trash"></i></button></div>`;
+            });
+            countSpan.textContent = cart.length;
+            countSpan.classList.toggle('hidden', cart.length === 0);
+            totalSpan.textContent = sum + " SDG";
+            localStorage.setItem('sg_cart', JSON.stringify(cart));
+        }
+
+        window.removeFromCart = function(idx) { cart.splice(idx, 1); updateCartUI(); };
+        window.clearCart = function() { cart = []; updateCartUI(); };
+        window.clearHistory = function() { history = []; localStorage.setItem('sg_history', '[]'); renderHistory(); showToast("تم مسح السجل"); };
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if (history.length === 0) { list.innerHTML = '<p class="text-center py-10 opacity-50">لا يوجد سجل طلبات</p>'; return; }
+            list.innerHTML = history.map(item => `<div class="glass p-3 rounded-xl border-r-2 border-blue-500"><p class="text-sm font-bold">${item.game} - ${item.pack}</p><p class="text-[10px] opacity-50">${item.timestamp} | ID: ${item.id}</p></div>`).join('');
+        }
+
+        window.checkout = async function() {
+            if(cart.length === 0) return;
+            const btn = document.getElementById('checkout-btn');
+            btn.disabled = true; btn.textContent = "جاري الإرسال...";
+            let msg = `🛒 *طلب شحن جديد*\n`;
+            cart.forEach((item, i) => msg += `\n${i+1}. ${item.game}\n📦 ${item.pack}\n🆔 ${item.id}\n📱 ${item.phone}\n`);
+            msg += `\n💰 الإجمالي: ${document.getElementById('total-price').textContent}`;
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: getC(), text: msg, parse_mode: 'Markdown' })
+                });
+                if (res.ok) {
+                    history.unshift(...cart);
+                    localStorage.setItem('sg_history', JSON.stringify(history));
+                    cart = []; updateCartUI();
+                    showToast("✅ تم إرسال الطلب بنجاح!");
+                    showSection('history');
+                } else { showToast("فشل في الإرسال", "error"); }
+            } catch (e) { showToast("خطأ في الشبكة", "error"); }
+            btn.disabled = false; btn.textContent = "إتمام وإرسال الطلب";
+        };
+
+        window.onload = () => { updateCartUI(); };
+    </script>
+</body>
+</html>
                     <i class="fas fa-trash-alt ml-2"></i> تفريغ السلة
                 </button>
             </div>
