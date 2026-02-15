@@ -17,7 +17,6 @@
             scroll-behavior: smooth; 
         }
         
-        /* Glassmorphism Effect */
         .glass { 
             background: rgba(30, 41, 59, 0.7); 
             -webkit-backdrop-filter: blur(12px); 
@@ -30,11 +29,9 @@
             color: #3b82f6; 
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { height: 4px; width: 4px; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         
-        /* Horizontal Sections */
         .horizontal-scroll {
             display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scroll-snap-type: x mandatory;
         }
@@ -59,14 +56,12 @@
             display: flex; flex-direction: column; justify-content: flex-end; padding: 15px;
         }
 
-        /* FAQ Styling */
         .faq-item { background: rgba(30, 41, 59, 0.5); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
         .faq-question { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
         .faq-answer { padding: 0 15px; max-height: 0; overflow: hidden; transition: all 0.3s ease; opacity: 0; font-size: 13px; color: #94a3b8; }
         .faq-item.active .faq-answer { padding: 10px 15px 15px; max-height: 200px; opacity: 1; }
         .faq-item.active i { transform: rotate(180deg); }
         
-        /* Toast Notifications */
         .toast { 
             position: fixed; bottom: 20px; right: 20px; background: #1e293b; 
             border-right: 4px solid #3b82f6; padding: 12px 20px; border-radius: 12px;
@@ -74,7 +69,6 @@
         }
         @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Rating Stars Style */
         .star-rating {
             display: flex; flex-direction: row-reverse; justify-content: center; gap: 10px;
         }
@@ -181,7 +175,9 @@
                     <span>الإجمالي:</span>
                     <span class="text-green-400" id="total-price">0 SDG</span>
                 </div>
-                <button id="checkout-btn" class="w-full py-4 bg-green-600 rounded-xl font-bold shadow-lg shadow-green-900/20">إتمام وإرسال الطلب عبر واتساب</button>
+                <button id="checkout-btn" class="w-full py-4 bg-sky-600 rounded-xl font-bold shadow-lg shadow-sky-900/20">
+                    <i class="fab fa-telegram-plane ml-2"></i> إتمام وإرسال الطلب عبر تليجرام
+                </button>
                 <button id="clear-cart-btn" class="w-full py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">تفريغ السلة</button>
             </div>
         </section>
@@ -195,11 +191,10 @@
         </section>
 
         <section id="support" class="section-content hidden space-y-6">
-            
             <div class="glass p-6 rounded-3xl space-y-3 border-r-4 border-blue-500">
                 <h2 class="text-lg font-bold">📖 من نحن</h2>
                 <p class="text-sm text-slate-300 leading-relaxed">
-                    نحن منصة <b>SUDAN GAMES</b>، الوجهة الأولى والآمنة للاعبين في السودان. نسعى لتوفير خدمات شحن الألعاب بأسرع وقت وأفضل سعر، مع ضمان كامل لحقوق العميل.
+                    نحن منصة <b>SUDAN GAMES</b>، الوجهة الأولى والآمنة للاعبين في السودان. نسعى لتوفير خدمات شحن الألعاب بأسرع وقت وأفضل سعر.
                 </p>
             </div>
 
@@ -217,8 +212,8 @@
                     <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
                     <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
                 </div>
-                <textarea id="rating-comment" placeholder="أضف تعليقك هنا (اختياري)..." class="w-full p-3 rounded-xl bg-slate-800 border-none outline-none text-sm h-20"></textarea>
-                <button id="send-rating-btn" class="w-full py-3 bg-yellow-600 rounded-xl font-bold text-sm">إرسال التقييم عبر واتساب</button>
+                <textarea id="rating-comment" placeholder="أضف تعليقك هنا..." class="w-full p-3 rounded-xl bg-slate-800 border-none outline-none text-sm h-20"></textarea>
+                <button id="send-rating-btn" class="w-full py-3 bg-yellow-600 rounded-xl font-bold text-sm">إرسال التقييم عبر تليجرام</button>
             </div>
 
             <div class="glass p-6 rounded-3xl text-center space-y-3">
@@ -230,23 +225,10 @@
                     <i class="fab fa-telegram"></i> تيليجرام
                 </a>
             </div>
-
-            <div class="space-y-3">
-                <h2 class="text-lg font-bold pr-2 border-r-4 border-blue-500">الأسئلة الشائعة</h2>
-                <div class="faq-item">
-                    <div class="faq-question">كم يستغرق الشحن؟ <i class="fas fa-chevron-down text-[10px]"></i></div>
-                    <div class="faq-answer">يستغرق الشحن عادةً من 15 إلى 45 دقيقة بعد إتمام عملية الدفع.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">كيف يمكنني الدفع؟ <i class="fas fa-chevron-down text-[10px]"></i></div>
-                    <div class="faq-answer">نوفر الدفع عبر تطبيق (بنكك) أو تحويل الرصيد.</div>
-                </div>
-            </div>
         </section>
     </main>
 
     <script>
-        // --- تهيئة البيانات ---
         const _0x4f = ["ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ==", "ODQ5NjUyNTYxOQ=="];
         const getT = () => atob(_0x4f[0]);
         const getC = () => atob(_0x4f[1]);
@@ -276,7 +258,6 @@
         let cart = JSON.parse(localStorage.getItem('sg_cart') || '[]');
         let history = JSON.parse(localStorage.getItem('sg_history') || '[]');
 
-        // --- عناصر الواجهة ---
         const cartCount = document.getElementById('cart-count');
         const cartItemsDiv = document.getElementById('cart-items');
         const totalPriceSpan = document.getElementById('total-price');
@@ -284,7 +265,6 @@
         const gameSelect = document.getElementById('game');
         const packSelect = document.getElementById('pack');
 
-        // --- الوظائف الأساسية ---
         function init() {
             updatePacks();
             updateCartUI();
@@ -308,10 +288,7 @@
 
             document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
             document.getElementById('checkout-btn').addEventListener('click', checkout);
-
-            document.querySelectorAll('.faq-question').forEach(q => {
-                q.addEventListener('click', () => q.parentElement.classList.toggle('active'));
-            });
+            document.getElementById('send-rating-btn').addEventListener('click', sendRating);
 
             document.getElementById('clear-history-btn').addEventListener('click', () => {
                 if(confirm('مسح السجل؟')){
@@ -326,8 +303,6 @@
                 updateCartUI();
                 showToast('تم تفريغ السلة');
             });
-
-            document.getElementById('send-rating-btn').addEventListener('click', sendRating);
         }
 
         function updatePacks() {
@@ -426,7 +401,7 @@
             const reviews = JSON.parse(localStorage.getItem('sg_reviews') || '[]');
             const container = document.getElementById('reviews-container');
             if (reviews.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-500 text-center">لا توجد تقييمات بعد. كن أول من يقيم!</p>';
+                container.innerHTML = '<p class="text-xs text-slate-500 text-center">لا توجد تقييمات بعد.</p>';
                 return;
             }
             container.innerHTML = reviews.map(rev => `
@@ -443,23 +418,18 @@
         async function sendRating() {
             const starInput = document.querySelector('input[name="star"]:checked');
             const commentInput = document.getElementById('rating-comment');
-            const btn = document.getElementById('send-rating-btn');
-            
-            if(!starInput) {
-                showToast('يرجى اختيار عدد النجوم أولاً', 'error');
-                return;
-            }
+            if(!starInput) { showToast('اختر النجوم أولاً', 'error'); return; }
 
             const stars = starInput.value;
             const comment = commentInput.value.trim() || "بدون تعليق";
-            const starsText = "⭐".repeat(stars);
             const dateNow = new Date().toLocaleDateString('ar-EG');
-
+            
+            const btn = document.getElementById('send-rating-btn');
             btn.disabled = true;
-            btn.innerHTML = "جاري الحفظ...";
-            
-            const telegramMsg = `🌟 *تقييم جديد للموقع*\n\nالتقييم: ${starsText}\nالتعليق: ${comment}`;
-            
+            btn.innerHTML = "جاري الإرسال للتليجرام...";
+
+            const telegramMsg = `🌟 *تقييم جديد*\n\nالتقييم: ${"⭐".repeat(stars)}\nالتعليق: ${comment}`;
+
             try {
                 await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
                     method: 'POST',
@@ -470,35 +440,33 @@
                 const reviews = JSON.parse(localStorage.getItem('sg_reviews') || '[]');
                 reviews.unshift({ stars, comment, date: dateNow });
                 localStorage.setItem('sg_reviews', JSON.stringify(reviews.slice(0, 5)));
-
                 loadReviews();
                 commentInput.value = '';
-                showToast('شكراً لك! تم نشر تقييمك');
-                
-                // فتح واتساب أيضاً كقناة تواصل إضافية
-                const whatsappUrl = `https://wa.me/249115169965?text=${encodeURIComponent(telegramMsg)}`;
-                window.open(whatsappUrl, '_blank');
-
+                showToast('شكراً لتقييمك!');
             } catch (e) {
-                showToast('حدث خطأ في الاتصال', 'error');
+                showToast('خطأ في الإرسال', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "إرسال التقييم عبر واتساب";
+                btn.innerHTML = "إرسال التقييم عبر تليجرام";
             }
         }
 
         async function checkout() {
             if (cart.length === 0) return;
-            
             const btn = document.getElementById('checkout-btn');
             btn.disabled = true;
-            btn.innerHTML = 'جاري الإرسال...';
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال للتليجرام...';
 
-            let msg = `🛒 *طلب جديد من SUDAN GAMES*\n`;
+            let msg = `🎮 *طلب شحن جديد - SUDAN GAMES*\n`;
+            msg += `━━━━━━━━━━━━━━\n`;
             cart.forEach((item, i) => {
-                msg += `\n${i+1}. ${item.game}\n📦 ${item.pack}\n🆔 ${item.id}\n📱 ${item.phone}\n`;
+                msg += `📦 *الطلب (${i+1}):* ${item.game}\n`;
+                msg += `💎 *الباقة:* ${item.pack}\n`;
+                msg += `🆔 *الـ ID:* \`${item.id}\`\n`;
+                msg += `📱 *واتساب:* ${item.phone}\n`;
+                msg += `━━━━━━━━━━━━━━\n`;
             });
-            msg += `\n💰 الإجمالي: ${totalPriceSpan.textContent}`;
+            msg += `💰 *الإجمالي:* ${totalPriceSpan.textContent}\n`;
 
             try {
                 const res = await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
@@ -510,22 +478,17 @@
                 if (res.ok) {
                     history.unshift(...cart);
                     localStorage.setItem('sg_history', JSON.stringify(history));
-                    
-                    // فتح واتساب لإتمام العملية مع الإدارة
-                    const whatsappUrl = `https://wa.me/249115169965?text=${encodeURIComponent(msg)}`;
-                    window.open(whatsappUrl, '_blank');
-
                     cart = [];
                     updateCartUI();
                     renderHistory();
-                    showToast('تم إرسال طلبك بنجاح!');
+                    showToast('تم إرسال طلبك بنجاح ✅');
                     showSection('history');
                 }
             } catch (e) {
                 showToast('خطأ في الاتصال', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'إتمام وإرسال الطلب عبر واتساب';
+                btn.innerHTML = '<i class="fab fa-telegram-plane ml-2"></i> إتمام وإرسال الطلب عبر تليجرام';
             }
         }
 
@@ -533,4 +496,3 @@
     </script>
 </body>
 </html>
-
