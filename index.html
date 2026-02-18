@@ -170,10 +170,23 @@
         <section id="cart" class="section-content hidden space-y-4">
             <h2 class="text-lg font-bold">🛒 سلة المشتريات</h2>
             <div id="cart-items" class="space-y-3"></div>
+            
+            <div class="glass p-4 rounded-2xl space-y-3 border border-blue-500/30">
+                <p class="text-xs text-slate-400">هل لديك كود خصم؟</p>
+                <div class="flex gap-2">
+                    <input type="text" id="coupon-input" placeholder="أدخل الكود هنا" class="flex-1 p-2 rounded-lg bg-slate-800 border-none text-sm outline-none focus:ring-1 focus:ring-blue-500">
+                    <button onclick="applyCoupon()" class="bg-blue-600 px-4 py-2 rounded-lg text-sm font-bold">تطبيق</button>
+                </div>
+                <div id="coupon-msg" class="text-[10px] hidden"></div>
+            </div>
+
             <div class="glass p-6 rounded-3xl space-y-4">
-                <div class="flex justify-between font-bold text-xl">
-                    <span>الإجمالي:</span>
-                    <span class="text-green-400" id="total-price">0 SDG</span>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-lg">الإجمالي:</span>
+                    <div class="text-left text-right">
+                        <span id="old-price" class="text-slate-500 line-through text-sm hidden"></span>
+                        <span class="text-green-400 font-bold text-xl block" id="total-price">0 SDG</span>
+                    </div>
                 </div>
                 <button id="checkout-btn" class="w-full py-4 bg-sky-600 rounded-xl font-bold shadow-lg shadow-sky-900/20">
                     <i class="fab fa-telegram-plane ml-2"></i> إتمام وإرسال الطلب عبر تليجرام
@@ -257,10 +270,15 @@
 
         let cart = JSON.parse(localStorage.getItem('sg_cart') || '[]');
         let history = JSON.parse(localStorage.getItem('sg_history') || '[]');
+        
+        // متغيرات نظام الخصم
+        let activeDiscount = 0;
+        let appliedCoupon = "";
 
         const cartCount = document.getElementById('cart-count');
         const cartItemsDiv = document.getElementById('cart-items');
         const totalPriceSpan = document.getElementById('total-price');
+        const oldPriceSpan = document.getElementById('old-price');
         const historyListDiv = document.getElementById('history-list');
         const gameSelect = document.getElementById('game');
         const packSelect = document.getElementById('pack');
@@ -300,6 +318,8 @@
 
             document.getElementById('clear-cart-btn').addEventListener('click', () => {
                 cart = [];
+                activeDiscount = 0;
+                appliedCoupon = "";
                 updateCartUI();
                 showToast('تم تفريغ السلة');
             });
@@ -340,11 +360,50 @@
             showToast('تمت الإضافة للسلة');
         }
 
+        // دالة تطبيق الكوبون
+        window.applyCoupon = function() {
+            const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+            const msg = document.getElementById('coupon-msg');
+            
+            if (cart.length === 0) {
+                showToast('السلة فارغة!', 'error');
+                return;
+            }
+
+            // تعريف الكوبونات هنا
+            const coupons = {
+                "SUDAN-AZ": 0.15,   // خصم 10% لـ عبدالعزيز
+                "SUDAN-RK": 0.10   // خصم 5%
+            };
+
+            if (coupons[code]) {
+                activeDiscount = coupons[code];
+                appliedCoupon = code;
+                msg.textContent = `تم تطبيق خصم ${coupons[code] * 100}% بنجاح!`;
+                msg.className = "text-[10px] text-green-400";
+                msg.classList.remove('hidden');
+                updateCartUI(); 
+                showToast('تم تطبيق الكود');
+            } else {
+                activeDiscount = 0;
+                appliedCoupon = "";
+                msg.textContent = "كود الخصم غير صحيح";
+                msg.className = "text-[10px] text-red-400";
+                msg.classList.remove('hidden');
+                updateCartUI();
+                showToast('الكود غير صالح', 'error');
+            }
+        }
+
         function updateCartUI() {
             if (cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p class="text-center py-10 opacity-50">السلة فارغة</p>';
                 totalPriceSpan.textContent = '0 SDG';
+                oldPriceSpan.classList.add('hidden');
                 cartCount.classList.add('hidden');
+                activeDiscount = 0;
+                appliedCoupon = "";
+                if(document.getElementById('coupon-msg')) document.getElementById('coupon-msg').classList.add('hidden');
             } else {
                 cartItemsDiv.innerHTML = cart.map((item, idx) => `
                     <div class="glass p-4 rounded-2xl flex justify-between items-center">
@@ -356,8 +415,18 @@
                     </div>
                 `).join('');
                 
-                const sum = cart.reduce((acc, item) => acc + item.price, 0);
-                totalPriceSpan.textContent = sum + ' SDG';
+                const originalSum = cart.reduce((acc, item) => acc + item.price, 0);
+                
+                if (activeDiscount > 0) {
+                    const discountedSum = originalSum - (originalSum * activeDiscount);
+                    totalPriceSpan.textContent = discountedSum.toLocaleString() + ' SDG';
+                    oldPriceSpan.textContent = originalSum.toLocaleString() + ' SDG';
+                    oldPriceSpan.classList.remove('hidden');
+                } else {
+                    totalPriceSpan.textContent = originalSum.toLocaleString() + ' SDG';
+                    oldPriceSpan.classList.add('hidden');
+                }
+
                 cartCount.textContent = cart.length;
                 cartCount.classList.remove('hidden');
             }
@@ -454,6 +523,7 @@
         async function checkout() {
             if (cart.length === 0) return;
             const btn = document.getElementById('checkout-btn');
+            const finalTotal = totalPriceSpan.textContent;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال للتليجرام...';
 
@@ -466,7 +536,12 @@
                 msg += `📱 *واتساب:* ${item.phone}\n`;
                 msg += `━━━━━━━━━━━━━━\n`;
             });
-            msg += `💰 *الإجمالي:* ${totalPriceSpan.textContent}\n`;
+
+            if (appliedCoupon) {
+                msg += `🎟️ *كود الخصم:* ${appliedCoupon}\n`;
+            }
+
+            msg += `💰 *الإجمالي النهائي:* ${finalTotal}\n`;
 
             try {
                 const res = await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
@@ -479,6 +554,9 @@
                     history.unshift(...cart);
                     localStorage.setItem('sg_history', JSON.stringify(history));
                     cart = [];
+                    activeDiscount = 0;
+                    appliedCoupon = "";
+                    document.getElementById('coupon-input').value = "";
                     updateCartUI();
                     renderHistory();
                     showToast('تم إرسال طلبك بنجاح ✅');
