@@ -30,10 +30,12 @@
             border-radius: 20px;
         }
 
-        .gold-text { color: var(--ramadan-gold); }
+        .gold-text { 
+            color: var(--ramadan-gold); 
+        }
         .gold-border { border-color: var(--ramadan-gold); }
         .gold-bg { background-color: var(--ramadan-gold); }
-
+        
         .tab-btn.active { 
             border-bottom: 3px solid var(--ramadan-gold); 
             color: var(--ramadan-gold); 
@@ -53,6 +55,7 @@
             overflow-x: auto;
             gap: 15px;
             padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
         }
         
         .promo-card {
@@ -73,13 +76,14 @@
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
         
-        .SUDAN-RK {
+        .coupon-badge {
             background: var(--ramadan-gold);
             color: var(--ramadan-green);
             font-weight: 800;
-            padding: 5px;
-            margin: 5px;
+            padding: 2px 8px;
             border-radius: 5px;
+            display: inline-block;
+            margin: 0 5px;
         }
 
         .add-funds-btn {
@@ -88,6 +92,10 @@
             font-weight: 800;
             padding: 10px 20px;
             border-radius: 50px;
+            transition: 0.3s;
+        }
+        .add-funds-btn:hover {
+            opacity: 0.9;
         }
 
         /* نافذة الدفع والتسجيل */
@@ -118,6 +126,11 @@
             border-radius: 15px; 
             font-weight: 700;
             cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-modal:hover {
+            background: var(--ramadan-gold);
+            color: var(--ramadan-green);
         }
 
         /* تنسيقات إضافية */
@@ -145,6 +158,7 @@
             font-size: 30px;
             color: #4b5563;
             cursor: pointer;
+            transition: color 0.2s;
         }
         .star-rating input:checked ~ label,
         .star-rating label:hover,
@@ -222,8 +236,8 @@
                 <div class="promo-card border-yellow-500">
                     <span class="absolute top-2 left-2 bg-yellow-500 text-emerald-950 text-[10px] font-bold px-2 py-0.5 rounded">عرض رمضان</span>
                     <h3 class="font-black gold-text">باقة رمضان</h3>
-            <p class="text-xs mt-1">خصم 10% على جميع شدات ببجي خلال شهر رمضان عبر الكود!
-          <span class="SUDAN-RK">SUDAN-RK</span>
+            <p class="text-xs mt-1">خصم 10% على جميع شدات ببجي خلال شهر رمضان عبر الكود:
+                <span class="coupon-badge">SUDAN-RK</span>
             </p>
                 </div>
             </div>
@@ -510,17 +524,51 @@
         }
 
         // ====== منطق المنتجات والسلة ======
+                // ====== بيانات المنتجات المحدثة من الصور ======
         const packsData = {
             "Free Fire": [
-                { name: "💎 110 جواهر", price: 3500 },
-                { name: "💎 231 جواهر", price: 7000 },
-                { name: "الباقة الاسبوعية", price: 9000 }
+                { name: "💎 50 جوهرة", price: 1800 },
+                { name: "💎 110 جوهرة", price: 3500 },
+                { name: "💎 231 جوهرة", price: 7000 },
+                { name: "💎 583 جوهرة", price: 17500 },
+                { name: "💎 1180 جوهرة", price: 35000 },
+                { name: "💎 2420 جوهرة", price: 86000 },
+                { name: "💎 5600 جوهرة", price: 214000 },
+                { name: "🌙 الباقة الاسبوعية", price: 9000 },
+                { name: "🌙 الباقة الشهرية", price: 43000 }
             ],
             "PUBG Mobile": [
                 { name: "⚡ 60 UC", price: 3300 }, 
-                { name: "⚡ 325 UC", price: 16500 }
+                { name: "⚡ 325 UC", price: 16500 },
+                {         // ====== بيانات المنتجات المحدثة من الصور ======
+        const packsData = {
+            "Free Fire": [
+                { name: "💎 50 جوهرة", price: 1800 },
+                { name: "💎 110 جوهرة", price: 3500 },
+                { name: "💎 231 جوهرة", price: 7000 },
+                { name: "💎 583 جوهرة", price: 17500 },
+                { name: "💎 1180 جوهرة", price: 35000 },
+                { name: "💎 2420 جوهرة", price: 86000 },
+                { name: "💎 5600 جوهرة", price: 214000 },
+                { name: "🌙 الباقة الاسبوعية", price: 9000 },
+                { name: "🌙 الباقة الشهرية", price: 43000 }
+            ],
+            "PUBG Mobile": [
+                { name: "⚡ 60 UC", price: 3300 }, 
+                { name: "⚡ 325 UC", price: 16500 },
+                { name: "⚡ 660 UC", price: 33000 },
+                { name: "⚡ 1800 UC", price: 82500 },
+                { name: "⚡ 3850 UC", price: 165000 },
+                { name: "⚡ 8100 UC", price: 330000 }
             ]
         };
+: "⚡ 660 UC", price: 33000 },
+                { name: "⚡ 1800 UC", price: 82500 },
+                { name: "⚡ 3850 UC", price: 165000 },
+                { name: "⚡ 8100 UC", price: 330000 }
+            ]
+        };
+
 
         let cart = JSON.parse(localStorage.getItem('sg_cart')) || [];
         let history = JSON.parse(localStorage.getItem('sg_history')) || [];
@@ -697,6 +745,8 @@
                     renderHistory();
                     showToast('تم إرسال الطلب');
                     showSection('history');
+                } else {
+                    showToast('فشل الإرسال، تحقق من الاتصال', 'error');
                 }
             } catch (e) {
                 showToast('خطأ في الإرسال', 'error');
