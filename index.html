@@ -72,6 +72,15 @@
             border: 1px gold solid;
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
+        
+        .SUDAN-RK {
+            background: var(--ramadan-gold);
+            color: var(--ramadan-green);
+            font-weight: 800;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+        }
 
         .add-funds-btn {
             background: var(--ramadan-gold);
@@ -212,8 +221,10 @@
             <div class="horizontal-scroll">
                 <div class="promo-card border-yellow-500">
                     <span class="absolute top-2 left-2 bg-yellow-500 text-emerald-950 text-[10px] font-bold px-2 py-0.5 rounded">عرض رمضان</span>
-                    <h3 class="font-black gold-text">باقة الإفطار</h3>
-                    <p class="text-xs mt-1">خصم 10% على جميع شدات ببجي وقت أذان المغرب!</p>
+                    <h3 class="font-black gold-text">باقة رمضان</h3>
+            <p class="text-xs mt-1">خصم 10% على جميع شدات ببجي خلال شهر رمضان عبر الكود!
+          <span class="SUDAN-RK">SUDAN-RK</span>
+            </p>
                 </div>
             </div>
 
@@ -634,7 +645,7 @@
         // ====== كوبون الخصم ======
         window.applyCoupon = function() {
             const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-            const coupons = { "رمضان10": 0.10, "SUDAN-RK": 0.20, "خصم5": 0.05 };
+            const coupons = { "رمضان10": 0.10, "SUDAN-RK": 0.10, "خصم5": 0.05 };
             if (coupons[code]) {
                 activeDiscount = coupons[code];
                 appliedCoupon = code;
