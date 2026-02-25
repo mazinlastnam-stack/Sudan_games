@@ -3,221 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUDAN GAMES | المنصة الاحترافية</title>
+    <title>SUDAN GAMES | رمضان كريم - متكامل</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: #0f172a; 
-            color: white; 
-            scroll-behavior: smooth; 
-        }
-        
-        .glass { 
-            background: rgba(30, 41, 59, 0.7); 
-            -webkit-backdrop-filter: blur(12px); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255,255,255,0.1); 
-        }
-        
-        .tab-btn.active { 
-            border-bottom: 3px solid #3b82f6; 
-            color: #3b82f6; 
+        :root {
+            --ramadan-green: #064e3b;
+            --ramadan-gold: #fbbf24;
+            --dark-bg: #022c22;
         }
 
-        ::-webkit-scrollbar { height: 4px; width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--dark-bg); 
+            color: white; 
+            background-image: url('https://www.transparenttextures.com/patterns/islamic-art.png');
+        }
         
+        .ramadan-card { 
+            background: rgba(6, 78, 59, 0.8); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid var(--ramadan-gold);
+            border-radius: 20px;
+        }
+
+        .gold-text { color: var(--ramadan-gold); }
+        .gold-border { border-color: var(--ramadan-gold); }
+        .gold-bg { background-color: var(--ramadan-gold); }
+
+        .tab-btn.active { 
+            border-bottom: 3px solid var(--ramadan-gold); 
+            color: var(--ramadan-gold); 
+        }
+
+        /* زخرفة الهلال */
+        .moon-icon {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            opacity: 0.2;
+            font-size: 50px;
+        }
+
         .horizontal-scroll {
-            display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scroll-snap-type: x mandatory;
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 10px;
         }
         
         .promo-card {
-            flex: 0 0 85%; scroll-snap-align: start;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; padding: 15px;
+            flex: 0 0 85%;
+            background: linear-gradient(135deg, #065f46 0%, #022c22 100%);
+            border: 1px solid var(--ramadan-gold);
+            border-radius: 20px; padding: 15px;
+            position: relative;
         }
 
-        .game-card {
-            flex: 0 0 70%; scroll-snap-align: start;
-            position: relative; overflow: hidden; border-radius: 20px;
-            height: 200px; border: 1px solid rgba(255,255,255,0.1);
+        /* المحفظة الرمضانية */
+        .wallet-card {
+            background: linear-gradient(145deg, #064e3b, #022c22);
+            margin: 20px 0;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px gold solid;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
-        .game-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .game-card:hover img { transform: scale(1.1); }
+
+        .add-funds-btn {
+            background: var(--ramadan-gold);
+            color: var(--ramadan-green);
+            font-weight: 800;
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        /* نافذة الدفع والتسجيل */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; z-index: 1000;
+        }
+        .payment-modal, .auth-modal {
+            position: fixed;
+            bottom: -100%; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px;
+            background: #064e3b;
+            border-radius: 30px 30px 0 0;
+            padding: 25px;
+            transition: 0.4s;
+            z-index: 1001;
+            border-top: 3px solid var(--ramadan-gold);
+        }
+        .payment-modal.active, .auth-modal.active { bottom: 0; }
         
-        .game-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 10%, transparent);
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 15px;
+        .close-modal {
+            margin-top: 15px; 
+            width: 100%; 
+            padding: 12px; 
+            background: none; 
+            border: 1px solid var(--ramadan-gold); 
+            color: var(--ramadan-gold); 
+            border-radius: 15px; 
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .faq-item { background: rgba(30, 41, 59, 0.5); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
-        .faq-question { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
-        .faq-answer { padding: 0 15px; max-height: 0; overflow: hidden; transition: all 0.3s ease; opacity: 0; font-size: 13px; color: #94a3b8; }
-        .faq-item.active .faq-answer { padding: 10px 15px 15px; max-height: 200px; opacity: 1; }
-        .faq-item.active i { transform: rotate(180deg); }
-        
-        .toast { 
-            position: fixed; bottom: 20px; right: 20px; background: #1e293b; 
-            border-right: 4px solid #3b82f6; padding: 12px 20px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999; animation: slideIn 0.3s ease;
+        /* تنسيقات إضافية */
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            background: #065f46;
+            border: 1px solid #047857;
+            outline: none;
+            color: white;
+            margin-bottom: 12px;
         }
-        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
+        .input-field:focus {
+            border-color: var(--ramadan-gold);
+        }
         .star-rating {
-            display: flex; flex-direction: row-reverse; justify-content: center; gap: 10px;
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 5px;
         }
         .star-rating input { display: none; }
-        .star-rating label { font-size: 30px; color: #475569; cursor: pointer; transition: color 0.2s; }
+        .star-rating label {
+            font-size: 30px;
+            color: #4b5563;
+            cursor: pointer;
+        }
+        .star-rating input:checked ~ label,
         .star-rating label:hover,
-        .star-rating label:hover ~ label,
-        .star-rating input:checked ~ label { color: #f59e0b; }
+        .star-rating label:hover ~ label {
+            color: var(--ramadan-gold);
+        }
     </style>
 </head>
 <body class="pb-20">
 
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
-
-    <header class="p-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-50 flex justify-between items-center">
-        <h1 class="text-2xl font-black italic text-blue-500">SUDAN GAMES</h1>
-        <div class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 flex items-center gap-1">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> متصل الآن
+    <header class="p-6 bg-emerald-950 border-b border-yellow-600/50 sticky top-0 z-50 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-black gold-text">SUDAN GAMES</h1>
+            <p class="text-[10px] text-emerald-300">رمضان مـبارك 🌙 وكل عام وأنتم بخير</p>
+        </div>
+        <div class="bg-yellow-600/20 p-2 rounded-full border border-yellow-600">
+            <i class="fa-solid fa-mosque gold-text"></i>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-6">
-        
-        <div class="flex justify-around glass rounded-xl p-2 sticky top-20 z-40">
-            <button data-tab="store" class="tab-btn active p-2 font-bold text-sm flex-1">المتجر</button>
-            <button data-tab="cart" class="tab-btn p-2 font-bold text-sm flex-1 relative">
-                السلة <span id="cart-count" class="hidden absolute top-0 right-2 bg-red-500 text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
-            </button>
-            <button data-tab="history" class="tab-btn p-2 font-bold text-sm flex-1">طلباتي</button>
-            <button data-tab="support" class="tab-btn p-2 font-bold text-sm flex-1">عنا</button>
+
+        <!-- بطاقة الحساب (تعرض بيانات المستخدم) -->
+        <section class="ramadan-card p-4 relative overflow-hidden">
+            <i class="fa-solid fa-moon moon-icon gold-text"></i>
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-16 h-16 rounded-full border-2 border-yellow-500 p-1">
+                    <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Sudan+Games&background=fbbf24&color=064e3b" class="rounded-full" alt="المقيم">
+                </div>
+                <div id="user-info-display">
+                    <h3 class="font-bold text-lg gold-text" id="user-name-display">مازن حسن محمد</h3>
+                    <p class="text-xs text-emerald-100">رقم الجوال: <span class="font-bold" id="user-phone-display">0912345678</span></p>
+                    <p class="text-xs text-emerald-100">معرف اللاعب: <span class="font-bold" id="user-playerid-display">8374738336</span></p>
+                    <div class="flex gap-2 mt-1">
+                        <span class="text-[10px] bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700">دعم فني 24/7</span>
+                        <span class="text-[10px] bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700 text-yellow-400">توثيق ذهبي</span>
+                    </div>
+                </div>
+                <div id="guest-buttons" class="hidden flex-1 flex justify-end gap-2">
+                    <button onclick="openAuthModal('login')" class="gold-bg text-emerald-900 px-4 py-2 rounded-xl text-sm font-bold">دخول</button>
+                    <button onclick="openAuthModal('register')" class="border border-gold text-gold px-4 py-2 rounded-xl text-sm font-bold">تسجيل</button>
+                </div>
+                <div id="logout-btn-container" class="flex-1 flex justify-end">
+                    <button onclick="logout()" class="text-xs text-red-300 border border-red-700 px-3 py-1 rounded-full">تسجيل خروج</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- نافذة الدفع (وسائل الدفع) -->
+        <div class="wallet-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs gold-text">رمضانك علينا مع </p>
+                    <h2 class="text-3xl font-black"> Sudan games</h2>
+                </div>
+                <button onclick="openPaymentModal()" class="add-funds-btn shadow-lg"> وسائل دفع</button>
+            </div>
+            <div class="mt-4 flex gap-4 text-[10px] text-emerald-200 border-t border-emerald-800 pt-3">
+                <span><i class="fa-solid fa-bolt gold-text"></i> شحن فوري</span>
+                <span><i class="fa-solid fa-shield-halved gold-text"></i> آمن 100%</span>
+            </div>
         </div>
 
+        <!-- تبويبات التنقل داخل الصفحة (4 أقسام) -->
+        <div class="flex justify-around ramadan-card p-2 sticky top-24 z-40">
+            <button data-tab="store" class="tab-btn active p-2 font-bold text-sm flex-1" onclick="showSection('store')">الخيمة</button>
+            <button data-tab="cart" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('cart')">السلة</button>
+            <button data-tab="history" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('history')">الطلبات</button>
+            <button data-tab="about" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('about')">عنا</button>
+        </div>
+
+        <!-- قسم الخيمة (المتجر) -->
         <section id="store" class="section-content space-y-6">
             <div class="horizontal-scroll">
-                <div class="promo-card">
-                    <i class="fab fa-whatsapp text-green-400 text-2xl mb-2"></i>
-                    <h3 class="font-bold text-blue-400">قناة الواتساب</h3>
-                    <p class="text-xs text-slate-400 mt-1">تابع العروض الشهرية والمسابقات وجوائز الـ ID.</p>
-                </div>
-                <div class="promo-card">
-                    <i class="fas fa-bolt text-yellow-400 text-2xl mb-2"></i>
-                    <h3 class="font-bold text-blue-400">سرعة خرافية</h3>
-                    <p class="text-xs text-slate-400 mt-1">شحن جواهر فري فاير و UC ببجي خلال 15 دقيقة.</p>
+                <div class="promo-card border-yellow-500">
+                    <span class="absolute top-2 left-2 bg-yellow-500 text-emerald-950 text-[10px] font-bold px-2 py-0.5 rounded">عرض رمضان</span>
+                    <h3 class="font-black gold-text">باقة الإفطار</h3>
+                    <p class="text-xs mt-1">خصم 10% على جميع شدات ببجي وقت أذان المغرب!</p>
                 </div>
             </div>
 
-            <div class="glass p-6 rounded-3xl space-y-4 border-t-2 border-blue-500 shadow-xl">
-                <h2 class="text-lg font-bold pr-2 border-r-4 border-blue-500">طلب شحن جديد</h2>
+            <div class="ramadan-card p-6 space-y-4 shadow-2xl">
+                <h2 class="text-lg font-bold border-r-4 border-yellow-500 pr-3">نموذج الشحن السريع</h2>
+                <input type="text" id="player_id" placeholder="ID اللاعب" class="w-full p-4 rounded-xl bg-emerald-900/50 border border-emerald-700 outline-none focus:border-yellow-500 text-white placeholder:text-emerald-400">
+                <input type="tel" id="phone" placeholder="رقم واتساب" class="w-full p-4 rounded-xl bg-emerald-900/50 border border-emerald-700 outline-none focus:border-yellow-500 text-white placeholder:text-emerald-400">
                 
-                <div class="relative">
-                    <input type="text" id="player_id" placeholder="ID اللاعب (أرقام فقط)" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-white">
-                    <button class="clear-field absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-700 px-2 py-1 rounded" data-target="player_id">مسح</button>
-                </div>
-
-                <div class="relative">
-                    <input type="tel" id="phone" placeholder="رقم واتساب (249...)" class="w-full p-4 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-left" dir="ltr">
-                    <button class="clear-field absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs bg-slate-700 px-2 py-1 rounded" data-target="phone">مسح</button>
-                </div>
-
                 <div class="grid grid-cols-2 gap-2">
-                    <select id="game" class="p-4 rounded-xl bg-slate-800 text-sm outline-none cursor-pointer">
-                        <option value="" disabled selected>اختر اللعبة</option>
-                        <option value="Free Fire">Free Fire</option>
-                        <option value="PUBG Mobile">PUBG Mobile</option>
+                    <select id="game" class="p-4 rounded-xl bg-emerald-900 border border-emerald-700 text-sm">
+                        <option value="" disabled selected>اللعبة</option>
+                        <option value="Free Fire">فري فاير</option>
+                        <option value="PUBG Mobile">ببجي</option>
                     </select>
-                    <select id="pack" class="p-4 rounded-xl bg-slate-800 text-sm outline-none cursor-pointer">
+                    <select id="pack" class="p-4 rounded-xl bg-emerald-900 border border-emerald-700 text-sm">
                         <option value="">الباقة</option>
                     </select>
                 </div>
 
-                <button id="add-to-cart-btn" class="w-full py-4 bg-blue-600 rounded-xl font-bold hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-900/20">
-                    <i class="fas fa-cart-plus ml-2"></i> إضافة للسلة
+                <button id="add-to-cart-btn" class="w-full py-4 gold-bg text-emerald-950 rounded-xl font-black text-lg hover:brightness-110 active:scale-95 transition-all">
+                    إضافة إلى السلة 🌙
                 </button>
-            </div>
-
-            <div class="space-y-4">
-                <h2 class="text-lg font-bold pr-2 border-r-4 border-blue-500">الألعاب المتوفرة</h2>
-                <div class="horizontal-scroll">
-                    <div class="game-card">
-                        <img src="Free Fire.jpg" alt="Free Fire" loading="lazy">
-                        <div class="game-overlay">
-                            <span class="bg-blue-600 text-[10px] w-fit px-2 py-1 rounded mb-1">متوفر الآن</span>
-                            <h3 class="font-bold text-white">فـري فـاير</h3>
-                            <p class="text-[10px] text-slate-300">شحن فوري عبر المعرف ID</p>
-                        </div>
-                    </div>
-                    <div class="game-card">
-                        <img src="PUBG.jpg" alt="PUBG" loading="lazy">
-                        <div class="game-overlay">
-                            <span class="bg-blue-600 text-[10px] w-fit px-2 py-1 rounded mb-1">متوفر الآن</span>
-                            <h3 class="font-bold text-white">ببـجي موبايل</h3>
-                            <p class="text-[10px] text-slate-300">أرخص سعر للشدات في السودان</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
+        <!-- قسم السلة (مع كوبون خصم) -->
         <section id="cart" class="section-content hidden space-y-4">
-            <h2 class="text-lg font-bold">🛒 سلة المشتريات</h2>
             <div id="cart-items" class="space-y-3"></div>
-            
-            <div class="glass p-4 rounded-2xl space-y-3 border border-blue-500/30">
-                <p class="text-xs text-slate-400">هل لديك كود خصم؟</p>
+            <div class="ramadan-card p-4 space-y-3">
+                <p class="text-xs gold-text">هل لديك كود خصم؟</p>
                 <div class="flex gap-2">
-                    <input type="text" id="coupon-input" placeholder="أدخل الكود هنا" class="flex-1 p-2 rounded-lg bg-slate-800 border-none text-sm outline-none focus:ring-1 focus:ring-blue-500">
-                    <button onclick="applyCoupon()" class="bg-blue-600 px-4 py-2 rounded-lg text-sm font-bold">تطبيق</button>
+                    <input type="text" id="coupon-input" placeholder="أدخل الكود" class="flex-1 p-2 rounded-lg bg-emerald-900 border border-emerald-700 text-sm outline-none focus:border-yellow-500 text-white">
+                    <button onclick="applyCoupon()" class="gold-bg text-emerald-950 px-4 py-2 rounded-lg font-bold">تطبيق</button>
                 </div>
-                <div id="coupon-msg" class="text-[10px] hidden"></div>
+                <div id="coupon-msg" class="text-[10px] text-yellow-300 hidden"></div>
             </div>
-
-            <div class="glass p-6 rounded-3xl space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-lg">الإجمالي:</span>
-                    <div class="text-left text-right">
-                        <span id="old-price" class="text-slate-500 line-through text-sm hidden"></span>
-                        <span class="text-green-400 font-bold text-xl block" id="total-price">0 SDG</span>
-                    </div>
-                </div>
-                <button id="checkout-btn" class="w-full py-4 bg-sky-600 rounded-xl font-bold shadow-lg shadow-sky-900/20">
-                    <i class="fab fa-telegram-plane ml-2"></i> إتمام وإرسال الطلب عبر تليجرام
-                </button>
-                <button id="clear-cart-btn" class="w-full py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">تفريغ السلة</button>
+            <div class="ramadan-card p-6 text-center">
+                <p class="gold-text">الإجمالي</p>
+                <h3 id="total-price" class="text-3xl font-black">0 SDG</h3>
+                <h3 id="discounted-price" class="text-xl gold-text hidden"></h3>
+                <button id="checkout-btn" class="w-full mt-4 py-4 gold-bg text-emerald-950 rounded-xl font-bold">تأكيد الطلب عبر تليجرام</button>
+                <button id="clear-cart-btn" class="w-full mt-2 py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">تفريغ السلة</button>
             </div>
         </section>
 
+        <!-- قسم سجل الطلبات -->
         <section id="history" class="section-content hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-bold">📋 سجل الطلبات</h2>
+                <h2 class="text-lg font-bold gold-text">📋 سجل الطلبات</h2>
                 <button id="clear-history-btn" class="text-[10px] text-red-400 bg-red-400/10 px-2 py-1 rounded">مسح السجل</button>
             </div>
             <div id="history-list" class="space-y-3"></div>
         </section>
 
-        <section id="support" class="section-content hidden space-y-6">
-            <div class="glass p-6 rounded-3xl space-y-3 border-r-4 border-blue-500">
-                <h2 class="text-lg font-bold">📖 من نحن</h2>
-                <p class="text-sm text-slate-300 leading-relaxed">
-                    نحن منصة <b>SUDAN GAMES</b>، الوجهة الأولى والآمنة للاعبين في السودان. نسعى لتوفير خدمات شحن الألعاب بأسرع وقت وأفضل سعر.
+        <!-- قسم عنا + التقييم -->
+        <section id="about" class="section-content hidden space-y-6">
+            <div class="ramadan-card p-6">
+                <h2 class="text-lg font-bold gold-text">📖 من نحن</h2>
+                <p class="text-sm text-emerald-200 mt-2 leading-relaxed">
+                    <b>SUDAN GAMES</b> منصة سودانية متخصصة في شحن الألعاب الإلكترونية (فري فاير، ببجي) بأسرع وقت وأفضل سعر. 
+                    نعمل على مدار الساعة لتلبية طلباتكم. رمضان كريم 🌙
                 </p>
             </div>
 
-            <div class="glass p-6 rounded-3xl space-y-4">
-                <div class="space-y-3 mt-6">
-                    <h3 class="text-md font-bold pr-2 border-r-4 border-yellow-500">آخر التقييمات</h3>
-                    <div id="reviews-container" class="space-y-3"></div>
-                </div>
-                
-                <h2 class="text-lg font-bold text-center">⭐ قيم تجربتك معنا</h2>
+            <!-- آخر التقييمات -->
+            <div class="ramadan-card p-6">
+                <h3 class="text-md font-bold gold-text border-r-4 border-yellow-500 pr-2">آخر التقييمات</h3>
+                <div id="reviews-container" class="space-y-3 mt-4"></div>
+            </div>
+
+            <!-- إضافة تقييم جديد -->
+            <div class="ramadan-card p-6">
+                <h3 class="text-md font-bold gold-text text-center mb-4">⭐ قيم تجربتك</h3>
                 <div class="star-rating">
                     <input type="radio" name="star" id="star5" value="5"><label for="star5">★</label>
                     <input type="radio" name="star" id="star4" value="4"><label for="star4">★</label>
@@ -225,118 +294,252 @@
                     <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
                     <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
                 </div>
-                <textarea id="rating-comment" placeholder="أضف تعليقك هنا..." class="w-full p-3 rounded-xl bg-slate-800 border-none outline-none text-sm h-20"></textarea>
-                <button id="send-rating-btn" class="w-full py-3 bg-yellow-600 rounded-xl font-bold text-sm">إرسال التقييم عبر تليجرام</button>
-            </div>
-
-            <div class="glass p-6 rounded-3xl text-center space-y-3">
-                <h2 class="text-lg font-bold mb-4">الدعم الفني</h2>
-                <a href="https://wa.me/249115169965" class="flex items-center justify-center gap-3 w-full py-3 bg-green-600 rounded-xl font-bold">
-                    <i class="fab fa-whatsapp"></i> واتساب
-                </a>
-                <a href="https://t.me/+fqjerf_uowxkZTRk" class="flex items-center justify-center gap-3 w-full py-3 bg-sky-600 rounded-xl font-bold">
-                    <i class="fab fa-telegram"></i> تيليجرام
-                </a>
+                <textarea id="review-comment" placeholder="أضف تعليقك هنا..." class="w-full p-3 rounded-xl bg-emerald-900 border border-emerald-700 outline-none focus:border-yellow-500 text-sm h-20 mt-4"></textarea>
+                <button id="send-review-btn" class="w-full mt-3 py-3 gold-bg text-emerald-950 rounded-xl font-bold text-sm">إرسال التقييم عبر تليجرام</button>
             </div>
         </section>
     </main>
 
-    <script>
-        const _0x4f = ["ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ==", "ODQ5NjUyNTYxOQ=="];
-        const getT = () => atob(_0x4f[0]);
-        const getC = () => atob(_0x4f[1]);
+    <!-- ===== نافذة الدفع المنبثقة ===== -->
+    <div class="modal-overlay" id="overlay" onclick="closeAllModals()"></div>
+    <div class="payment-modal" id="paymentModal">
+        <div class="w-12 h-1 bg-emerald-800 rounded-full mx-auto mb-6"></div>
+        <h3 class="text-center gold-text font-black text-xl mb-6">إيداع رصيد (رمضان)</h3>
+        
+        <div class="space-y-4">
+            <div class="flex items-center justify-between bg-emerald-900/50 p-4 rounded-2xl border border-yellow-600/30" onclick="copyNum('4719082')">
+                <div class="flex items-center gap-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Bank_of_Khartoum_logo.svg/1024px-Bank_of_Khartoum_logo.svg.png" class="w-10 h-10 rounded-lg bg-white" alt="بنكك">
+                    <div>
+                        <p class="font-bold">بنك الخرطوم</p>
+                        <p class="text-xs text-emerald-300">مازن حسن محمد</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-mono gold-text">4719082</p>
+                    <span class="text-[10px] opacity-50">اضغط للنسخ</span>
+                </div>
+            </div>
 
+            <div class="flex items-center justify-between bg-emerald-900/50 p-4 rounded-2xl border border-yellow-600/30" onclick="copyNum('1469979')">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center font-black text-emerald-900">O</div>
+                    <div>
+                        <p class="font-bold">أووكاش - O Cash</p>
+                        <p class="text-xs text-emerald-300">مازن حسن محمد</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-mono gold-text">1469979</p>
+                    <span class="text-[10px] opacity-50">اضغط للنسخ</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-[10px] text-center mt-6 text-emerald-200">بعد التحويل، يرجى إرسال الإشعار لخدمة العملاء لتفعيل الرصيد.</p>
+        <button onclick="closePaymentModal()" class="close-modal">إغلاق النافذة</button>
+    </div>
+
+    <!-- ===== نافذة التسجيل / تسجيل الدخول ===== -->
+    <div class="auth-modal" id="authModal">
+        <div class="w-12 h-1 bg-emerald-800 rounded-full mx-auto mb-4"></div>
+        <h3 class="text-center gold-text font-black text-xl mb-4" id="auth-title">إنشاء حساب جديد</h3>
+        <div id="login-fields">
+            <input type="text" id="login-username" placeholder="اسم المستخدم" class="input-field">
+            <input type="password" id="login-password" placeholder="كلمة المرور" class="input-field">
+            <button onclick="performLogin()" class="w-full gold-bg text-emerald-950 py-4 rounded-xl font-bold mb-2">تسجيل الدخول</button>
+        </div>
+        <div id="register-fields" class="hidden">
+            <input type="text" id="reg-name" placeholder="الاسم الكامل" class="input-field">
+            <input type="tel" id="reg-phone" placeholder="رقم الجوال (249...)" class="input-field">
+            <input type="text" id="reg-playerid" placeholder="معرف اللاعب (اختياري)" class="input-field">
+            <input type="password" id="reg-password" placeholder="كلمة المرور" class="input-field">
+            <button onclick="performRegister()" class="w-full gold-bg text-emerald-950 py-4 rounded-xl font-bold mb-2">تسجيل جديد</button>
+        </div>
+        <div class="text-center text-sm text-emerald-300 mb-3">
+            <span id="toggle-auth-text">لديك حساب؟ <button onclick="toggleAuthModal()" class="gold-text underline">تسجيل الدخول</button></span>
+        </div>
+        <button onclick="closeAuthModal()" class="close-modal">إلغاء</button>
+    </div>
+
+    <script>
+        // ====== إدارة المستخدمين (تسجيل/دخول/تخزين) ======
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        const userInfoDisplay = document.getElementById('user-info-display');
+        const guestButtons = document.getElementById('guest-buttons');
+        const logoutBtnContainer = document.getElementById('logout-btn-container');
+        const userNameSpan = document.getElementById('user-name-display');
+        const userPhoneSpan = document.getElementById('user-phone-display');
+        const userPlayerIdSpan = document.getElementById('user-playerid-display');
+
+        function updateUIBasedOnAuth() {
+            if (currentUser) {
+                userInfoDisplay.classList.remove('hidden');
+                guestButtons.classList.add('hidden');
+                logoutBtnContainer.classList.remove('hidden');
+                userNameSpan.textContent = currentUser.name || 'مستخدم';
+                userPhoneSpan.textContent = currentUser.phone || 'غير محدد';
+                userPlayerIdSpan.textContent = currentUser.playerId || 'غير محدد';
+                // تعبئة حقول الشحن تلقائياً إذا كانت موجودة
+                document.getElementById('phone').value = currentUser.phone || '';
+                document.getElementById('player_id').value = currentUser.playerId || '';
+            } else {
+                userInfoDisplay.classList.add('hidden');
+                guestButtons.classList.remove('hidden');
+                logoutBtnContainer.classList.add('hidden');
+                // إفراغ الحقول
+                document.getElementById('phone').value = '';
+                document.getElementById('player_id').value = '';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            updateUIBasedOnAuth();
+            closeAllModals();
+            showToast('تم تسجيل الخروج');
+        }
+
+        let authMode = 'register';
+        function openAuthModal(mode) {
+            authMode = mode;
+            const modal = document.getElementById('authModal');
+            document.getElementById('overlay').style.display = 'block';
+            modal.classList.add('active');
+
+            if (mode === 'login') {
+                document.getElementById('auth-title').textContent = 'تسجيل الدخول';
+                document.getElementById('login-fields').classList.remove('hidden');
+                document.getElementById('register-fields').classList.add('hidden');
+                document.getElementById('toggle-auth-text').innerHTML = 'ليس لديك حساب؟ <button onclick="toggleAuthModal()" class="gold-text underline">إنشاء حساب</button>';
+            } else {
+                document.getElementById('auth-title').textContent = 'إنشاء حساب جديد';
+                document.getElementById('login-fields').classList.add('hidden');
+                document.getElementById('register-fields').classList.remove('hidden');
+                document.getElementById('toggle-auth-text').innerHTML = 'لديك حساب؟ <button onclick="toggleAuthModal()" class="gold-text underline">تسجيل الدخول</button>';
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function toggleAuthModal() {
+            if (authMode === 'register') openAuthModal('login');
+            else openAuthModal('register');
+        }
+
+        function performRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const playerId = document.getElementById('reg-playerid').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+
+            if (!name || !phone || !password) {
+                alert('الرجاء ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.find(u => u.name === name)) {
+                alert('اسم المستخدم موجود مسبقاً');
+                return;
+            }
+
+            const newUser = { name, phone, playerId: playerId || 'غير محدد', password };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = { name, phone, playerId: newUser.playerId };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUIBasedOnAuth();
+            closeAuthModal();
+            showToast('تم إنشاء الحساب بنجاح');
+        }
+
+        function performLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.name === username && u.password === password);
+            if (!user) {
+                alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+                return;
+            }
+
+            currentUser = { name: user.name, phone: user.phone, playerId: user.playerId };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUIBasedOnAuth();
+            closeAuthModal();
+            showToast('مرحباً بعودتك');
+        }
+
+        // ====== دوال النسخ والنوافذ ======
+        function copyNum(num) {
+            navigator.clipboard.writeText(num).then(() => showToast('تم النسخ'));
+        }
+
+        function openPaymentModal() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function closeAllModals() {
+            document.getElementById('paymentModal').classList.remove('active');
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // ====== منطق المنتجات والسلة ======
         const packsData = {
             "Free Fire": [
-                { name: "💎 50 جواهر", price: 1800 },
                 { name: "💎 110 جواهر", price: 3500 },
                 { name: "💎 231 جواهر", price: 7000 },
-                { name: "💎 583 جواهر", price: 17500 }, 
-                { name: "💎 1180 جواهر", price: 35000 }, 
-                { name: "💎 2420 جواهر", price: 86000 }, 
-                { name: "💎 5600 جواهر", price: 214000 }, 
-                { name: "الباقة الاسبوعية", price: 9000 }, 
-                { name: "الباقة الشهرية", price: 43000 }
+                { name: "الباقة الاسبوعية", price: 9000 }
             ],
             "PUBG Mobile": [
                 { name: "⚡ 60 UC", price: 3300 }, 
-                { name: "⚡ 325 UC", price: 16500 }, 
-                { name: "⚡ 660 UC", price: 33000 },
-                { name: "⚡ 1800 UC", price: 82500 }, 
-                { name: "⚡ 3850 UC", price: 165000 },
-                { name: "⚡ 8100 UC", price: 330000 }
+                { name: "⚡ 325 UC", price: 16500 }
             ]
         };
 
-        let cart = JSON.parse(localStorage.getItem('sg_cart') || '[]');
-        let history = JSON.parse(localStorage.getItem('sg_history') || '[]');
-        
-        // متغيرات نظام الخصم
+        let cart = JSON.parse(localStorage.getItem('sg_cart')) || [];
+        let history = JSON.parse(localStorage.getItem('sg_history')) || [];
         let activeDiscount = 0;
-        let appliedCoupon = "";
+        let appliedCoupon = '';
 
-        const cartCount = document.getElementById('cart-count');
-        const cartItemsDiv = document.getElementById('cart-items');
-        const totalPriceSpan = document.getElementById('total-price');
-        const oldPriceSpan = document.getElementById('old-price');
-        const historyListDiv = document.getElementById('history-list');
         const gameSelect = document.getElementById('game');
         const packSelect = document.getElementById('pack');
+        const cartItemsDiv = document.getElementById('cart-items');
+        const totalPriceSpan = document.getElementById('total-price');
+        const discountedPriceSpan = document.getElementById('discounted-price');
+        const couponMsg = document.getElementById('coupon-msg');
 
-        function init() {
-            updatePacks();
-            updateCartUI();
-            renderHistory();
-            loadReviews();
-            attachEvents();
-        }
-
-        function attachEvents() {
-            document.querySelectorAll('[data-tab]').forEach(btn => {
-                btn.addEventListener('click', () => showSection(btn.dataset.tab));
-            });
-
-            gameSelect.addEventListener('change', updatePacks);
-
-            document.querySelectorAll('.clear-field').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.getElementById(btn.dataset.target).value = '';
-                });
-            });
-
-            document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
-            document.getElementById('checkout-btn').addEventListener('click', checkout);
-            document.getElementById('send-rating-btn').addEventListener('click', sendRating);
-
-            document.getElementById('clear-history-btn').addEventListener('click', () => {
-                if(confirm('مسح السجل؟')){
-                    history = [];
-                    localStorage.setItem('sg_history', '[]');
-                    renderHistory();
-                }
-            });
-
-            document.getElementById('clear-cart-btn').addEventListener('click', () => {
-                cart = [];
-                activeDiscount = 0;
-                appliedCoupon = "";
-                updateCartUI();
-                showToast('تم تفريغ السلة');
-            });
-        }
+        gameSelect.addEventListener('change', updatePacks);
 
         function updatePacks() {
             const game = gameSelect.value;
-            packSelect.innerHTML = '<option value="" disabled selected>الباقة</option>';
-            if(packsData[game]) {
+            packSelect.innerHTML = '<option value="">الباقة</option>';
+            if (packsData[game]) {
                 packsData[game].forEach((p, idx) => {
-                    const opt = document.createElement('option');
-                    opt.value = idx;
-                    opt.textContent = `${p.name} - ${p.price} SDG`;
-                    packSelect.appendChild(opt);
+                    packSelect.innerHTML += `<option value="${idx}">${p.name} - ${p.price} SDG</option>`;
                 });
             }
         }
+
+        document.getElementById('add-to-cart-btn').addEventListener('click', addToCart);
+        document.getElementById('checkout-btn').addEventListener('click', checkout);
+        document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
+        document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+        document.getElementById('send-review-btn').addEventListener('click', sendReview);
 
         function addToCart() {
             const id = document.getElementById('player_id').value.trim();
@@ -344,7 +547,7 @@
             const game = gameSelect.value;
             const pIdx = packSelect.value;
 
-            if(!id || !phone || !game || pIdx === "") {
+            if (!id || !phone || !game || pIdx === "") {
                 showToast('يرجى ملء جميع الحقول', 'error');
                 return;
             }
@@ -360,75 +563,34 @@
             showToast('تمت الإضافة للسلة');
         }
 
-        // دالة تطبيق الكوبون
-        window.applyCoupon = function() {
-            const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-            const msg = document.getElementById('coupon-msg');
-            
-            if (cart.length === 0) {
-                showToast('السلة فارغة!', 'error');
-                return;
-            }
-
-            // تعريف الكوبونات هنا
-            const coupons = {
-                "SUDAN-AB": 0.20,   // خصم 10% لـ عبدالعزيز
-                "SUDAN-.~": 0.10   // خصم 5%
-            };
-
-            if (coupons[code]) {
-                activeDiscount = coupons[code];
-                appliedCoupon = code;
-                msg.textContent = `تم تطبيق خصم ${coupons[code] * 100}% بنجاح!`;
-                msg.className = "text-[10px] text-green-400";
-                msg.classList.remove('hidden');
-                updateCartUI(); 
-                showToast('تم تطبيق الكود');
-            } else {
-                activeDiscount = 0;
-                appliedCoupon = "";
-                msg.textContent = "كود الخصم غير صحيح";
-                msg.className = "text-[10px] text-red-400";
-                msg.classList.remove('hidden');
-                updateCartUI();
-                showToast('الكود غير صالح', 'error');
-            }
-        }
-
         function updateCartUI() {
             if (cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p class="text-center py-10 opacity-50">السلة فارغة</p>';
+                cartItemsDiv.innerHTML = '<p class="text-center py-10 opacity-50 text-yellow-200">السلة فارغة</p>';
                 totalPriceSpan.textContent = '0 SDG';
-                oldPriceSpan.classList.add('hidden');
-                cartCount.classList.add('hidden');
+                discountedPriceSpan.classList.add('hidden');
+                couponMsg.classList.add('hidden');
                 activeDiscount = 0;
-                appliedCoupon = "";
-                if(document.getElementById('coupon-msg')) document.getElementById('coupon-msg').classList.add('hidden');
+                appliedCoupon = '';
             } else {
                 cartItemsDiv.innerHTML = cart.map((item, idx) => `
-                    <div class="glass p-4 rounded-2xl flex justify-between items-center">
+                    <div class="ramadan-card p-4 flex justify-between items-center">
                         <div>
-                            <p class="font-bold text-sm text-blue-400">${item.game}</p>
+                            <p class="font-bold text-sm gold-text">${item.game}</p>
                             <p class="text-xs">${item.pack} - ID: ${item.id}</p>
                         </div>
-                        <button onclick="removeItem(${idx})" class="text-red-500"><i class="fas fa-trash"></i></button>
+                        <button onclick="removeItem(${idx})" class="text-red-400"><i class="fas fa-trash"></i></button>
                     </div>
                 `).join('');
                 
                 const originalSum = cart.reduce((acc, item) => acc + item.price, 0);
-                
+                totalPriceSpan.textContent = originalSum.toLocaleString() + ' SDG';
                 if (activeDiscount > 0) {
-                    const discountedSum = originalSum - (originalSum * activeDiscount);
-                    totalPriceSpan.textContent = discountedSum.toLocaleString() + ' SDG';
-                    oldPriceSpan.textContent = originalSum.toLocaleString() + ' SDG';
-                    oldPriceSpan.classList.remove('hidden');
+                    const discounted = originalSum * (1 - activeDiscount);
+                    discountedPriceSpan.textContent = 'بعد الخصم: ' + discounted.toLocaleString() + ' SDG';
+                    discountedPriceSpan.classList.remove('hidden');
                 } else {
-                    totalPriceSpan.textContent = originalSum.toLocaleString() + ' SDG';
-                    oldPriceSpan.classList.add('hidden');
+                    discountedPriceSpan.classList.add('hidden');
                 }
-
-                cartCount.textContent = cart.length;
-                cartCount.classList.remove('hidden');
             }
             localStorage.setItem('sg_cart', JSON.stringify(cart));
         }
@@ -438,139 +600,178 @@
             updateCartUI();
         };
 
-        function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden');
-            document.querySelector(`[data-tab="${id}"]`).classList.add('active');
+        function clearCart() {
+            cart = [];
+            activeDiscount = 0;
+            appliedCoupon = '';
+            updateCartUI();
+            showToast('تم تفريغ السلة');
         }
 
-        function showToast(msg, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type === 'error' ? 'border-red-500' : 'border-green-500'}`;
-            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-check-circle'} ml-2"></i> ${msg}`;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        function clearHistory() {
+            if (confirm('مسح سجل الطلبات؟')) {
+                history = [];
+                localStorage.setItem('sg_history', '[]');
+                renderHistory();
+                showToast('تم مسح السجل');
+            }
         }
 
         function renderHistory() {
+            const historyListDiv = document.getElementById('history-list');
             if (history.length === 0) {
                 historyListDiv.innerHTML = '<p class="text-center py-10 opacity-50">لا يوجد طلبات سابقة</p>';
             } else {
                 historyListDiv.innerHTML = history.map(item => `
-                    <div class="glass p-3 rounded-xl border-r-2 border-blue-500">
-                        <p class="text-sm font-bold">${item.game} - ${item.pack}</p>
-                        <p class="text-[10px] opacity-50">${item.timestamp} | ID: ${item.id}</p>
+                    <div class="ramadan-card p-3 rounded-xl border-r-2 border-yellow-500">
+                        <p class="text-sm font-bold gold-text">${item.game} - ${item.pack}</p>
+                        <p class="text-[10px] opacity-70">${item.timestamp} | ID: ${item.id}</p>
                     </div>
                 `).join('');
             }
         }
 
-        function loadReviews() {
-            const reviews = JSON.parse(localStorage.getItem('sg_reviews') || '[]');
-            const container = document.getElementById('reviews-container');
-            if (reviews.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-500 text-center">لا توجد تقييمات بعد.</p>';
-                return;
+        // ====== كوبون الخصم ======
+        window.applyCoupon = function() {
+            const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+            const coupons = { "رمضان10": 0.10, "SUDAN-RK": 0.20, "خصم5": 0.05 };
+            if (coupons[code]) {
+                activeDiscount = coupons[code];
+                appliedCoupon = code;
+                couponMsg.textContent = `تم تطبيق خصم ${activeDiscount*100}%`;
+                couponMsg.classList.remove('hidden');
+                updateCartUI();
+                showToast('تم تطبيق الخصم');
+            } else {
+                couponMsg.textContent = 'كود غير صالح';
+                couponMsg.classList.remove('hidden');
+                activeDiscount = 0;
+                updateCartUI();
             }
-            container.innerHTML = reviews.map(rev => `
-                <div class="glass p-3 rounded-xl border-b border-yellow-500/20">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-yellow-400 text-xs">${"★".repeat(rev.stars)}</span>
-                        <span class="text-[10px] text-slate-500">${rev.date}</span>
-                    </div>
-                    <p class="text-sm text-slate-200">${rev.comment}</p>
-                </div>
-            `).join('');
-        }
+        };
 
-        async function sendRating() {
-            const starInput = document.querySelector('input[name="star"]:checked');
-            const commentInput = document.getElementById('rating-comment');
-            if(!starInput) { showToast('اختر النجوم أولاً', 'error'); return; }
-
-            const stars = starInput.value;
-            const comment = commentInput.value.trim() || "بدون تعليق";
-            const dateNow = new Date().toLocaleDateString('ar-EG');
-            
-            const btn = document.getElementById('send-rating-btn');
-            btn.disabled = true;
-            btn.innerHTML = "جاري الإرسال للتليجرام...";
-
-            const telegramMsg = `🌟 *تقييم جديد*\n\nالتقييم: ${"⭐".repeat(stars)}\nالتعليق: ${comment}`;
-
-            try {
-                await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: getC(), text: telegramMsg, parse_mode: 'Markdown' })
-                });
-
-                const reviews = JSON.parse(localStorage.getItem('sg_reviews') || '[]');
-                reviews.unshift({ stars, comment, date: dateNow });
-                localStorage.setItem('sg_reviews', JSON.stringify(reviews.slice(0, 5)));
-                loadReviews();
-                commentInput.value = '';
-                showToast('شكراً لتقييمك!');
-            } catch (e) {
-                showToast('خطأ في الإرسال', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "إرسال التقييم عبر تليجرام";
-            }
-        }
-
+        // ====== إرسال الطلب (checkout) مع بيانات المستخدم ======
         async function checkout() {
             if (cart.length === 0) return;
             const btn = document.getElementById('checkout-btn');
-            const finalTotal = totalPriceSpan.textContent;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال للتليجرام...';
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال...';
 
-            let msg = `🎮 *طلب شحن جديد - SUDAN GAMES*\n`;
-            msg += `━━━━━━━━━━━━━━\n`;
-            cart.forEach((item, i) => {
-                msg += `📦 *الطلب (${i+1}):* ${item.game}\n`;
-                msg += `💎 *الباقة:* ${item.pack}\n`;
-                msg += `🆔 *الـ ID:* \`${item.id}\`\n`;
-                msg += `📱 *واتساب:* ${item.phone}\n`;
-                msg += `━━━━━━━━━━━━━━\n`;
-            });
-
-            if (appliedCoupon) {
-                msg += `🎟️ *كود الخصم:* ${appliedCoupon}\n`;
+            let msg = `🎮 *طلب شحن جديد - SUDAN GAMES (رمضان)*\n`;
+            if (currentUser) {
+                msg += `👤 المستخدم: ${currentUser.name}\n📱 جوال: ${currentUser.phone}\n`;
             }
-
-            msg += `💰 *الإجمالي النهائي:* ${finalTotal}\n`;
+            cart.forEach((item, i) => {
+                msg += `━━━━━━━━\n📦 الطلب ${i+1}: ${item.game} - ${item.pack}\n🆔 ID: \`${item.id}\`\n📱 واتساب: ${item.phone}\n`;
+            });
+            if (appliedCoupon) msg += `🎟️ كود الخصم: ${appliedCoupon}\n`;
+            const finalTotal = cart.reduce((acc, item) => acc + item.price, 0) * (1 - activeDiscount);
+            msg += `💰 *الإجمالي:* ${finalTotal.toLocaleString()} SDG\n`;
 
             try {
-                const res = await fetch(`https://api.telegram.org/bot${getT()}/sendMessage`, {
+                const token = "ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ=="; // مثال
+                const chatId = "ODQ5NjUyNTYxOQ==";
+                const res = await fetch(`https://api.telegram.org/bot${atob(token)}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: getC(), text: msg, parse_mode: 'Markdown' })
+                    body: JSON.stringify({ chat_id: atob(chatId), text: msg, parse_mode: 'Markdown' })
                 });
-
                 if (res.ok) {
                     history.unshift(...cart);
                     localStorage.setItem('sg_history', JSON.stringify(history));
                     cart = [];
                     activeDiscount = 0;
-                    appliedCoupon = "";
-                    document.getElementById('coupon-input').value = "";
+                    appliedCoupon = '';
                     updateCartUI();
                     renderHistory();
-                    showToast('تم إرسال طلبك بنجاح ✅');
+                    showToast('تم إرسال الطلب');
                     showSection('history');
                 }
             } catch (e) {
-                showToast('خطأ في الاتصال', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fab fa-telegram-plane ml-2"></i> إتمام وإرسال الطلب عبر تليجرام';
+                showToast('خطأ في الإرسال', 'error');
             }
+            btn.disabled = false;
+            btn.innerHTML = 'تأكيد الطلب عبر تليجرام';
         }
 
-        window.onload = init;
+        // ====== التقييمات ======
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem('sg_reviews')) || [];
+            const container = document.getElementById('reviews-container');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-xs text-emerald-500">لا توجد تقييمات بعد.</p>';
+                return;
+            }
+            container.innerHTML = reviews.map(r => `
+                <div class="bg-emerald-900/30 p-3 rounded-xl border border-yellow-500/30">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-yellow-400 text-xs">${"★".repeat(r.stars)}</span>
+                        <span class="text-[10px] text-emerald-400">${r.date}</span>
+                    </div>
+                    <p class="text-sm">${r.comment}</p>
+                    <p class="text-[10px] text-emerald-300 mt-1">- ${r.reviewer}</p>
+                </div>
+            `).join('');
+        }
+
+        async function sendReview() {
+            const starInput = document.querySelector('input[name="star"]:checked');
+            const comment = document.getElementById('review-comment').value.trim();
+            if (!starInput) { showToast('اختر التقييم بالنجوم', 'error'); return; }
+            const stars = starInput.value;
+            const dateNow = new Date().toLocaleDateString('ar-EG');
+            const reviewer = currentUser ? currentUser.name + (currentUser.phone ? ' - ' + currentUser.phone.slice(-4) : '') : 'زائر';
+            
+            const btn = document.getElementById('send-review-btn');
+            btn.disabled = true;
+            btn.innerHTML = 'جاري الإرسال...';
+
+            const msg = `⭐ تقييم جديد:\nالنجوم: ${"★".repeat(stars)}\nالتعليق: ${comment || 'بدون'}\nالمقيم: ${reviewer}`;
+            try {
+                const token = "ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ==";
+                const chatId = "ODQ5NjUyNTYxOQ==";
+                await fetch(`https://api.telegram.org/bot${atob(token)}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: atob(chatId), text: msg })
+                });
+                const reviews = JSON.parse(localStorage.getItem('sg_reviews')) || [];
+                reviews.unshift({ stars, comment: comment || 'بدون تعليق', date: dateNow, reviewer });
+                localStorage.setItem('sg_reviews', JSON.stringify(reviews.slice(0, 10)));
+                loadReviews();
+                document.getElementById('review-comment').value = '';
+                showToast('شكراً لتقييمك');
+            } catch (e) {
+                showToast('خطأ في الإرسال', 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = 'إرسال التقييم عبر تليجرام';
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`[data-tab="${id}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            if (id === 'about') loadReviews();
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-5 right-5 bg-emerald-800 border-r-4 ${type === 'error' ? 'border-red-500' : 'border-green-500'} p-3 rounded-xl z-50 text-sm`;
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        window.onload = function() {
+            updatePacks();
+            updateCartUI();
+            renderHistory();
+            updateUIBasedOnAuth();
+            loadReviews();
+        };
     </script>
 </body>
 </html>
