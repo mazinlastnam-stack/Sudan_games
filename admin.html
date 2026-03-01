@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -109,6 +109,7 @@
         <div class="flex flex-wrap gap-2 admin-card p-2 mb-6 sticky top-0 z-50">
             <button data-tab="dashboard" class="tab-btn active p-3 font-bold text-sm flex-1" onclick="showAdminTab('dashboard')"><i class="fas fa-chart-pie ml-1"></i> الرئيسية</button>
             <button data-tab="users" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('users')"><i class="fas fa-users ml-1"></i> المستخدمين</button>
+            <button data-tab="wallet" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('wallet')"><i class="fas fa-wallet ml-1"></i> المحفظة</button>
             <button data-tab="products" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('products')"><i class="fas fa-box ml-1"></i> المنتجات</button>
             <button data-tab="orders" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('orders')"><i class="fas fa-shopping-cart ml-1"></i> الطلبات</button>
             <button data-tab="reviews" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('reviews')"><i class="fas fa-star ml-1"></i> التقييمات</button>
@@ -154,6 +155,17 @@
                     <table class="table-auto w-full">
                         <thead><tr><th>الاسم</th><th>الجوال</th><th>معرف اللاعب</th><th>الإجراءات</th></tr></thead>
                         <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- إدارة المحفظة (جديد) -->
+            <div id="wallet" class="tab-content hidden">
+                <h2 class="text-xl font-bold gold-text mb-4">💰 إدارة أرصدة المستخدمين</h2>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>الاسم</th><th>الجوال</th><th>الرصيد الحالي (SDG)</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="wallet-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -255,6 +267,18 @@
         </div>
     </div>
 
+    <!-- نافذة تعديل الرصيد (جديد) -->
+    <div class="admin-modal" id="walletModal">
+        <h3 class="text-xl gold-text font-bold mb-4">تعديل رصيد المستخدم</h3>
+        <p id="wallet-user-name" class="text-lg"></p>
+        <input type="number" id="wallet-amount" placeholder="المبلغ (SDG)" class="input-field" min="0" step="100">
+        <div class="flex gap-2">
+            <button onclick="addWalletBalance()" class="flex-1 gold-bg text-emerald-950 py-3 rounded-xl font-bold">إضافة رصيد</button>
+            <button onclick="deductWalletBalance()" class="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold">خصم رصيد</button>
+            <button onclick="closeWalletModal()" class="flex-1 border border-gold text-gold py-3 rounded-xl font-bold">إلغاء</button>
+        </div>
+    </div>
+
     <script>
         // ==================== بيانات تسجيل الدخول ====================
         const ADMIN_USER = 'THEMAX09';
@@ -298,6 +322,7 @@
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
             if (tabId === 'dashboard') updateStats();
             else if (tabId === 'users') renderUsersTable();
+            else if (tabId === 'wallet') renderWalletTable();
             else if (tabId === 'products') renderProductsTable();
             else if (tabId === 'orders') renderOrdersTable();
             else if (tabId === 'reviews') renderReviewsTable();
@@ -411,11 +436,82 @@
             }
 
             let users = getUsers();
-            users.push({ name, phone, playerId: playerId || 'غير محدد', password });
+            users.push({ name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 }); // إضافة رصيد افتراضي 0
             localStorage.setItem('users', JSON.stringify(users));
             closeUserModal();
             renderUsersTable();
             updateStats();
+        }
+
+        // ==================== المحفظة (جديد) ====================
+        let currentWalletUserIndex = null;
+
+        function renderWalletTable() {
+            const users = getUsers();
+            const tbody = document.getElementById('wallet-table-body');
+            tbody.innerHTML = '';
+            users.forEach((user, index) => {
+                const balance = user.wallet || 0;
+                tbody.innerHTML += `<tr>
+                    <td>${user.name}</td>
+                    <td>${user.phone}</td>
+                    <td>${balance.toLocaleString()} SDG</td>
+                    <td>
+                        <button class="action-btn" onclick="openWalletModal(${index})"><i class="fas fa-coins"></i> تعديل</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function openWalletModal(index) {
+            currentWalletUserIndex = index;
+            const users = getUsers();
+            const user = users[index];
+            document.getElementById('wallet-user-name').textContent = `المستخدم: ${user.name} (الرصيد الحالي: ${(user.wallet || 0).toLocaleString()} SDG)`;
+            document.getElementById('wallet-amount').value = '';
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('walletModal').classList.add('active');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
+            document.getElementById('modalOverlay').style.display = 'none';
+            currentWalletUserIndex = null;
+        }
+
+        function addWalletBalance() {
+            if (currentWalletUserIndex === null) return;
+            const amount = parseFloat(document.getElementById('wallet-amount').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('الرجاء إدخال مبلغ صحيح');
+                return;
+            }
+            let users = getUsers();
+            users[currentWalletUserIndex].wallet = (users[currentWalletUserIndex].wallet || 0) + amount;
+            localStorage.setItem('users', JSON.stringify(users));
+            closeWalletModal();
+            renderWalletTable();
+            showToast('تم إضافة الرصيد بنجاح');
+        }
+
+        function deductWalletBalance() {
+            if (currentWalletUserIndex === null) return;
+            const amount = parseFloat(document.getElementById('wallet-amount').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('الرجاء إدخال مبلغ صحيح');
+                return;
+            }
+            let users = getUsers();
+            const currentBalance = users[currentWalletUserIndex].wallet || 0;
+            if (currentBalance < amount) {
+                alert('الرصيد غير كافي للخصم');
+                return;
+            }
+            users[currentWalletUserIndex].wallet = currentBalance - amount;
+            localStorage.setItem('users', JSON.stringify(users));
+            closeWalletModal();
+            renderWalletTable();
+            showToast('تم خصم الرصيد بنجاح');
         }
 
         // ==================== المنتجات ====================
@@ -637,10 +733,20 @@
         function loadAllData() {
             updateStats();
             renderUsersTable();
+            renderWalletTable();
             renderProductsTable();
             renderOrdersTable();
             renderReviewsTable();
             renderCouponsTable();
+        }
+
+        // دالة مساعدة لإشعارات بسيطة
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-emerald-800 border-r-4 border-green-500 p-3 rounded-xl z-50 text-sm';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
     </script>
 </body>
