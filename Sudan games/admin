@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم SUDAN GAMES</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --ramadan-green: #064e3b;
+            --ramadan-gold: #fbbf24;
+            --dark-bg: #022c22;
+        }
+
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--dark-bg); 
+            color: white; 
+            background-image: url('https://www.transparenttextures.com/patterns/islamic-art.png');
+        }
+        
+        .admin-card { 
+            background: rgba(6, 78, 59, 0.8); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid var(--ramadan-gold);
+            border-radius: 20px;
+        }
+
+        .gold-text { color: var(--ramadan-gold); }
+        .gold-border { border-color: var(--ramadan-gold); }
+        .gold-bg { background-color: var(--ramadan-gold); }
+
+        .tab-btn.active { 
+            border-bottom: 3px solid var(--ramadan-gold); 
+            color: var(--ramadan-gold); 
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; z-index: 1000;
+        }
+
+        .admin-modal {
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 500px;
+            background: #064e3b;
+            border-radius: 30px;
+            padding: 25px;
+            z-index: 1001;
+            border: 3px solid var(--ramadan-gold);
+            display: none;
+        }
+
+        .admin-modal.active { display: block; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            background: #065f46;
+            border: 1px solid #047857;
+            outline: none;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .input-field:focus { border-color: var(--ramadan-gold); }
+
+        .table-auto { width: 100%; border-collapse: collapse; }
+        .table-auto th { background: #065f46; color: var(--ramadan-gold); padding: 10px; }
+        .table-auto td { border-bottom: 1px solid #047857; padding: 10px; }
+
+        .status-badge {
+            padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;
+        }
+        .status-pending { background: #f59e0b; color: black; }
+        .status-completed { background: #10b981; color: white; }
+        .status-cancelled { background: #ef4444; color: white; }
+
+        .action-btn {
+            background: none; border: 1px solid var(--ramadan-gold); color: var(--ramadan-gold);
+            padding: 5px 10px; border-radius: 10px; cursor: pointer; margin: 2px;
+        }
+        .action-btn:hover { background: var(--ramadan-gold); color: var(--ramadan-green); }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen" class="max-w-md mx-auto mt-20 admin-card p-8">
+        <h2 class="text-3xl font-black gold-text text-center mb-6">🔐 دخول المسؤول</h2>
+        <input type="text" id="admin-username" placeholder="اسم المستخدم" class="input-field" value="admin">
+        <input type="password" id="admin-password" placeholder="كلمة المرور" class="input-field" value="admin123">
+        <button onclick="adminLogin()" class="w-full gold-bg text-emerald-950 py-4 rounded-xl font-bold text-lg">دخول</button>
+        <p class="text-center text-emerald-300 mt-4 text-sm">البيانات الافتراضية: admin / admin123</p>
+    </div>
+
+    <!-- لوحة التحكم (تظهر بعد تسجيل الدخول) -->
+    <div id="admin-panel" class="max-w-6xl mx-auto hidden">
+        <!-- رأس الصفحة -->
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-black gold-text">👑 لوحة تحكم SUDAN GAMES</h1>
+            <button onclick="adminLogout()" class="bg-red-600/30 text-red-400 px-4 py-2 rounded-xl border border-red-700">تسجيل خروج</button>
+        </header>
+
+        <!-- تبويبات الإدارة -->
+        <div class="flex flex-wrap gap-2 admin-card p-2 mb-6 sticky top-0 z-50">
+            <button data-tab="dashboard" class="tab-btn active p-3 font-bold text-sm flex-1" onclick="showAdminTab('dashboard')"><i class="fas fa-chart-pie ml-1"></i> الرئيسية</button>
+            <button data-tab="users" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('users')"><i class="fas fa-users ml-1"></i> المستخدمين</button>
+            <button data-tab="products" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('products')"><i class="fas fa-box ml-1"></i> المنتجات</button>
+            <button data-tab="orders" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('orders')"><i class="fas fa-shopping-cart ml-1"></i> الطلبات</button>
+            <button data-tab="reviews" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('reviews')"><i class="fas fa-star ml-1"></i> التقييمات</button>
+            <button data-tab="coupons" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('coupons')"><i class="fas fa-ticket ml-1"></i> الكوبونات</button>
+        </div>
+
+        <!-- محتوى التبويبات -->
+        <div class="admin-card p-6">
+            <!-- لوحة المعلومات -->
+            <div id="dashboard" class="tab-content">
+                <h2 class="text-xl font-bold gold-text mb-4">📊 إحصائيات سريعة</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                        <i class="fas fa-users text-3xl gold-text mb-2"></i>
+                        <p class="text-2xl font-black" id="stats-users">0</p>
+                        <p class="text-sm">المستخدمين</p>
+                    </div>
+                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                        <i class="fas fa-shopping-cart text-3xl gold-text mb-2"></i>
+                        <p class="text-2xl font-black" id="stats-orders">0</p>
+                        <p class="text-sm">الطلبات</p>
+                    </div>
+                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                        <i class="fas fa-box text-3xl gold-text mb-2"></i>
+                        <p class="text-2xl font-black" id="stats-products">0</p>
+                        <p class="text-sm">المنتجات</p>
+                    </div>
+                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                        <i class="fas fa-star text-3xl gold-text mb-2"></i>
+                        <p class="text-2xl font-black" id="stats-reviews">0</p>
+                        <p class="text-sm">التقييمات</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إدارة المستخدمين -->
+            <div id="users" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold gold-text">👤 قائمة المستخدمين</h2>
+                    <button onclick="openUserModal()" class="gold-bg text-emerald-950 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-plus ml-1"></i> إضافة مستخدم</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>الاسم</th><th>الجوال</th><th>معرف اللاعب</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- إدارة المنتجات -->
+            <div id="products" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold gold-text">📦 المنتجات (الباقات)</h2>
+                    <button onclick="openProductModal()" class="gold-bg text-emerald-950 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-plus ml-1"></i> إضافة منتج</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>اللعبة</th><th>الباقة</th><th>السعر (SDG)</th><th>عرض خاص</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="products-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- إدارة الطلبات -->
+            <div id="orders" class="tab-content hidden">
+                <h2 class="text-xl font-bold gold-text mb-4">🛒 جميع الطلبات</h2>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>المستخدم</th><th>المنتج</th><th>ID اللاعب</th><th>الحالة</th><th>التاريخ</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="orders-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- إدارة التقييمات -->
+            <div id="reviews" class="tab-content hidden">
+                <h2 class="text-xl font-bold gold-text mb-4">⭐ التقييمات</h2>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>المقيم</th><th>النجوم</th><th>التعليق</th><th>التاريخ</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="reviews-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- إدارة الكوبونات -->
+            <div id="coupons" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold gold-text">🎟️ كوبونات الخصم</h2>
+                    <button onclick="openCouponModal()" class="gold-bg text-emerald-950 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-plus ml-1"></i> إضافة كوبون</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead><tr><th>الكود</th><th>الخصم %</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="coupons-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- النوافذ المنبثقة للإضافة/التعديل -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+    <!-- نافذة إضافة/تعديل مستخدم -->
+    <div class="admin-modal" id="userModal">
+        <h3 class="text-xl gold-text font-bold mb-4" id="userModalTitle">إضافة مستخدم جديد</h3>
+        <input type="text" id="userName" placeholder="الاسم الكامل" class="input-field">
+        <input type="tel" id="userPhone" placeholder="رقم الجوال" class="input-field">
+        <input type="text" id="userPlayerId" placeholder="معرف اللاعب (اختياري)" class="input-field">
+        <input type="password" id="userPassword" placeholder="كلمة المرور" class="input-field">
+        <div class="flex gap-2">
+            <button onclick="saveUser()" class="flex-1 gold-bg text-emerald-950 py-3 rounded-xl font-bold">حفظ</button>
+            <button onclick="closeUserModal()" class="flex-1 border border-gold text-gold py-3 rounded-xl font-bold">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة/تعديل منتج -->
+    <div class="admin-modal" id="productModal">
+        <h3 class="text-xl gold-text font-bold mb-4" id="productModalTitle">إضافة منتج</h3>
+        <select id="productGame" class="input-field">
+            <option value="Free Fire">فري فاير</option>
+            <option value="PUBG Mobile">ببجي</option>
+        </select>
+        <input type="text" id="productName" placeholder="اسم الباقة (مثال: 110 جوهرة)" class="input-field">
+        <input type="number" id="productPrice" placeholder="السعر (SDG)" class="input-field">
+        <label class="flex items-center gap-2 text-sm mb-4">
+            <input type="checkbox" id="productSpecial"> <span class="gold-text">عرض خاص (يظهر في الخيمة)</span>
+        </label>
+        <div class="flex gap-2">
+            <button onclick="saveProduct()" class="flex-1 gold-bg text-emerald-950 py-3 rounded-xl font-bold">حفظ</button>
+            <button onclick="closeProductModal()" class="flex-1 border border-gold text-gold py-3 rounded-xl font-bold">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة كوبون -->
+    <div class="admin-modal" id="couponModal">
+        <h3 class="text-xl gold-text font-bold mb-4">إضافة كوبون</h3>
+        <input type="text" id="couponCode" placeholder="الكود (مثال: رمضان10)" class="input-field">
+        <input type="number" id="couponDiscount" placeholder="نسبة الخصم (5 = 5%)" class="input-field" min="1" max="100">
+        <div class="flex gap-2">
+            <button onclick="saveCoupon()" class="flex-1 gold-bg text-emerald-950 py-3 rounded-xl font-bold">حفظ</button>
+            <button onclick="closeCouponModal()" class="flex-1 border border-gold text-gold py-3 rounded-xl font-bold">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== بيانات تسجيل الدخول ====================
+        const ADMIN_USER = 'admin';
+        const ADMIN_PASS = 'admin123';
+
+        function adminLogin() {
+            const user = document.getElementById('admin-username').value;
+            const pass = document.getElementById('admin-password').value;
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                localStorage.setItem('admin_logged', 'true');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadAllData();
+                showAdminTab('dashboard');
+            } else {
+                alert('بيانات دخول غير صحيحة');
+            }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('admin_logged');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-panel').classList.add('hidden');
+        }
+
+        // التحقق من الجلسة عند تحميل الصفحة
+        (function() {
+            if (localStorage.getItem('admin_logged') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadAllData();
+                showAdminTab('dashboard');
+            }
+        })();
+
+        // ==================== التبويبات ====================
+        function showAdminTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            if (tabId === 'dashboard') updateStats();
+            else if (tabId === 'users') renderUsersTable();
+            else if (tabId === 'products') renderProductsTable();
+            else if (tabId === 'orders') renderOrdersTable();
+            else if (tabId === 'reviews') renderReviewsTable();
+            else if (tabId === 'coupons') renderCouponsTable();
+        }
+
+        // ==================== البيانات (localStorage) ====================
+        function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
+        function getProducts() { 
+            // المنتجات الافتراضية إذا لم تكن موجودة
+            let prods = JSON.parse(localStorage.getItem('sg_products'));
+            if (!prods) {
+                prods = [
+                    { game: 'Free Fire', name: '50 جوهرة', price: 1800, special: false },
+                    { game: 'Free Fire', name: '110 جوهرة', price: 3500, special: false },
+                    { game: 'Free Fire', name: '231 جوهرة', price: 7000, special: false },
+                    { game: 'Free Fire', name: '583 جوهرة', price: 17500, special: false },
+                    { game: 'Free Fire', name: '1180 جوهرة', price: 35000, special: false },
+                    { game: 'Free Fire', name: '2420 جوهرة', price: 86000, special: false },
+                    { game: 'Free Fire', name: '5600 جوهرة', price: 214000, special: false },
+                    { game: 'Free Fire', name: 'الباقة الاسبوعية', price: 9000, special: true },
+                    { game: 'Free Fire', name: 'الباقة الشهرية', price: 43000, special: true },
+                    { game: 'PUBG Mobile', name: '60 UC', price: 3300, special: false },
+                    { game: 'PUBG Mobile', name: '325 UC', price: 16500, special: false },
+                    { game: 'PUBG Mobile', name: '660 UC', price: 33000, special: false },
+                    { game: 'PUBG Mobile', name: '1800 UC', price: 82500, special: false },
+                    { game: 'PUBG Mobile', name: '3850 UC', price: 165000, special: false },
+                    { game: 'PUBG Mobile', name: '8100 UC', price: 330000, special: false }
+                ];
+                localStorage.setItem('sg_products', JSON.stringify(prods));
+            }
+            return prods;
+        }
+        function getOrders() { return JSON.parse(localStorage.getItem('sg_history')) || []; }
+        function getReviews() { return JSON.parse(localStorage.getItem('sg_reviews')) || []; }
+        function getCoupons() { 
+            let coupons = JSON.parse(localStorage.getItem('sg_coupons'));
+            if (!coupons) {
+                coupons = [
+                    { code: 'رمضان10', discount: 10, active: true },
+                    { code: 'SUDAN-RK', discount: 10, active: true },
+                    { code: 'خصم5', discount: 5, active: true }
+                ];
+                localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+            }
+            return coupons;
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            document.getElementById('stats-users').textContent = getUsers().length;
+            document.getElementById('stats-orders').textContent = getOrders().length;
+            document.getElementById('stats-products').textContent = getProducts().length;
+            document.getElementById('stats-reviews').textContent = getReviews().length;
+        }
+
+        // ==================== المستخدمين ====================
+        function renderUsersTable() {
+            const users = getUsers();
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+            users.forEach((user, index) => {
+                tbody.innerHTML += `<tr>
+                    <td>${user.name}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.playerId || '—'}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteUser(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function deleteUser(index) {
+            if (confirm('حذف المستخدم؟')) {
+                let users = getUsers();
+                users.splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                renderUsersTable();
+                updateStats();
+            }
+        }
+
+        // نافذة إضافة مستخدم
+        let editingUserIndex = -1;
+        function openUserModal(user = null) {
+            editingUserIndex = -1;
+            document.getElementById('userModalTitle').textContent = 'إضافة مستخدم جديد';
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+            document.getElementById('userPlayerId').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('active');
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        function saveUser() {
+            const name = document.getElementById('userName').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const playerId = document.getElementById('userPlayerId').value.trim();
+            const password = document.getElementById('userPassword').value.trim();
+
+            if (!name || !phone || !password) {
+                alert('الرجاء ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            let users = getUsers();
+            users.push({ name, phone, playerId: playerId || 'غير محدد', password });
+            localStorage.setItem('users', JSON.stringify(users));
+            closeUserModal();
+            renderUsersTable();
+            updateStats();
+        }
+
+        // ==================== المنتجات ====================
+        function renderProductsTable() {
+            const prods = getProducts();
+            const tbody = document.getElementById('products-table-body');
+            tbody.innerHTML = '';
+            prods.forEach((prod, index) => {
+                tbody.innerHTML += `<tr>
+                    <td>${prod.game}</td>
+                    <td>${prod.name}</td>
+                    <td>${prod.price} SDG</td>
+                    <td>${prod.special ? '⭐ نعم' : '—'}</td>
+                    <td>
+                        <button class="action-btn" onclick="editProduct(${index})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="deleteProduct(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        let editingProductIndex = -1;
+        function openProductModal(prod = null) {
+            editingProductIndex = prod !== null ? prod : -1;
+            document.getElementById('productModalTitle').textContent = prod !== null ? 'تعديل منتج' : 'إضافة منتج';
+            if (prod !== null) {
+                const p = getProducts()[prod];
+                document.getElementById('productGame').value = p.game;
+                document.getElementById('productName').value = p.name;
+                document.getElementById('productPrice').value = p.price;
+                document.getElementById('productSpecial').checked = p.special;
+            } else {
+                document.getElementById('productGame').value = 'Free Fire';
+                document.getElementById('productName').value = '';
+                document.getElementById('productPrice').value = '';
+                document.getElementById('productSpecial').checked = false;
+            }
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('active');
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        function saveProduct() {
+            const game = document.getElementById('productGame').value;
+            const name = document.getElementById('productName').value.trim();
+            const price = parseInt(document.getElementById('productPrice').value);
+            const special = document.getElementById('productSpecial').checked;
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert('الرجاء إدخال بيانات صحيحة');
+                return;
+            }
+
+            let prods = getProducts();
+            if (editingProductIndex >= 0) {
+                // تعديل
+                prods[editingProductIndex] = { game, name, price, special };
+            } else {
+                // إضافة
+                prods.push({ game, name, price, special });
+            }
+            localStorage.setItem('sg_products', JSON.stringify(prods));
+            closeProductModal();
+            renderProductsTable();
+            updateStats();
+        }
+
+        function editProduct(index) {
+            openProductModal(index);
+        }
+
+        function deleteProduct(index) {
+            if (confirm('حذف المنتج؟')) {
+                let prods = getProducts();
+                prods.splice(index, 1);
+                localStorage.setItem('sg_products', JSON.stringify(prods));
+                renderProductsTable();
+                updateStats();
+            }
+        }
+
+        // ==================== الطلبات ====================
+        function renderOrdersTable() {
+            const orders = getOrders();
+            const tbody = document.getElementById('orders-table-body');
+            tbody.innerHTML = '';
+            orders.forEach((order, index) => {
+                // نعطي حالة افتراضية إذا لم تكن موجودة
+                const status = order.status || 'pending';
+                const statusClass = status === 'pending' ? 'status-pending' : (status === 'completed' ? 'status-completed' : 'status-cancelled');
+                const statusText = { pending: 'معلق', completed: 'مكتمل', cancelled: 'ملغي' }[status] || 'معلق';
+                tbody.innerHTML += `<tr>
+                    <td>${order.phone || '—'}</td>
+                    <td>${order.game} - ${order.pack}</td>
+                    <td>${order.id}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${order.timestamp || ''}</td>
+                    <td>
+                        <button class="action-btn" onclick="updateOrderStatus(${index}, 'completed')"><i class="fas fa-check"></i></button>
+                        <button class="action-btn" onclick="updateOrderStatus(${index}, 'cancelled')"><i class="fas fa-times"></i></button>
+                        <button class="action-btn" onclick="deleteOrder(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function updateOrderStatus(index, status) {
+            let orders = getOrders();
+            orders[index].status = status;
+            localStorage.setItem('sg_history', JSON.stringify(orders));
+            renderOrdersTable();
+        }
+
+        function deleteOrder(index) {
+            if (confirm('حذف الطلب؟')) {
+                let orders = getOrders();
+                orders.splice(index, 1);
+                localStorage.setItem('sg_history', JSON.stringify(orders));
+                renderOrdersTable();
+                updateStats();
+            }
+        }
+
+        // ==================== التقييمات ====================
+        function renderReviewsTable() {
+            const reviews = getReviews();
+            const tbody = document.getElementById('reviews-table-body');
+            tbody.innerHTML = '';
+            reviews.forEach((rev, index) => {
+                tbody.innerHTML += `<tr>
+                    <td>${rev.reviewer}</td>
+                    <td>${'★'.repeat(rev.stars)}</td>
+                    <td>${rev.comment}</td>
+                    <td>${rev.date}</td>
+                    <td><button class="action-btn" onclick="deleteReview(${index})"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+            });
+        }
+
+        function deleteReview(index) {
+            if (confirm('حذف التقييم؟')) {
+                let reviews = getReviews();
+                reviews.splice(index, 1);
+                localStorage.setItem('sg_reviews', JSON.stringify(reviews));
+                renderReviewsTable();
+                updateStats();
+            }
+        }
+
+        // ==================== الكوبونات ====================
+        function renderCouponsTable() {
+            const coupons = getCoupons();
+            const tbody = document.getElementById('coupons-table-body');
+            tbody.innerHTML = '';
+            coupons.forEach((cup, index) => {
+                tbody.innerHTML += `<tr>
+                    <td>${cup.code}</td>
+                    <td>${cup.discount}%</td>
+                    <td>${cup.active ? '🟢 مفعل' : '🔴 معطل'}</td>
+                    <td>
+                        <button class="action-btn" onclick="toggleCouponStatus(${index})"><i class="fas fa-toggle-${cup.active ? 'on' : 'off'}"></i></button>
+                        <button class="action-btn" onclick="deleteCoupon(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function openCouponModal() {
+            document.getElementById('couponCode').value = '';
+            document.getElementById('couponDiscount').value = '';
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('couponModal').classList.add('active');
+        }
+
+        function closeCouponModal() {
+            document.getElementById('couponModal').classList.remove('active');
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        function saveCoupon() {
+            const code = document.getElementById('couponCode').value.trim().toUpperCase();
+            const discount = parseInt(document.getElementById('couponDiscount').value);
+            if (!code || isNaN(discount) || discount < 1 || discount > 100) {
+                alert('الرجاء إدخال كود صحيح ونسبة خصم بين 1-100');
+                return;
+            }
+            let coupons = getCoupons();
+            coupons.push({ code, discount, active: true });
+            localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+            closeCouponModal();
+            renderCouponsTable();
+        }
+
+        function toggleCouponStatus(index) {
+            let coupons = getCoupons();
+            coupons[index].active = !coupons[index].active;
+            localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+            renderCouponsTable();
+        }
+
+        function deleteCoupon(index) {
+            if (confirm('حذف الكوبون؟')) {
+                let coupons = getCoupons();
+                coupons.splice(index, 1);
+                localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+                renderCouponsTable();
+            }
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.admin-modal').forEach(m => m.classList.remove('active'));
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        function loadAllData() {
+            updateStats();
+            renderUsersTable();
+            renderProductsTable();
+            renderOrdersTable();
+            renderReviewsTable();
+            renderCouponsTable();
+        }
+    </script>
+</body>
+</html>
