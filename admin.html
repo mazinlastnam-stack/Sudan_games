@@ -740,6 +740,104 @@
             renderCouponsTable();
         }
 
+        // ... داخل index.html، استبدال دالة checkout وإضافة الدوال المساعدة
+
+// دالة خصم الرصيد
+function deductWallet(amount) {
+    if (!currentUser) return false;
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    const userIndex = users.findIndex(u => u.name === currentUser.name);
+    if (userIndex === -1) return false;
+    const currentBalance = users[userIndex].wallet || 0;
+    if (currentBalance < amount) return false;
+    users[userIndex].wallet = currentBalance - amount;
+    localStorage.setItem('users', JSON.stringify(users));
+    // تحديث currentUser في الجلسة
+    currentUser = { ...currentUser, wallet: users[userIndex].wallet };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    updateUIBasedOnAuth(); // تحديث العرض
+    return true;
+}
+
+// دالة checkout المعدلة
+async function checkout() {
+    if (cart.length === 0) return;
+    const btn = document.getElementById('checkout-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال...';
+
+    // حساب المبلغ الإجمالي بعد الخصم
+    const originalSum = cart.reduce((acc, item) => acc + item.price, 0);
+    const finalTotal = originalSum * (1 - activeDiscount);
+
+    // إذا كان المستخدم مسجل دخول، تحقق من الرصيد وخصم
+    if (currentUser) {
+        const wallet = getUserWallet();
+        if (wallet < finalTotal) {
+            showToast('رصيد غير كافٍ في المحفظة', 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'تأكيد الطلب عبر تليجرام';
+            return;
+        }
+        // خصم الرصيد
+        deductWallet(finalTotal);
+    }
+
+    // إعداد رسالة التليجرام
+    let msg = `🎮 *طلب شحن جديد - SUDAN GAMES (رمضان)*\n`;
+    if (currentUser) {
+        msg += `👤 المستخدم: ${currentUser.name}\n📱 جوال: ${currentUser.phone}\n`;
+    }
+    cart.forEach((item, i) => {
+        msg += `━━━━━━━━\n📦 الطلب ${i+1}: ${item.game} - ${item.pack}\n🆔 ID: \`${item.id}\`\n📱 واتساب: ${item.phone}\n`;
+    });
+    if (appliedCoupon) msg += `🎟️ كود الخصم: ${appliedCoupon}\n`;
+    msg += `💰 *الإجمالي:* ${finalTotal.toLocaleString()} SDG\n`;
+    if (currentUser) {
+        msg += `💳 *تم الخصم من المحفظة.* الرصيد المتبقي: ${(getUserWallet() - finalTotal).toLocaleString()} SDG`;
+    }
+
+    try {
+        const token = "ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ=="; // مثال
+        const chatId = "ODQ5NjUyNTYxOQ==";
+        const res = await fetch(`https://api.telegram.org/bot${atob(token)}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: atob(chatId), text: msg, parse_mode: 'Markdown' })
+        });
+        if (res.ok) {
+            history.unshift(...cart);
+            localStorage.setItem('sg_history', JSON.stringify(history));
+            cart = [];
+            activeDiscount = 0;
+            appliedCoupon = '';
+            updateCartUI();
+            renderHistory();
+            showToast('تم إرسال الطلب وخصم الرصيد');
+            showSection('history');
+        } else {
+            // إذا فشل الإرسال، نعيد الرصيد (في حالة الخصم)
+            if (currentUser) {
+                // إعادة الرصيد (يمكن تنفيذ دالة addWallet)
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                const userIndex = users.findIndex(u => u.name === currentUser.name);
+                if (userIndex !== -1) {
+                    users[userIndex].wallet = (users[userIndex].wallet || 0) + finalTotal;
+                    localStorage.setItem('users', JSON.stringify(users));
+                    currentUser = { ...currentUser, wallet: users[userIndex].wallet };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateUIBasedOnAuth();
+                }
+            }
+            showToast('خطأ في الإرسال، تم استرداد الرصيد', 'error');
+        }
+    } catch (e) {
+        showToast('خطأ في الإرسال', 'error');
+    }
+    btn.disabled = false;
+    btn.innerHTML = 'تأكيد الطلب عبر تليجرام';
+}
+
         // دالة مساعدة لإشعارات بسيطة
         function showToast(msg) {
             const toast = document.createElement('div');
