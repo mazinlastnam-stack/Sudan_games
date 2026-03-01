@@ -31,15 +31,11 @@
         }
 
         .gold-text { 
-            justify-content: space-around;
-            color: var(--ramadan-gold); }
+            color: var(--ramadan-gold); 
+        }
         .gold-border { border-color: var(--ramadan-gold); }
         .gold-bg { background-color: var(--ramadan-gold); }
         
-        .mt-1{
-            justify-content: space-around;
-        }
-
         .tab-btn.active { 
             border-bottom: 3px solid var(--ramadan-gold); 
             color: var(--ramadan-gold); 
@@ -173,20 +169,27 @@
 
     <main class="max-w-md mx-auto p-4 space-y-6">
 
-        <!-- بطاقة الحساب (تعرض بيانات المستخدم) -->
+        <!-- بطاقة الحساب (تعرض بيانات المستخدم والرصيد) -->
         <section class="ramadan-card p-4 relative overflow-hidden">
             <i class="fa-solid fa-moon moon-icon gold-text"></i>
             <div class="flex items-center gap-4 relative z-10">
                 <div class="w-16 h-16 rounded-full border-2 border-yellow-500 p-1">
                     <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Sudan+Games&background=fbbf24&color=064e3b" class="rounded-full" alt="المقيم">
                 </div>
-                <div id="user-info-display">
+                <div id="user-info-display" class="flex-1">
                     <h3 class="font-bold text-lg gold-text" id="user-name-display">مازن حسن محمد</h3>
                     <p class="text-xs text-emerald-100">رقم الجوال: <span class="font-bold" id="user-phone-display">0912345678</span></p>
                     <p class="text-xs text-emerald-100">معرف اللاعب: <span class="font-bold" id="user-playerid-display">8374738336</span></p>
-                    <div class="flex gap-2 mt-1">
+                    <div class="flex items-center gap-2 mt-1">
                         <span class="text-[10px] bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700">دعم فني 24/7</span>
                         <span class="text-[10px] bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700 text-yellow-400">توثيق ذهبي</span>
+                    </div>
+                    <!-- عرض الرصيد (جديد) -->
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-sm gold-text">💳 الرصيد:</span>
+                        <span class="text-lg font-black text-white" id="user-wallet-display">0</span>
+                        <span class="text-xs">SDG</span>
+                        <button onclick="openPaymentModal()" class="text-xs gold-bg text-emerald-900 px-3 py-1 rounded-full mr-auto">شحن</button>
                     </div>
                 </div>
                 <div id="guest-buttons" class="hidden flex-1 flex justify-end gap-2">
@@ -220,10 +223,6 @@
             <button data-tab="cart" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('cart')">السلة</button>
             <button data-tab="history" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('history')">الطلبات</button>
             <button data-tab="about" class="tab-btn p-2 font-bold text-sm flex-1" onclick="showSection('about')">عنا</button>
-            <footer class="p-4 text-center">
-    <a href="admin.html" class="text-xs text-gray-500 opacity-20 hover:opacity-100">لوحة الإدارة</a>
-</footer>
-
         </div>
 
         <!-- قسم الخيمة (المتجر) -->
@@ -275,6 +274,8 @@
                 <p class="gold-text">الإجمالي</p>
                 <h3 id="total-price" class="text-3xl font-black">0 SDG</h3>
                 <h3 id="discounted-price" class="text-xl gold-text hidden"></h3>
+                <!-- إظهار الرصيد الحالي أثناء الدفع (اختياري) -->
+                <p class="text-xs text-emerald-300 mt-2">رصيدك الحالي: <span id="current-wallet-in-cart">0</span> SDG</p>
                 <button id="checkout-btn" class="w-full mt-4 py-4 gold-bg text-emerald-950 rounded-xl font-bold">تأكيد الطلب عبر تليجرام</button>
                 <button id="clear-cart-btn" class="w-full mt-2 py-2 bg-red-600/20 text-red-400 rounded-xl text-sm">تفريغ السلة</button>
             </div>
@@ -319,6 +320,10 @@
                 <button id="send-review-btn" class="w-full mt-3 py-3 gold-bg text-emerald-950 rounded-xl font-bold text-sm">إرسال التقييم عبر تليجرام</button>
             </div>
         </section>
+        <!-- رابط لوحة الإدارة (يظهر أسفل الصفحة) -->
+        <footer class="p-4 text-center">
+            <a href="admin.html" class="text-xs text-gray-500 opacity-20 hover:opacity-100">لوحة الإدارة</a>
+        </footer>
     </main>
 
     <!-- ===== نافذة الدفع المنبثقة ===== -->
@@ -393,6 +398,15 @@
         const userNameSpan = document.getElementById('user-name-display');
         const userPhoneSpan = document.getElementById('user-phone-display');
         const userPlayerIdSpan = document.getElementById('user-playerid-display');
+        const userWalletSpan = document.getElementById('user-wallet-display');
+        const currentWalletInCart = document.getElementById('current-wallet-in-cart');
+
+        function getUserWallet() {
+            if (!currentUser) return 0;
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.name === currentUser.name);
+            return user ? (user.wallet || 0) : 0;
+        }
 
         function updateUIBasedOnAuth() {
             if (currentUser) {
@@ -402,6 +416,10 @@
                 userNameSpan.textContent = currentUser.name || 'مستخدم';
                 userPhoneSpan.textContent = currentUser.phone || 'غير محدد';
                 userPlayerIdSpan.textContent = currentUser.playerId || 'غير محدد';
+                // تحديث الرصيد
+                const wallet = getUserWallet();
+                userWalletSpan.textContent = wallet.toLocaleString();
+                if (currentWalletInCart) currentWalletInCart.textContent = wallet.toLocaleString();
                 // تعبئة حقول الشحن تلقائياً إذا كانت موجودة
                 document.getElementById('phone').value = currentUser.phone || '';
                 document.getElementById('player_id').value = currentUser.playerId || '';
@@ -409,6 +427,8 @@
                 userInfoDisplay.classList.add('hidden');
                 guestButtons.classList.remove('hidden');
                 logoutBtnContainer.classList.add('hidden');
+                userWalletSpan.textContent = '0';
+                if (currentWalletInCart) currentWalletInCart.textContent = '0';
                 // إفراغ الحقول
                 document.getElementById('phone').value = '';
                 document.getElementById('player_id').value = '';
@@ -470,7 +490,7 @@
                 return;
             }
 
-            const newUser = { name, phone, playerId: playerId || 'غير محدد', password };
+            const newUser = { name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 }; // رصيد افتراضي 0
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             currentUser = { name, phone, playerId: newUser.playerId };
@@ -541,7 +561,6 @@
                 { name: "⚡ 8100 UC", price: 330000 }
             ]
         };
-
 
         let cart = JSON.parse(localStorage.getItem('sg_cart')) || [];
         let history = JSON.parse(localStorage.getItem('sg_history')) || [];
@@ -787,6 +806,7 @@
             const activeBtn = document.querySelector(`[data-tab="${id}"]`);
             if (activeBtn) activeBtn.classList.add('active');
             if (id === 'about') loadReviews();
+            if (id === 'cart') updateUIBasedOnAuth(); // تحديث الرصيد في السلة
         }
 
         function showToast(msg, type = 'success') {
@@ -806,4 +826,4 @@
         };
     </script>
 </body>
-</html>
+                </html>
