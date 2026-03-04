@@ -282,7 +282,7 @@
     <script>
         // ==================== بيانات تسجيل الدخول ====================
         const ADMIN_USER = 'THEMAX09';
-        const ADMIN_PASS = 'THE00MAX';
+        const ADMIN_PASS = 'THE00MAX';  // يُفضل تغييرها عبر واجهة إعدادات لاحقاً
 
         function adminLogin() {
             const user = document.getElementById('admin-username').value;
@@ -386,9 +386,9 @@
             tbody.innerHTML = '';
             users.forEach((user, index) => {
                 tbody.innerHTML += `<tr>
-                    <td>${user.name}</td>
-                    <td>${user.phone}</td>
-                    <td>${user.playerId || '—'}</td>
+                    <td>${escapeHtml(user.name)}</td>
+                    <td>${escapeHtml(user.phone)}</td>
+                    <td>${escapeHtml(user.playerId || '—')}</td>
                     <td>
                         <button class="action-btn" onclick="deleteUser(${index})"><i class="fas fa-trash"></i></button>
                     </td>
@@ -436,6 +436,11 @@
             }
 
             let users = getUsers();
+            // تحقق من عدم تكرار رقم الجوال
+            if (users.some(u => u.phone === phone)) {
+                alert('رقم الجوال موجود بالفعل');
+                return;
+            }
             users.push({ name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 }); // إضافة رصيد افتراضي 0
             localStorage.setItem('users', JSON.stringify(users));
             closeUserModal();
@@ -453,8 +458,8 @@
             users.forEach((user, index) => {
                 const balance = user.wallet || 0;
                 tbody.innerHTML += `<tr>
-                    <td>${user.name}</td>
-                    <td>${user.phone}</td>
+                    <td>${escapeHtml(user.name)}</td>
+                    <td>${escapeHtml(user.phone)}</td>
                     <td>${balance.toLocaleString()} SDG</td>
                     <td>
                         <button class="action-btn" onclick="openWalletModal(${index})"><i class="fas fa-coins"></i> تعديل</button>
@@ -521,8 +526,8 @@
             tbody.innerHTML = '';
             prods.forEach((prod, index) => {
                 tbody.innerHTML += `<tr>
-                    <td>${prod.game}</td>
-                    <td>${prod.name}</td>
+                    <td>${escapeHtml(prod.game)}</td>
+                    <td>${escapeHtml(prod.name)}</td>
                     <td>${prod.price} SDG</td>
                     <td>${prod.special ? '⭐ نعم' : '—'}</td>
                     <td>
@@ -608,9 +613,9 @@
                 const statusClass = status === 'pending' ? 'status-pending' : (status === 'completed' ? 'status-completed' : 'status-cancelled');
                 const statusText = { pending: 'معلق', completed: 'مكتمل', cancelled: 'ملغي' }[status] || 'معلق';
                 tbody.innerHTML += `<tr>
-                    <td>${order.phone || '—'}</td>
-                    <td>${order.game} - ${order.pack}</td>
-                    <td>${order.id}</td>
+                    <td>${escapeHtml(order.phone || '—')}</td>
+                    <td>${escapeHtml(order.game)} - ${escapeHtml(order.pack)}</td>
+                    <td>${escapeHtml(order.id)}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                     <td>${order.timestamp || ''}</td>
                     <td>
@@ -646,9 +651,9 @@
             tbody.innerHTML = '';
             reviews.forEach((rev, index) => {
                 tbody.innerHTML += `<tr>
-                    <td>${rev.reviewer}</td>
+                    <td>${escapeHtml(rev.reviewer)}</td>
                     <td>${'★'.repeat(rev.stars)}</td>
-                    <td>${rev.comment}</td>
+                    <td>${escapeHtml(rev.comment)}</td>
                     <td>${rev.date}</td>
                     <td><button class="action-btn" onclick="deleteReview(${index})"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
@@ -666,16 +671,19 @@
         }
 
         // ==================== الكوبونات ====================
+        let editingCouponIndex = -1; // متغير عام لتحديد حالة التعديل
+
         function renderCouponsTable() {
             const coupons = getCoupons();
             const tbody = document.getElementById('coupons-table-body');
             tbody.innerHTML = '';
             coupons.forEach((cup, index) => {
                 tbody.innerHTML += `<tr>
-                    <td>${cup.code}</td>
+                    <td>${escapeHtml(cup.code)}</td>
                     <td>${cup.discount}%</td>
                     <td>${cup.active ? '🟢 مفعل' : '🔴 معطل'}</td>
                     <td>
+                        <button class="action-btn" onclick="editCoupon(${index})"><i class="fas fa-edit"></i></button>
                         <button class="action-btn" onclick="toggleCouponStatus(${index})"><i class="fas fa-toggle-${cup.active ? 'on' : 'off'}"></i></button>
                         <button class="action-btn" onclick="deleteCoupon(${index})"><i class="fas fa-trash"></i></button>
                     </td>
@@ -684,6 +692,7 @@
         }
 
         function openCouponModal() {
+            editingCouponIndex = -1; // وضع الإضافة
             document.getElementById('couponCode').value = '';
             document.getElementById('couponDiscount').value = '';
             document.getElementById('modalOverlay').style.display = 'block';
@@ -703,17 +712,39 @@
                 return;
             }
             let coupons = getCoupons();
-            coupons.push({ code, discount, active: true });
+            // التحقق من التكرار (إذا كان في وضع الإضافة)
+            if (editingCouponIndex === -1 && coupons.some(c => c.code === code)) {
+                alert('هذا الكود موجود بالفعل');
+                return;
+            }
+            if (editingCouponIndex >= 0) {
+                // تعديل
+                coupons[editingCouponIndex] = { code, discount, active: coupons[editingCouponIndex].active };
+            } else {
+                // إضافة
+                coupons.push({ code, discount, active: true });
+            }
             localStorage.setItem('sg_coupons', JSON.stringify(coupons));
             closeCouponModal();
             renderCouponsTable();
         }
 
+        function editCoupon(index) {
+            editingCouponIndex = index;
+            const coupon = getCoupons()[index];
+            document.getElementById('couponCode').value = coupon.code;
+            document.getElementById('couponDiscount').value = coupon.discount;
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('couponModal').classList.add('active');
+        }
+
         function toggleCouponStatus(index) {
-            let coupons = getCoupons();
-            coupons[index].active = !coupons[index].active;
-            localStorage.setItem('sg_coupons', JSON.stringify(coupons));
-            renderCouponsTable();
+            if (confirm('تغيير حالة الكوبون؟')) {
+                let coupons = getCoupons();
+                coupons[index].active = !coupons[index].active;
+                localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+                renderCouponsTable();
+            }
         }
 
         function deleteCoupon(index) {
@@ -725,11 +756,18 @@
             }
         }
 
+        // ==================== إغلاق جميع النوافذ ====================
         function closeAllModals() {
             document.querySelectorAll('.admin-modal').forEach(m => m.classList.remove('active'));
             document.getElementById('modalOverlay').style.display = 'none';
+            // إعادة تعيين متغيرات التحرير
+            editingUserIndex = -1;
+            editingProductIndex = -1;
+            editingCouponIndex = -1;
+            currentWalletUserIndex = null;
         }
 
+        // ==================== تحميل كل البيانات ====================
         function loadAllData() {
             updateStats();
             renderUsersTable();
@@ -740,105 +778,17 @@
             renderCouponsTable();
         }
 
-        // ... داخل index.html، استبدال دالة checkout وإضافة الدوال المساعدة
-
-// دالة خصم الرصيد
-function deductWallet(amount) {
-    if (!currentUser) return false;
-    let users = JSON.parse(localStorage.getItem('users')) || [];
-    const userIndex = users.findIndex(u => u.name === currentUser.name);
-    if (userIndex === -1) return false;
-    const currentBalance = users[userIndex].wallet || 0;
-    if (currentBalance < amount) return false;
-    users[userIndex].wallet = currentBalance - amount;
-    localStorage.setItem('users', JSON.stringify(users));
-    // تحديث currentUser في الجلسة
-    currentUser = { ...currentUser, wallet: users[userIndex].wallet };
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    updateUIBasedOnAuth(); // تحديث العرض
-    return true;
-}
-
-// دالة checkout المعدلة
-async function checkout() {
-    if (cart.length === 0) return;
-    const btn = document.getElementById('checkout-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال...';
-
-    // حساب المبلغ الإجمالي بعد الخصم
-    const originalSum = cart.reduce((acc, item) => acc + item.price, 0);
-    const finalTotal = originalSum * (1 - activeDiscount);
-
-    // إذا كان المستخدم مسجل دخول، تحقق من الرصيد وخصم
-    if (currentUser) {
-        const wallet = getUserWallet();
-        if (wallet < finalTotal) {
-            showToast('رصيد غير كافٍ في المحفظة', 'error');
-            btn.disabled = false;
-            btn.innerHTML = 'تأكيد الطلب عبر تليجرام';
-            return;
+        // ==================== دوال مساعدة ====================
+        function escapeHtml(unsafe) {
+            if (!unsafe) return unsafe;
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-        // خصم الرصيد
-        deductWallet(finalTotal);
-    }
 
-    // إعداد رسالة التليجرام
-    let msg = `🎮 *طلب شحن جديد - SUDAN GAMES (رمضان)*\n`;
-    if (currentUser) {
-        msg += `👤 المستخدم: ${currentUser.name}\n📱 جوال: ${currentUser.phone}\n`;
-    }
-    cart.forEach((item, i) => {
-        msg += `━━━━━━━━\n📦 الطلب ${i+1}: ${item.game} - ${item.pack}\n🆔 ID: \`${item.id}\`\n📱 واتساب: ${item.phone}\n`;
-    });
-    if (appliedCoupon) msg += `🎟️ كود الخصم: ${appliedCoupon}\n`;
-    msg += `💰 *الإجمالي:* ${finalTotal.toLocaleString()} SDG\n`;
-    if (currentUser) {
-        msg += `💳 *تم الخصم من المحفظة.* الرصيد المتبقي: ${(getUserWallet() - finalTotal).toLocaleString()} SDG`;
-    }
-
-    try {
-        const token = "ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ=="; // مثال
-        const chatId = "ODQ5NjUyNTYxOQ==";
-        const res = await fetch(`https://api.telegram.org/bot${atob(token)}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: atob(chatId), text: msg, parse_mode: 'Markdown' })
-        });
-        if (res.ok) {
-            history.unshift(...cart);
-            localStorage.setItem('sg_history', JSON.stringify(history));
-            cart = [];
-            activeDiscount = 0;
-            appliedCoupon = '';
-            updateCartUI();
-            renderHistory();
-            showToast('تم إرسال الطلب وخصم الرصيد');
-            showSection('history');
-        } else {
-            // إذا فشل الإرسال، نعيد الرصيد (في حالة الخصم)
-            if (currentUser) {
-                // إعادة الرصيد (يمكن تنفيذ دالة addWallet)
-                let users = JSON.parse(localStorage.getItem('users')) || [];
-                const userIndex = users.findIndex(u => u.name === currentUser.name);
-                if (userIndex !== -1) {
-                    users[userIndex].wallet = (users[userIndex].wallet || 0) + finalTotal;
-                    localStorage.setItem('users', JSON.stringify(users));
-                    currentUser = { ...currentUser, wallet: users[userIndex].wallet };
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateUIBasedOnAuth();
-                }
-            }
-            showToast('خطأ في الإرسال، تم استرداد الرصيد', 'error');
-        }
-    } catch (e) {
-        showToast('خطأ في الإرسال', 'error');
-    }
-    btn.disabled = false;
-    btn.innerHTML = 'تأكيد الطلب عبر تليجرام';
-}
-
-        // دالة مساعدة لإشعارات بسيطة
         function showToast(msg) {
             const toast = document.createElement('div');
             toast.className = 'fixed bottom-5 right-5 bg-emerald-800 border-r-4 border-green-500 p-3 rounded-xl z-50 text-sm';
@@ -846,6 +796,8 @@ async function checkout() {
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+
+        // تم إزالة الكود الخاص بالمتجر (checkout, deductWallet) بالكامل لأنه كان دخيلاً على لوحة التحكم
     </script>
 </body>
 </html>
