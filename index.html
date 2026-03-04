@@ -682,23 +682,16 @@
             }
         }
 
-        // ====== كوبون الخصم (معدل للتوافق مع admin) ======
-        // دالة لجلب الكوبونات من localStorage (نفس المفتاح المستخدم في admin.html)
-        function getStoredCoupons() {
-            return JSON.parse(localStorage.getItem('sg_coupons')) || [];
-        }
-
+        // ====== كوبون الخصم (معدل ليتزامن مع admin.html) ======
         window.applyCoupon = function() {
             const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-            const coupons = getStoredCoupons(); // نجلب الكوبونات المخزنة من الإدارة
-            
-            // البحث عن كوبون مطابق ونشط
-            const found = coupons.find(c => c.code.toUpperCase() === code && c.active === true);
-            
-            if (found) {
-                activeDiscount = found.discount / 100; // تحويل النسبة المئوية إلى عشرية
+            // قراءة الكوبونات من localStorage بنفس المفتاح المستخدم في admin.html
+            const coupons = JSON.parse(localStorage.getItem('sg_coupons')) || [];
+            const coupon = coupons.find(c => c.code === code && c.active === true);
+            if (coupon) {
+                activeDiscount = coupon.discount / 100;
                 appliedCoupon = code;
-                couponMsg.textContent = `تم تطبيق خصم ${found.discount}%`;
+                couponMsg.textContent = `تم تطبيق خصم ${coupon.discount}%`;
                 couponMsg.classList.remove('hidden');
                 updateCartUI();
                 showToast('تم تطبيق الخصم');
@@ -706,6 +699,7 @@
                 couponMsg.textContent = 'كود غير صالح أو غير مفعل';
                 couponMsg.classList.remove('hidden');
                 activeDiscount = 0;
+                appliedCoupon = '';
                 updateCartUI();
             }
         };
