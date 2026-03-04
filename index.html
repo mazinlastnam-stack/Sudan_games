@@ -682,19 +682,28 @@
             }
         }
 
-        // ====== كوبون الخصم ======
+        // ====== كوبون الخصم (معدل للتوافق مع admin) ======
+        // دالة لجلب الكوبونات من localStorage (نفس المفتاح المستخدم في admin.html)
+        function getStoredCoupons() {
+            return JSON.parse(localStorage.getItem('sg_coupons')) || [];
+        }
+
         window.applyCoupon = function() {
             const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-            const coupons = { "رمضان10": 0.10, "SUDAN-RK": 0.10, "خصم5": 0.05 };
-            if (coupons[code]) {
-                activeDiscount = coupons[code];
+            const coupons = getStoredCoupons(); // نجلب الكوبونات المخزنة من الإدارة
+            
+            // البحث عن كوبون مطابق ونشط
+            const found = coupons.find(c => c.code.toUpperCase() === code && c.active === true);
+            
+            if (found) {
+                activeDiscount = found.discount / 100; // تحويل النسبة المئوية إلى عشرية
                 appliedCoupon = code;
-                couponMsg.textContent = `تم تطبيق خصم ${activeDiscount*100}%`;
+                couponMsg.textContent = `تم تطبيق خصم ${found.discount}%`;
                 couponMsg.classList.remove('hidden');
                 updateCartUI();
                 showToast('تم تطبيق الخصم');
             } else {
-                couponMsg.textContent = 'كود غير صالح';
+                couponMsg.textContent = 'كود غير صالح أو غير مفعل';
                 couponMsg.classList.remove('hidden');
                 activeDiscount = 0;
                 updateCartUI();
@@ -826,4 +835,4 @@
         };
     </script>
 </body>
-                </html>
+</html>
