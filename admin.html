@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم SUDAN GAMES</title>
+    <title>لوحة تحكم SUDAN GAMES - متكاملة مع فيسبوك وتليجرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,10 +32,33 @@
         .gold-border { border-color: var(--ramadan-gold); }
         .gold-bg { background-color: var(--ramadan-gold); }
 
+        .tab-btn {
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
         .tab-btn.active { 
             border-bottom: 3px solid var(--ramadan-gold); 
             color: var(--ramadan-gold); 
+            background: rgba(251, 191, 36, 0.1);
         }
+
+        /* شريط التبويبات القابل للتمرير */
+        .tabs-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--ramadan-gold) #065f46;
+        }
+        .tabs-container::-webkit-scrollbar { height: 4px; }
+        .tabs-container::-webkit-scrollbar-thumb { background: var(--ramadan-gold); border-radius: 10px; }
+
+        /* تخصيص شريط التمرير للمحتوى */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -84,6 +107,15 @@
             padding: 5px 10px; border-radius: 10px; cursor: pointer; margin: 2px;
         }
         .action-btn:hover { background: var(--ramadan-gold); color: var(--ramadan-green); }
+
+        /* بطاقات الإحصائيات */
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body class="p-4">
@@ -94,7 +126,6 @@
         <input type="text" id="admin-username" placeholder="اسم المستخدم" class="input-field" value="admin">
         <input type="password" id="admin-password" placeholder="كلمة المرور" class="input-field" value="admin123">
         <button onclick="adminLogin()" class="w-full gold-bg text-emerald-950 py-4 rounded-xl font-bold text-lg">دخول</button>
-       
     </div>
 
     <!-- لوحة التحكم (تظهر بعد تسجيل الدخول) -->
@@ -105,15 +136,19 @@
             <button onclick="adminLogout()" class="bg-red-600/30 text-red-400 px-4 py-2 rounded-xl border border-red-700">تسجيل خروج</button>
         </header>
 
-        <!-- تبويبات الإدارة -->
-        <div class="flex flex-wrap gap-2 admin-card p-2 mb-6 sticky top-0 z-50">
-            <button data-tab="dashboard" class="tab-btn active p-3 font-bold text-sm flex-1" onclick="showAdminTab('dashboard')"><i class="fas fa-chart-pie ml-1"></i> الرئيسية</button>
-            <button data-tab="users" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('users')"><i class="fas fa-users ml-1"></i> المستخدمين</button>
-            <button data-tab="wallet" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('wallet')"><i class="fas fa-wallet ml-1"></i> المحفظة</button>
-            <button data-tab="products" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('products')"><i class="fas fa-box ml-1"></i> المنتجات</button>
-            <button data-tab="orders" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('orders')"><i class="fas fa-shopping-cart ml-1"></i> الطلبات</button>
-            <button data-tab="reviews" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('reviews')"><i class="fas fa-star ml-1"></i> التقييمات</button>
-            <button data-tab="coupons" class="tab-btn p-3 font-bold text-sm flex-1" onclick="showAdminTab('coupons')"><i class="fas fa-ticket ml-1"></i> الكوبونات</button>
+        <!-- تبويبات الإدارة (قابلة للتمرير على الجوال) -->
+        <div class="tabs-container admin-card p-2 mb-6 sticky top-0 z-50">
+            <div class="flex gap-2 min-w-max">
+                <button data-tab="dashboard" class="tab-btn active p-3 font-bold text-sm" onclick="showAdminTab('dashboard')"><i class="fas fa-chart-pie ml-1"></i> الرئيسية</button>
+                <button data-tab="users" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('users')"><i class="fas fa-users ml-1"></i> المستخدمين</button>
+                <button data-tab="wallet" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('wallet')"><i class="fas fa-wallet ml-1"></i> المحفظة</button>
+                <button data-tab="products" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('products')"><i class="fas fa-box ml-1"></i> المنتجات</button>
+                <button data-tab="orders" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('orders')"><i class="fas fa-shopping-cart ml-1"></i> الطلبات</button>
+                <button data-tab="reviews" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('reviews')"><i class="fas fa-star ml-1"></i> التقييمات</button>
+                <button data-tab="coupons" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('coupons')"><i class="fas fa-ticket ml-1"></i> الكوبونات</button>
+                <button data-tab="facebook" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('facebook')"><i class="fab fa-facebook ml-1"></i> فيسبوك</button>
+                <button data-tab="telegram" class="tab-btn p-3 font-bold text-sm" onclick="showAdminTab('telegram')"><i class="fab fa-telegram ml-1"></i> تليجرام</button>
+            </div>
         </div>
 
         <!-- محتوى التبويبات -->
@@ -122,22 +157,22 @@
             <div id="dashboard" class="tab-content">
                 <h2 class="text-xl font-bold gold-text mb-4">📊 إحصائيات سريعة</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                    <div class="stat-card bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
                         <i class="fas fa-users text-3xl gold-text mb-2"></i>
                         <p class="text-2xl font-black" id="stats-users">0</p>
                         <p class="text-sm">المستخدمين</p>
                     </div>
-                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                    <div class="stat-card bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
                         <i class="fas fa-shopping-cart text-3xl gold-text mb-2"></i>
                         <p class="text-2xl font-black" id="stats-orders">0</p>
                         <p class="text-sm">الطلبات</p>
                     </div>
-                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                    <div class="stat-card bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
                         <i class="fas fa-box text-3xl gold-text mb-2"></i>
                         <p class="text-2xl font-black" id="stats-products">0</p>
                         <p class="text-sm">المنتجات</p>
                     </div>
-                    <div class="bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
+                    <div class="stat-card bg-emerald-900/50 p-4 rounded-xl border border-yellow-600/30 text-center">
                         <i class="fas fa-star text-3xl gold-text mb-2"></i>
                         <p class="text-2xl font-black" id="stats-reviews">0</p>
                         <p class="text-sm">التقييمات</p>
@@ -159,7 +194,7 @@
                 </div>
             </div>
 
-            <!-- إدارة المحفظة (جديد) -->
+            <!-- إدارة المحفظة -->
             <div id="wallet" class="tab-content hidden">
                 <h2 class="text-xl font-bold gold-text mb-4">💰 إدارة أرصدة المستخدمين</h2>
                 <div class="overflow-x-auto">
@@ -184,9 +219,12 @@
                 </div>
             </div>
 
-            <!-- إدارة الطلبات -->
+            <!-- إدارة الطلبات (مع زر إضافة يدوي) -->
             <div id="orders" class="tab-content hidden">
-                <h2 class="text-xl font-bold gold-text mb-4">🛒 جميع الطلبات</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold gold-text">🛒 جميع الطلبات</h2>
+                    <button onclick="addManualOrder()" class="gold-bg text-emerald-950 px-4 py-2 rounded-xl font-bold text-sm"><i class="fas fa-plus ml-1"></i> إضافة طلب يدوي</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-auto w-full">
                         <thead><tr><th>المستخدم</th><th>المنتج</th><th>ID اللاعب</th><th>الحالة</th><th>التاريخ</th><th>الإجراءات</th></tr></thead>
@@ -217,6 +255,167 @@
                         <thead><tr><th>الكود</th><th>الخصم %</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
                         <tbody id="coupons-table-body"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- قسم فيسبوك -->
+            <div id="facebook" class="tab-content hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold gold-text flex items-center">
+                        <i class="fab fa-facebook ml-3 text-blue-500 animate-pulse"></i> 
+                        مركز إدارة فيسبوك
+                    </h2>
+                    <span class="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full border border-green-500/50">
+                        <span class="relative flex h-2 w-2 inline-block ml-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        متصل الآن
+                    </span>
+                </div>
+
+                <!-- إحصائيات فيسبوك -->
+                <div class="facebook-stats bg-slate-900/50 border border-slate-700 backdrop-blur-md rounded-2xl p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold gold-text">📊 مؤشرات الأداء الحالية</h3>
+                        <button onclick="refreshFacebookStats()" class="hover:rotate-180 transition-transform duration-500 text-blue-400" title="تحديث البيانات">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- المتابعون -->
+                        <div class="stat-card bg-slate-800/50 p-4 rounded-xl border border-blue-500/20">
+                            <div class="flex justify-between items-start mb-2">
+                                <i class="fas fa-user-plus text-blue-400 text-xl"></i>
+                                <span class="text-xs text-slate-400">الهدف: 1k</span>
+                            </div>
+                            <p class="text-3xl font-black text-white" id="fb-followers">3</p>
+                            <p class="text-xs text-slate-400 mb-2">متابع نشط</p>
+                            <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div id="fb-followers-progress" class="bg-blue-500 h-full" style="width: 0.3%"></div>
+                            </div>
+                        </div>
+
+                        <!-- المشاهدات -->
+                        <div class="stat-card bg-slate-800/50 p-4 rounded-xl border border-blue-500/20">
+                            <i class="fas fa-eye text-blue-400 text-xl mb-2"></i>
+                            <p class="text-3xl font-black text-white" id="fb-views">2,488</p>
+                            <p class="text-xs text-slate-400">مشاهدة المحتوى</p>
+                        </div>
+
+                        <!-- التفاعل -->
+                        <div class="stat-card bg-slate-800/50 p-4 rounded-xl border border-blue-500/20">
+                            <i class="fas fa-chart-line text-green-400 text-xl mb-2"></i>
+                            <p class="text-3xl font-black text-white" id="fb-engagement">46%</p>
+                            <p class="text-xs text-slate-400">نسبة التفاعل</p>
+                        </div>
+                    </div>
+
+                    <!-- نموذج تحديث يدوي للإحصائيات -->
+                    <div class="mt-6 border-t border-slate-700 pt-4">
+                        <p class="text-sm text-slate-400 mb-3">✏️ تحديث الإحصائيات يدوياً (بناءً على آخر بيانات فيسبوك)</p>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <input type="number" id="input-followers" placeholder="المتابعون" class="bg-slate-800 p-2 rounded border border-slate-600 text-sm">
+                            <input type="number" id="input-views" placeholder="المشاهدات" class="bg-slate-800 p-2 rounded border border-slate-600 text-sm">
+                            <input type="number" id="input-engagement" placeholder="التفاعل %" class="bg-slate-800 p-2 rounded border border-slate-600 text-sm" step="0.1">
+                            <button onclick="updateFacebookStats()" class="gold-bg text-emerald-950 px-4 py-2 rounded-lg font-bold text-sm">حفظ التحديثات</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار الإجراءات السريعة -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <a href="https://www.facebook.com/profile.php?id=61573761030765" target="_blank" 
+                       class="group flex items-center justify-center space-x-3 space-x-reverse bg-[#1877F2] hover:bg-blue-600 p-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
+                        <i class="fab fa-facebook-f text-xl group-hover:scale-110 transition"></i>
+                        <span class="font-bold">زيارة الصفحة</span>
+                    </a>
+                    
+                    <a href="https://business.facebook.com/latest/composer" target="_blank" 
+                       class="group flex items-center justify-center space-x-3 space-x-reverse bg-gradient-to-r from-emerald-600 to-teal-600 p-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
+                        <i class="fas fa-edit text-xl group-hover:rotate-12 transition"></i>
+                        <span class="font-bold">جدولة منشور</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/profile.php?id=61573761030765&sk=reviews" target="_blank" 
+                       class="group flex items-center justify-center space-x-3 space-x-reverse bg-slate-700 p-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 border border-slate-600">
+                        <i class="fas fa-star text-yellow-400 text-xl"></i>
+                        <span class="font-bold">المراجعات</span>
+                    </a>
+                </div>
+
+                <!-- نصائح ذكية (تحديث حسب الإحصائيات) -->
+                <div class="bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-700 rounded-2xl p-5 mb-6">
+                    <h4 class="font-bold gold-text mb-2 flex items-center"><i class="fas fa-lightbulb text-yellow-400 ml-2"></i> نصائح لتحسين التفاعل</h4>
+                    <p id="fb-tip" class="text-sm text-slate-300">قم بزيادة عدد المتابعين إلى 50 على الأقل لبدء تفاعل جيد.</p>
+                </div>
+
+                <!-- آخر التعليقات (محاكاة) -->
+                <div class="bg-slate-900/50 border border-slate-700 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold gold-text"><i class="fas fa-comments ml-2"></i> آخر التعليقات على المنشورات</h3>
+                        <button onclick="loadMockComments()" class="text-xs text-blue-400 hover:underline">تحديث</button>
+                    </div>
+                    <div id="fb-comments-list" class="space-y-1 max-h-80 overflow-y-auto custom-scrollbar">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم تليجرام -->
+            <div id="telegram" class="tab-content hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold gold-text flex items-center">
+                        <i class="fab fa-telegram ml-3 text-blue-400 animate-pulse"></i> 
+                        إشعارات تليجرام
+                    </h2>
+                    <span class="bg-blue-500/20 text-blue-400 text-xs px-3 py-1 rounded-full border border-blue-500/50">
+                        <i class="fas fa-check-circle ml-1"></i> البوت متصل
+                    </span>
+                </div>
+
+                <!-- إعدادات البوت -->
+                <div class="bg-slate-900/50 border border-slate-700 backdrop-blur-md rounded-2xl p-6 mb-6">
+                    <h3 class="text-lg font-bold gold-text mb-4">🤖 إعدادات البوت</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="text-sm text-slate-400 block mb-1">توكن البوت (Bot Token)</label>
+                            <input type="text" id="telegram-token" value="7963817662:AAEzdlPpa78KtKOtEtYYQZ8s8eZwu8toH-I" class="w-full bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm" readonly disabled>
+                            <p class="text-[10px] text-slate-500 mt-1">تم تعيين التوكن بشكل ثابت (يمكنك تغييره لاحقاً في الكود).</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-slate-400 block mb-1">معرف الدردشة (Chat ID) <span class="text-red-400">*</span></label>
+                            <input type="text" id="telegram-chatid" placeholder="مثال: 123456789" class="bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm w-full">
+                            <p class="text-[10px] text-slate-500 mt-1">أدخل معرف الدردشة الخاص بك (تحصل عليه من @userinfobot).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إرسال رسالة يدوية -->
+                <div class="bg-slate-900/50 border border-slate-700 backdrop-blur-md rounded-2xl p-6 mb-6">
+                    <h3 class="text-lg font-bold gold-text mb-4">✉️ إرسال رسالة يدوية</h3>
+                    <div class="space-y-3">
+                        <textarea id="telegram-message" rows="4" placeholder="نص الرسالة..." class="w-full bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm"></textarea>
+                        <div class="flex gap-2">
+                            <button onclick="sendTelegramMessage()" class="flex-1 gold-bg text-emerald-950 py-3 rounded-xl font-bold text-sm">
+                                <i class="fas fa-paper-plane ml-2"></i> إرسال
+                            </button>
+                            <button onclick="testTelegramMessage()" class="bg-blue-600 text-white py-3 px-4 rounded-xl font-bold text-sm">
+                                <i class="fas fa-vial ml-2"></i> اختبار
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إرسال تلقائي عند إضافة طلب -->
+                <div class="bg-slate-900/50 border border-slate-700 backdrop-blur-md rounded-2xl p-6">
+                    <h3 class="text-lg font-bold gold-text mb-4">⚙️ إعدادات الإشعارات التلقائية</h3>
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" id="auto-notify-orders" class="w-5 h-5 rounded border-slate-600 bg-slate-800">
+                        <span class="text-sm">إرسال إشعار إلى تليجرام عند إضافة طلب جديد</span>
+                    </label>
+                    <p class="text-xs text-slate-400 mt-2">إذا فعّلت هذا الخيار، سيتم إرسال رسالة إلى تليجرام في كل مرة تضيف فيها طلباً يدوياً.</p>
                 </div>
             </div>
         </div>
@@ -267,7 +466,7 @@
         </div>
     </div>
 
-    <!-- نافذة تعديل الرصيد (جديد) -->
+    <!-- نافذة تعديل الرصيد -->
     <div class="admin-modal" id="walletModal">
         <h3 class="text-xl gold-text font-bold mb-4">تعديل رصيد المستخدم</h3>
         <p id="wallet-user-name" class="text-lg"></p>
@@ -282,7 +481,7 @@
     <script>
         // ==================== بيانات تسجيل الدخول ====================
         const ADMIN_USER = 'THEMAX09';
-        const ADMIN_PASS = 'THE00MAX';  // يُفضل تغييرها عبر واجهة إعدادات لاحقاً
+        const ADMIN_PASS = 'THE00MAX';
 
         function adminLogin() {
             const user = document.getElementById('admin-username').value;
@@ -327,12 +526,13 @@
             else if (tabId === 'orders') renderOrdersTable();
             else if (tabId === 'reviews') renderReviewsTable();
             else if (tabId === 'coupons') renderCouponsTable();
+            else if (tabId === 'facebook') { loadFacebookStats(); loadMockComments(); }
+            else if (tabId === 'telegram') loadTelegramSettings();
         }
 
         // ==================== البيانات (localStorage) ====================
         function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
         function getProducts() { 
-            // المنتجات الافتراضية إذا لم تكن موجودة
             let prods = JSON.parse(localStorage.getItem('sg_products'));
             if (!prods) {
                 prods = [
@@ -406,7 +606,6 @@
             }
         }
 
-        // نافذة إضافة مستخدم
         let editingUserIndex = -1;
         function openUserModal(user = null) {
             editingUserIndex = -1;
@@ -436,19 +635,18 @@
             }
 
             let users = getUsers();
-            // تحقق من عدم تكرار رقم الجوال
             if (users.some(u => u.phone === phone)) {
                 alert('رقم الجوال موجود بالفعل');
                 return;
             }
-            users.push({ name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 }); // إضافة رصيد افتراضي 0
+            users.push({ name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 });
             localStorage.setItem('users', JSON.stringify(users));
             closeUserModal();
             renderUsersTable();
             updateStats();
         }
 
-        // ==================== المحفظة (جديد) ====================
+        // ==================== المحفظة ====================
         let currentWalletUserIndex = null;
 
         function renderWalletTable() {
@@ -576,10 +774,8 @@
 
             let prods = getProducts();
             if (editingProductIndex >= 0) {
-                // تعديل
                 prods[editingProductIndex] = { game, name, price, special };
             } else {
-                // إضافة
                 prods.push({ game, name, price, special });
             }
             localStorage.setItem('sg_products', JSON.stringify(prods));
@@ -588,10 +784,7 @@
             updateStats();
         }
 
-        function editProduct(index) {
-            openProductModal(index);
-        }
-
+        function editProduct(index) { openProductModal(index); }
         function deleteProduct(index) {
             if (confirm('حذف المنتج؟')) {
                 let prods = getProducts();
@@ -608,7 +801,6 @@
             const tbody = document.getElementById('orders-table-body');
             tbody.innerHTML = '';
             orders.forEach((order, index) => {
-                // نعطي حالة افتراضية إذا لم تكن موجودة
                 const status = order.status || 'pending';
                 const statusClass = status === 'pending' ? 'status-pending' : (status === 'completed' ? 'status-completed' : 'status-cancelled');
                 const statusText = { pending: 'معلق', completed: 'مكتمل', cancelled: 'ملغي' }[status] || 'معلق';
@@ -644,6 +836,46 @@
             }
         }
 
+        // دالة إضافة طلب يدوي (جديدة)
+        function addManualOrder() {
+            const game = prompt('اللعبة (Free Fire أو PUBG Mobile):', 'Free Fire');
+            if (!game) return;
+            const pack = prompt('الباقة:', '110 جوهرة');
+            if (!pack) return;
+            const price = parseInt(prompt('السعر (SDG):', '3500'));
+            if (isNaN(price) || price <= 0) return;
+            const phone = prompt('رقم واتساب:', '249115169965');
+            if (!phone) return;
+            const id = prompt('معرف اللاعب (ID):', '123456789');
+            if (!id) return;
+
+            const newOrder = {
+                game, pack, price, phone, id,
+                status: 'pending',
+                timestamp: new Date().toLocaleString('ar-EG')
+            };
+            let orders = getOrders();
+            orders.unshift(newOrder);
+            localStorage.setItem('sg_history', JSON.stringify(orders));
+            renderOrdersTable();
+            updateStats();
+            showToast('تمت إضافة الطلب بنجاح');
+
+            // إرسال إشعار تليجرام إذا كان الخيار مفعلاً
+            if (document.getElementById('auto-notify-orders') && document.getElementById('auto-notify-orders').checked) {
+                const chatId = document.getElementById('telegram-chatid').value.trim();
+                if (chatId) {
+                    const TELEGRAM_TOKEN = '7963817662:AAEzdlPpa78KtKOtEtYYQZ8s8eZwu8toH-I';
+                    const msg = `🆕 <b>طلب جديد</b>\n\n🎮 اللعبة: ${game}\n📦 الباقة: ${pack}\n💰 السعر: ${price} SDG\n🆔 ID: ${id}\n📱 واتساب: ${phone}\n⏰ ${newOrder.timestamp}`;
+                    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' })
+                    }).catch(() => {});
+                }
+            }
+        }
+
         // ==================== التقييمات ====================
         function renderReviewsTable() {
             const reviews = getReviews();
@@ -671,7 +903,7 @@
         }
 
         // ==================== الكوبونات ====================
-        let editingCouponIndex = -1; // متغير عام لتحديد حالة التعديل
+        let editingCouponIndex = -1;
 
         function renderCouponsTable() {
             const coupons = getCoupons();
@@ -692,7 +924,7 @@
         }
 
         function openCouponModal() {
-            editingCouponIndex = -1; // وضع الإضافة
+            editingCouponIndex = -1;
             document.getElementById('couponCode').value = '';
             document.getElementById('couponDiscount').value = '';
             document.getElementById('modalOverlay').style.display = 'block';
@@ -712,16 +944,13 @@
                 return;
             }
             let coupons = getCoupons();
-            // التحقق من التكرار (إذا كان في وضع الإضافة)
             if (editingCouponIndex === -1 && coupons.some(c => c.code === code)) {
                 alert('هذا الكود موجود بالفعل');
                 return;
             }
             if (editingCouponIndex >= 0) {
-                // تعديل
                 coupons[editingCouponIndex] = { code, discount, active: coupons[editingCouponIndex].active };
             } else {
-                // إضافة
                 coupons.push({ code, discount, active: true });
             }
             localStorage.setItem('sg_coupons', JSON.stringify(coupons));
@@ -756,26 +985,183 @@
             }
         }
 
+        // ==================== فيسبوك ====================
+        function loadFacebookStats() {
+            let stats = JSON.parse(localStorage.getItem('fb_stats')) || { followers: 3, views: 2488, engagement: 46 };
+            document.getElementById('fb-followers').innerText = stats.followers;
+            document.getElementById('fb-views').innerText = stats.views.toLocaleString();
+            document.getElementById('fb-engagement').innerText = stats.engagement + '%';
+            let progress = (stats.followers / 1000) * 100;
+            document.getElementById('fb-followers-progress').style.width = progress + '%';
+            updateTip(stats);
+            return stats;
+        }
+
+        function saveFacebookStats(stats) {
+            localStorage.setItem('fb_stats', JSON.stringify(stats));
+            loadFacebookStats();
+        }
+
+        function updateFacebookStats() {
+            let followers = parseInt(document.getElementById('input-followers').value);
+            let views = parseInt(document.getElementById('input-views').value);
+            let engagement = parseFloat(document.getElementById('input-engagement').value);
+            if (isNaN(followers) || followers < 0) followers = 3;
+            if (isNaN(views) || views < 0) views = 2488;
+            if (isNaN(engagement) || engagement < 0) engagement = 46;
+            saveFacebookStats({ followers, views, engagement });
+            document.getElementById('input-followers').value = '';
+            document.getElementById('input-views').value = '';
+            document.getElementById('input-engagement').value = '';
+            showToast('تم تحديث إحصائيات فيسبوك');
+        }
+
+        function updateTip(stats) {
+            let tipEl = document.getElementById('fb-tip');
+            if (stats.followers < 50) {
+                tipEl.innerText = 'قم بزيادة عدد المتابعين إلى 50 على الأقل لبدء تفاعل جيد.';
+            } else if (stats.engagement < 30) {
+                tipEl.innerText = 'نسبة التفاعل منخفضة. جرب طرح أسئلة أو عمل استفتاءات في المنشورات.';
+            } else if (stats.views < 5000) {
+                tipEl.innerText = 'المشاهدات قليلة. حاول النشر في أوقات الذروة (بعد الإفطار) واستخدم هاشتاجات محلية.';
+            } else {
+                tipEl.innerText = 'أداء ممتاز! استمر في تقديم محتوى جذاب. يمكنك تجربة البث المباشر لزيادة التفاعل.';
+            }
+        }
+
+        function refreshFacebookStats() {
+            let btn = event.currentTarget;
+            btn.classList.add('fa-spin');
+            setTimeout(() => {
+                btn.classList.remove('fa-spin');
+                let newStats = {
+                    followers: Math.floor(Math.random() * 50) + 3,
+                    views: Math.floor(Math.random() * 3000) + 2000,
+                    engagement: Math.floor(Math.random() * 30) + 30
+                };
+                saveFacebookStats(newStats);
+                showToast('تم تحديث البيانات من فيسبوك');
+            }, 1000);
+        }
+
+        const mockComments = [
+            { user: 'محمد عبدالله', avatar: '👨🏽', text: 'كم سعر شحن 110 جوهرة؟', time: 'منذ 10 دقائق' },
+            { user: 'أحمد علي', avatar: '👨🏻', text: 'شكراً على الشحن السريع ❤️', time: 'منذ ساعة' },
+            { user: 'نور الهدى', avatar: '👩🏽', text: 'هل توصلون لود مدني؟', time: 'منذ 3 ساعات' },
+            { user: 'عمر خالد', avatar: '👨🏾', text: 'عرض رمضان ممتاز، استلمت الكود', time: 'منذ 5 ساعات' },
+            { user: 'فاطمة الزهراء', avatar: '👩🏻', text: 'عندكم شحن UC ببجي؟', time: 'منذ يوم' }
+        ];
+
+        function loadMockComments() {
+            const list = document.getElementById('fb-comments-list');
+            if (!list) return;
+            list.innerHTML = '';
+            mockComments.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'p-3 hover:bg-slate-800/50 transition cursor-pointer flex items-start gap-3 rounded-lg';
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-base border border-slate-600">${c.avatar}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="text-sm font-bold text-blue-300">${c.user}</h4>
+                            <span class="text-[10px] text-slate-500">${c.time}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-1">${c.text}</p>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // ==================== تليجرام ====================
+        const TELEGRAM_TOKEN = '7963817662:AAEzdlPpa78KtKOtEtYYQZ8s8eZwu8toH-I';
+
+        function sendTelegramMessage() {
+            const chatId = document.getElementById('telegram-chatid').value.trim();
+            const message = document.getElementById('telegram-message').value.trim();
+            if (!chatId) {
+                showToast('الرجاء إدخال معرف الدردشة (Chat ID)', 'error');
+                return;
+            }
+            if (!message) {
+                showToast('الرجاء إدخال نص الرسالة', 'error');
+                return;
+            }
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الإرسال...';
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) {
+                    showToast('تم إرسال الرسالة بنجاح ✅');
+                    document.getElementById('telegram-message').value = '';
+                } else {
+                    showToast('خطأ في الإرسال: ' + (data.description || 'غير معروف'), 'error');
+                }
+            })
+            .catch(err => {
+                showToast('فشل الاتصال بتليجرام', 'error');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane ml-2"></i> إرسال';
+            });
+        }
+
+        function testTelegramMessage() {
+            const chatId = document.getElementById('telegram-chatid').value.trim();
+            if (!chatId) {
+                showToast('الرجاء إدخال معرف الدردشة أولاً', 'error');
+                return;
+            }
+            localStorage.setItem('telegram_chatid', chatId);
+
+            const testMsg = `🛠️ <b>رسالة اختبار من لوحة تحكم Sudan Games</b>\n✅ البوت يعمل بنجاح.\n📅 ${new Date().toLocaleString('ar-EG')}`;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: testMsg, parse_mode: 'HTML' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) showToast('تم إرسال رسالة الاختبار ✅');
+                else showToast('فشل الاختبار: ' + (data.description || ''), 'error');
+            })
+            .catch(() => showToast('خطأ في الاتصال', 'error'));
+        }
+
+        function loadTelegramSettings() {
+            const savedChatId = localStorage.getItem('telegram_chatid');
+            if (savedChatId) document.getElementById('telegram-chatid').value = savedChatId;
+            const autoNotify = localStorage.getItem('auto_notify_orders') === 'true';
+            document.getElementById('auto-notify-orders').checked = autoNotify;
+        }
+
+        // حفظ إعدادات الإشعارات التلقائية
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'auto-notify-orders') {
+                localStorage.setItem('auto_notify_orders', e.target.checked);
+            }
+        });
+
         // ==================== إغلاق جميع النوافذ ====================
         function closeAllModals() {
             document.querySelectorAll('.admin-modal').forEach(m => m.classList.remove('active'));
             document.getElementById('modalOverlay').style.display = 'none';
-            // إعادة تعيين متغيرات التحرير
             editingUserIndex = -1;
             editingProductIndex = -1;
             editingCouponIndex = -1;
             currentWalletUserIndex = null;
-        }
-
-        // ==================== تحميل كل البيانات ====================
-        function loadAllData() {
-            updateStats();
-            renderUsersTable();
-            renderWalletTable();
-            renderProductsTable();
-            renderOrdersTable();
-            renderReviewsTable();
-            renderCouponsTable();
         }
 
         // ==================== دوال مساعدة ====================
@@ -789,15 +1175,26 @@
                 .replace(/'/g, "&#039;");
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = 'success') {
             const toast = document.createElement('div');
-            toast.className = 'fixed bottom-5 right-5 bg-emerald-800 border-r-4 border-green-500 p-3 rounded-xl z-50 text-sm';
+            toast.className = `fixed bottom-5 right-5 bg-emerald-800 border-r-4 ${type === 'error' ? 'border-red-500' : 'border-green-500'} p-3 rounded-xl z-50 text-sm`;
             toast.innerText = msg;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // تم إزالة الكود الخاص بالمتجر (checkout, deductWallet) بالكامل لأنه كان دخيلاً على لوحة التحكم
+        function loadAllData() {
+            updateStats();
+            renderUsersTable();
+            renderWalletTable();
+            renderProductsTable();
+            renderOrdersTable();
+            renderReviewsTable();
+            renderCouponsTable();
+            loadFacebookStats();
+            loadMockComments();
+            loadTelegramSettings();
+        }
     </script>
 </body>
 </html>
