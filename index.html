@@ -41,7 +41,6 @@
             color: var(--ramadan-gold); 
         }
 
-        /* زخرفة الهلال */
         .moon-icon {
             position: absolute;
             top: 10px;
@@ -65,7 +64,6 @@
             position: relative;
         }
 
-        /* المحفظة الرمضانية */
         .wallet-card {
             background: linear-gradient(145deg, #064e3b, #022c22);
             margin: 20px 0;
@@ -92,7 +90,6 @@
             border-radius: 50px;
         }
 
-        /* نافذة الدفع والتسجيل */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             display: none; z-index: 1000;
@@ -122,7 +119,6 @@
             cursor: pointer;
         }
 
-        /* تنسيقات إضافية */
         .input-field {
             width: 100%;
             padding: 16px;
@@ -490,7 +486,16 @@
                 return;
             }
 
-            const newUser = { name, phone, playerId: playerId || 'غير محدد', password, wallet: 0 }; // رصيد افتراضي 0
+            const newUser = { 
+                id: users.length + 1,
+                name, 
+                phone, 
+                playerId: playerId || 'غير محدد', 
+                password, 
+                wallet: 0,
+                status: 'نشط',
+                regDate: new Date().toISOString().split('T')[0]
+            };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             currentUser = { name, phone, playerId: newUser.playerId };
@@ -682,7 +687,7 @@
             }
         }
 
-        // ====== كوبون الخصم (معدل ليتزامن مع admin.html) ======
+        // ====== كوبون الخصم (يقرأ من localStorage الذي تديره لوحة الإدارة) ======
         window.applyCoupon = function() {
             const code = document.getElementById('coupon-input').value.trim().toUpperCase();
             // قراءة الكوبونات من localStorage بنفس المفتاح المستخدم في admin.html
@@ -704,13 +709,30 @@
             }
         };
 
-        // ====== إرسال الطلب (checkout) مع بيانات المستخدم ======
+        // ====== إرسال الطلب (checkout) مع حفظ الطلب في localStorage ليظهر بلوحة الإدارة ======
         async function checkout() {
             if (cart.length === 0) return;
             const btn = document.getElementById('checkout-btn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner animate-spin ml-2"></i> جاري الإرسال...';
 
+            // إنشاء كائن الطلب
+            const newOrder = {
+                id: '#ORD' + Math.floor(Math.random() * 10000),
+                customer: currentUser ? currentUser.name : 'زائر',
+                product: cart.map(item => `${item.game} - ${item.pack}`).join('، '),
+                amount: cart.reduce((acc, item) => acc + item.price, 0) * (1 - activeDiscount),
+                status: 'جديد',
+                date: new Date().toISOString().split('T')[0],
+                items: cart
+            };
+
+            // حفظ الطلب في localStorage (ليظهر في admin.html)
+            let orders = JSON.parse(localStorage.getItem('sg_orders')) || [];
+            orders.unshift(newOrder);
+            localStorage.setItem('sg_orders', JSON.stringify(orders));
+
+            // إرسال إلى تليجرام (اختياري)
             let msg = `🎮 *طلب شحن جديد - SUDAN GAMES (رمضان)*\n`;
             if (currentUser) {
                 msg += `👤 المستخدم: ${currentUser.name}\n📱 جوال: ${currentUser.phone}\n`;
@@ -719,8 +741,7 @@
                 msg += `━━━━━━━━\n📦 الطلب ${i+1}: ${item.game} - ${item.pack}\n🆔 ID: \`${item.id}\`\n📱 واتساب: ${item.phone}\n`;
             });
             if (appliedCoupon) msg += `🎟️ كود الخصم: ${appliedCoupon}\n`;
-            const finalTotal = cart.reduce((acc, item) => acc + item.price, 0) * (1 - activeDiscount);
-            msg += `💰 *الإجمالي:* ${finalTotal.toLocaleString()} SDG\n`;
+            msg += `💰 *الإجمالي:* ${newOrder.amount.toLocaleString()} SDG\n`;
 
             try {
                 const token = "ODQ3NTMyODc2MDpBQUZGS3oxQVNxaG5TbHQ0cXlMTmh1ODBOek5pTExPdjJsSQ=="; // مثال
