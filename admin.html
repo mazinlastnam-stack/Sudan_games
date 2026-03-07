@@ -1087,19 +1087,39 @@
             });
         }
 
-        // تحديث حالة الطلب
+        // ======================= الإصلاح هنا =======================
+        // تحديث حالة الطلب (مع بحث مرن وتسجيل)
         window.updateOrderStatus = function(orderId, newStatus) {
-            const order = orders.find(o => o.id === orderId);
+            console.log('🔍 محاولة تحديث الطلب:', orderId, 'إلى', newStatus);
+            console.log('📦 عدد الطلبات الحالي:', orders.length);
+
+            // محاولة العثور على الطلب بالمعرف الأصلي
+            let order = orders.find(o => o.id === orderId);
+
+            // إذا لم يتم العثور، حاول بدون الرمز # (إذا كان موجوداً)
+            if (!order && orderId.startsWith('#')) {
+                const idWithoutHash = orderId.substring(1);
+                order = orders.find(o => o.id === idWithoutHash || o.id === '#' + idWithoutHash);
+            }
+
             if (order) {
                 order.status = newStatus;
-                saveData();
+                saveData(); // حفظ التغيير في localStorage
+
+                // إعادة عرض الجداول والإحصائيات
                 displayRecentOrders();
                 displayAllOrders();
                 updateStats();
                 updateCharts();
                 updateNotifications();
+
+                console.log('✅ تم تحديث الحالة بنجاح');
+            } else {
+                console.error('❌ لم يتم العثور على الطلب:', orderId);
+                alert('الطلب غير موجود! قد يكون قد حُذف أو حدث خطأ في المعرف.');
             }
         };
+        // ===========================================================
 
         // عرض المنتجات
         function displayProductsTable() {
