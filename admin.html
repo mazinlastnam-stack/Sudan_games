@@ -534,19 +534,19 @@
                         <div class="table-responsive table-custom">
                             <table class="table table-hover align-middle mb-0">
                                 <thead>
-                                    <tr>
+                                     <tr>
                                         <th>رقم الطلب</th>
                                         <th>العميل</th>
                                         <th>المنتج</th>
                                         <th>المبلغ</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
-                                    </tr>
+                                     </tr>
                                 </thead>
                                 <tbody id="recentOrdersTable">
                                     <!-- ديناميكي -->
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
 
@@ -566,19 +566,19 @@
                         <div class="table-responsive table-custom">
                             <table class="table table-hover align-middle" id="productsTable">
                                 <thead>
-                                    <tr>
+                                     <tr>
                                         <th>#</th>
                                         <th>اسم المنتج</th>
                                         <th>السعر (SDG)</th>
                                         <th>الفئة</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
-                                    </tr>
+                                     </tr>
                                 </thead>
                                 <tbody id="productsTableBody">
                                     <!-- ديناميكي -->
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
 
@@ -588,7 +588,7 @@
                         <div class="table-responsive table-custom">
                             <table class="table table-hover align-middle">
                                 <thead>
-                                    <tr>
+                                     <tr>
                                         <th>رقم الطلب</th>
                                         <th>العميل</th>
                                         <th>المنتج</th>
@@ -596,27 +596,32 @@
                                         <th>التاريخ</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
-                                    </tr>
+                                     </tr>
                                 </thead>
                                 <tbody id="allOrdersTableBody">
                                     <!-- ديناميكي -->
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
 
-                    <!-- صفحة المستخدمين (من index.html) -->
+                    <!-- صفحة المستخدمين (تم إضافة زر تحديث) -->
                     <div id="users" class="page">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4><i class="fas fa-users ms-2"></i>إدارة المستخدمين (العملاء)</h4>
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                <i class="fas fa-user-plus"></i> إضافة مستخدم
-                            </button>
+                            <div>
+                                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                    <i class="fas fa-user-plus"></i> إضافة مستخدم
+                                </button>
+                                <button class="btn btn-info" onclick="refreshUsers()">
+                                    <i class="fas fa-sync-alt"></i> تحديث
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive table-custom">
                             <table class="table table-hover align-middle">
                                 <thead>
-                                    <tr>
+                                     <tr>
                                         <th>#</th>
                                         <th>الاسم</th>
                                         <th>رقم الجوال</th>
@@ -625,12 +630,12 @@
                                         <th>الحالة</th>
                                         <th>تاريخ التسجيل</th>
                                         <th>الإجراءات</th>
-                                    </tr>
+                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody">
                                     <!-- ديناميكي -->
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
 
@@ -645,17 +650,17 @@
                         <div class="table-responsive table-custom">
                             <table class="table table-hover align-middle">
                                 <thead>
-                                    <tr>
+                                     <tr>
                                         <th>الكود</th>
                                         <th>نسبة الخصم %</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
-                                    </tr>
+                                     </tr>
                                 </thead>
                                 <tbody id="couponsTableBody">
                                     <!-- ديناميكي -->
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     </div>
 
@@ -893,6 +898,35 @@
         </div>
     </div>
 
+    <!-- مودال إعادة تعيين كلمة المرور (اختياري) -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إعادة تعيين كلمة المرور</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="resetPasswordForm">
+                        <input type="hidden" id="resetUserId">
+                        <div class="mb-3">
+                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmResetPassword()">تحديث كلمة المرور</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- مودال إضافة كوبون -->
     <div class="modal fade" id="addCouponModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -950,7 +984,7 @@
             // الطلبات (من index.html)
             orders = JSON.parse(localStorage.getItem('sg_orders')) || [];
 
-            // المستخدمين (من index.html)
+            // المستخدمين (من index.html) - نقرأهم مباشرة
             users = JSON.parse(localStorage.getItem('users')) || [];
 
             // الكوبونات
@@ -970,12 +1004,11 @@
         }
 
         // ==============================
-        // تسجيل الدخول / الخروج
+        // تسجيل الدخول / الخروج (تم الإصلاح: admin/admin)
         // ==============================
         const loginScreen = document.getElementById('loginScreen');
         const adminWrapper = document.getElementById('adminWrapper');
 
-        // التحقق من الجلسة
         if (sessionStorage.getItem('sg_logged') === 'true') {
             loginScreen.style.display = 'none';
             adminWrapper.style.display = 'block';
@@ -988,7 +1021,8 @@
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            if (username === 'MAZHAS' && password === 'MAZHAS09') {
+            // الإصلاح: قبول admin/admin
+            if (username === 'admin' && password === 'admin') {
                 sessionStorage.setItem('sg_logged', 'true');
                 loginScreen.style.opacity = 0;
                 setTimeout(() => {
@@ -999,7 +1033,7 @@
                     initAll();
                 }, 500);
             } else {
-                alert('بيانات الدخول غير صحيحة');
+                alert('بيانات الدخول غير صحيحة (يجب admin/admin)');
             }
         });
 
@@ -1022,7 +1056,7 @@
             displayRecentOrders();
             displayAllOrders();
             displayProductsTable();
-            displayUsersTable();
+            displayUsersTable();   // عرض المستخدمين
             displayCouponsTable();
             initCharts();
             initRevenueChart();
@@ -1030,6 +1064,13 @@
             initStaffChart();
             updateNotifications();
             setupSearch();
+        }
+
+        // دالة لتحديث المستخدمين (يتم استدعاؤها عند النقر على زر التحديث أو عند الانتقال لصفحة المستخدمين)
+        function refreshUsers() {
+            loadData();           // إعادة قراءة جميع البيانات من localStorage
+            displayUsersTable();  // إعادة عرض جدول المستخدمين
+            updateStats();        // تحديث الإحصائيات (مثل عدد المستخدمين النشطين)
         }
 
         // تحديث الإحصائيات في الرئيسية
@@ -1087,39 +1128,24 @@
             });
         }
 
-        // ======================= الإصلاح هنا =======================
-        // تحديث حالة الطلب (مع بحث مرن وتسجيل)
         window.updateOrderStatus = function(orderId, newStatus) {
-            console.log('🔍 محاولة تحديث الطلب:', orderId, 'إلى', newStatus);
-            console.log('📦 عدد الطلبات الحالي:', orders.length);
-
-            // محاولة العثور على الطلب بالمعرف الأصلي
             let order = orders.find(o => o.id === orderId);
-
-            // إذا لم يتم العثور، حاول بدون الرمز # (إذا كان موجوداً)
             if (!order && orderId.startsWith('#')) {
                 const idWithoutHash = orderId.substring(1);
                 order = orders.find(o => o.id === idWithoutHash || o.id === '#' + idWithoutHash);
             }
-
             if (order) {
                 order.status = newStatus;
-                saveData(); // حفظ التغيير في localStorage
-
-                // إعادة عرض الجداول والإحصائيات
+                saveData();
                 displayRecentOrders();
                 displayAllOrders();
                 updateStats();
                 updateCharts();
                 updateNotifications();
-
-                console.log('✅ تم تحديث الحالة بنجاح');
             } else {
-                console.error('❌ لم يتم العثور على الطلب:', orderId);
-                alert('الطلب غير موجود! قد يكون قد حُذف أو حدث خطأ في المعرف.');
+                alert('الطلب غير موجود!');
             }
         };
-        // ===========================================================
 
         // عرض المنتجات
         function displayProductsTable() {
@@ -1156,7 +1182,6 @@
             document.getElementById('addProductForm').reset();
         };
 
-        // حذف منتج
         window.deleteProduct = function(id) {
             if (confirm('هل أنت متأكد من الحذف؟')) {
                 products = products.filter(p => p.id !== id);
@@ -1166,7 +1191,6 @@
             }
         };
 
-        // فتح مودال التعديل
         window.openEditProductModal = function(id) {
             const product = products.find(p => p.id === id);
             if (!product) return;
@@ -1178,7 +1202,6 @@
             new bootstrap.Modal(document.getElementById('editProductModal')).show();
         };
 
-        // تحديث المنتج
         window.updateProduct = function() {
             const id = parseInt(document.getElementById('editProductId').value);
             const product = products.find(p => p.id === id);
@@ -1193,7 +1216,7 @@
             }
         };
 
-        // عرض المستخدمين (من index.html)
+        // عرض المستخدمين (يتم قراءة users من localStorage عند كل عرض)
         function displayUsersTable() {
             const tbody = document.getElementById('usersTableBody');
             if (!tbody) return;
@@ -1209,6 +1232,7 @@
                     <td>${user.regDate || ''}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-warning btn-action" onclick="openEditWalletModal(${user.id}, ${user.wallet || 0})"><i class="fas fa-wallet"></i></button>
+                        <button class="btn btn-sm btn-outline-info btn-action" onclick="openResetPasswordModal(${user.id})"><i class="fas fa-key"></i></button>
                         <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
@@ -1250,7 +1274,6 @@
             }
         };
 
-        // فتح نافذة تعديل الرصيد
         window.openEditWalletModal = function(userId, currentWallet) {
             document.getElementById('editUserId').value = userId;
             document.getElementById('editUserWallet').value = currentWallet;
@@ -1266,6 +1289,31 @@
                 saveData();
                 displayUsersTable();
                 bootstrap.Modal.getInstance(document.getElementById('editUserWalletModal')).hide();
+            }
+        };
+
+        // إعادة تعيين كلمة المرور
+        window.openResetPasswordModal = function(userId) {
+            document.getElementById('resetUserId').value = userId;
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+            new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+        };
+
+        window.confirmResetPassword = function() {
+            const userId = parseInt(document.getElementById('resetUserId').value);
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmNewPassword').value;
+            if (!newPass) return alert('الرجاء إدخال كلمة المرور الجديدة');
+            if (newPass !== confirmPass) return alert('كلمة المرور غير متطابقة');
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.password = newPass;
+                saveData();
+                alert(`تم إعادة تعيين كلمة مرور المستخدم ${user.name} بنجاح`);
+                bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
+            } else {
+                alert('المستخدم غير موجود');
             }
         };
 
@@ -1314,7 +1362,6 @@
             }
         };
 
-        // تصدير المنتجات إلى CSV
         window.exportProducts = function() {
             let csv = "ID,الاسم,السعر,الفئة,الحالة\n";
             products.forEach(p => {
@@ -1333,7 +1380,6 @@
         let ordersChart, statusChart, revenueChart, categoryChart, staffChart;
 
         function initCharts() {
-            // رسم بياني خطي للطلبات
             const ctx1 = document.getElementById('ordersChart')?.getContext('2d');
             if (ctx1) {
                 ordersChart = new Chart(ctx1, {
@@ -1353,7 +1399,6 @@
                 });
             }
 
-            // رسم بياني دائري لحالات الطلبات
             const ctx2 = document.getElementById('statusChart')?.getContext('2d');
             if (ctx2) {
                 const pending = orders.filter(o => o.status === 'قيد التنفيذ' || o.status === 'جديد').length;
@@ -1452,13 +1497,12 @@
         }
 
         // ==============================
-        // البحث الشامل (بسيط)
+        // البحث الشامل
         // ==============================
         function setupSearch() {
             const searchInput = document.getElementById('globalSearch');
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase();
-                // يمكن تطبيق البحث في الجداول المرئية حاليًا
                 const rows = document.querySelectorAll('#allOrdersTableBody tr, #usersTableBody tr, #productsTableBody tr');
                 rows.forEach(row => {
                     const text = row.innerText.toLowerCase();
@@ -1468,7 +1512,7 @@
         }
 
         // ==============================
-        // التنقل بين الصفحات
+        // التنقل بين الصفحات (مع تحديث المستخدمين عند الضغط على رابط "المستخدمون")
         // ==============================
         document.querySelectorAll('#sidebarMenu .nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1481,6 +1525,11 @@
                 if (targetPage) {
                     targetPage.classList.add('active-page');
                     document.getElementById('pageTitle').innerText = this.innerText.trim();
+                    
+                    // إذا كانت الصفحة هي "المستخدمون"، نقوم بتحديث البيانات
+                    if (pageId === 'users') {
+                        refreshUsers();
+                    }
                 }
             });
         });
