@@ -2,152 +2,354 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCHOS | المنظومة الرقمية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sudan Games | متجر الألعاب الرقمي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-blue: #00d4ff; --dark-bg: #0d0d0d; --card-bg: #141414; }
-        * { font-family: 'Tajawal', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { background-color: var(--dark-bg); background-image: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%); color: white; }
-        
-        .logo-glow { filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.3)); animation: pulse 4s infinite; }
-        @keyframes pulse { 0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.2)); } 50% { filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5)); } }
-
-        .custom-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
-        .custom-card:hover { border-color: var(--primary-blue); background: rgba(0, 212, 255, 0.08); }
-
-        /* تنسيق قائمة المشاريع المنسدلة */
-        .projects-container { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
-        .projects-container.open { max-height: 600px; }
-
-        .project-item { background: rgba(255, 255, 255, 0.03); border-right: 2px solid transparent; }
-        .project-item:hover { border-right-color: var(--primary-blue); background: rgba(0, 212, 255, 0.05); }
-
-        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); }
-        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
-        .modal-content { background: #111; border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 28px; max-width: 400px; width: 100%; padding: 35px; position: relative; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .rotate-icon { transform: rotate(180deg); }
+        :root {
+            --neon-blue: #00e0ff;
+            --dark-bg: #0a0a0a;
+            --card-bg: #111111;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0f0f0f, #020202);
+            color: #e5e5e5;
+        }
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid #2a2a2a;
+            transition: all 0.2s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0,224,255,0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        .cart-badge {
+            background: var(--neon-blue);
+            color: black;
+            font-size: 0.7rem;
+            top: -8px;
+            right: -8px;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="flex justify-center items-center min-h-screen p-6">
+<body>
 
-<div class="main-container max-w-sm w-full bg-[#111] rounded-[32px] p-8 border border-white/5 relative shadow-2xl">
-    <div class="relative z-10 text-center">
-        <img src="1000029489.png" alt="ARCHOS Logo" class="logo-img w-full mb-6 logo-glow">
-        <div class="slogan mb-8 pb-4 border-b border-white/10 text-gray-400 text-xs font-bold tracking-widest uppercase">
-            الذكاء أصلاً والمنطق نصلاً
+    <!-- هيدر المتجر -->
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#00e0ff]/30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-gamepad text-2xl text-[#00e0ff]"></i>
+                <h1 class="text-xl font-black text-white">SUDAN GAMES</h1>
+            </div>
+            <button id="cartBtn" class="relative bg-[#1e1e1e] p-2 rounded-xl hover:bg-[#2a2a2a] transition">
+                <i class="fa-solid fa-cart-shopping text-[#00e0ff] text-xl"></i>
+                <span id="cartCount" class="cart-badge absolute rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">0</span>
+            </button>
         </div>
-    </div>
+    </header>
 
-    <div id="socialGrid" class="grid grid-cols-2 gap-4 mb-4">
-    </div>
-
-    <div onclick="toggleProjects()" class="custom-card col-span-2 flex items-center justify-between p-5 rounded-2xl border-l-4 border-l-[var(--primary-blue)]">
-        <div class="flex items-center gap-4">
-            <i class="fas fa-layer-group text-xl text-[var(--primary-blue)]"></i>
-            <span class="text-sm font-black text-gray-200">مشاريع ARCHOS</span>
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Banner ترحيبي -->
+        <div class="bg-gradient-to-r from-[#00e0ff]/20 to-transparent rounded-2xl p-6 mb-8 border border-[#00e0ff]/30 text-center">
+            <h2 class="text-2xl font-black">أهلاً بك في متجر سودان جيمز</h2>
+            <p class="text-gray-300">أسرع طريقة لشحن حسابات الألعاب والبطاقات الرقمية بأفضل الأسعار</p>
         </div>
-        <i id="chevronIcon" class="fas fa-chevron-down text-xs text-gray-500 transition-transform"></i>
-    </div>
 
-    <div id="projectsWrapper" class="projects-container flex flex-col gap-2 mt-2">
-    </div>
+        <!-- فلتر المنصات -->
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button data-platform="all" class="platform-filter active bg-[#00e0ff] text-black px-4 py-2 rounded-full font-bold text-sm">الكل</button>
+            <button data-platform="Free_Fire" class="platform-filter bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm">Free Fire</button>
 
-    <div class="mt-8 text-center text-[10px] text-gray-600 font-mono tracking-tighter uppercase">
-        &copy; 2025 ARCHOS Protocol | The Systematic Mind
-    </div>
-</div>
-
-<div id="infoModal" class="modal" onclick="closeModal(event)">
-    <div class="modal-content text-center" onclick="event.stopPropagation()">
-        <div id="modalIcon" class="text-5xl text-[var(--primary-blue)] mb-5"></div>
-        <h2 id="modalTitle" class="text-2xl font-black text-white mb-3 tracking-wide"></h2>
-        <p id="modalDesc" class="text-gray-400 text-sm mb-8 leading-relaxed px-2"></p>
-        
-        <div class="flex flex-col gap-3">
-            <a id="modalActionBtn" href="#" target="_blank" class="bg-[var(--primary-blue)] text-black font-black py-4 rounded-2xl hover:brightness-110 active:scale-95 shadow-lg shadow-blue-500/20"></a>
-            <button onclick="closeModal(null)" class="text-gray-500 text-xs font-bold py-2 hover:text-white">إغلاق</button>
+            <button data-platform="PUBG Mobile" class="platform-filter bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm">PUBG Mobile</button>
         </div>
-    </div>
-</div>
 
-<script>
-    const socialLinks = [
-        { id: 'wa', title: 'واتساب', icon: 'fab fa-whatsapp', desc: 'تواصل مباشر للاستشارات البرمجية.', link: 'https://wa.me/249115169965', btn: 'بدء المحادثة' },
-        { id: 'tk', title: 'تيك توك', icon: 'fab fa-tiktok', desc: 'محتوى تقني وبصري سريع.', link: 'https://www.tiktok.com/@mazin.hassan025?_r=1&_t=ZS-957zkoHkGxN', btn: 'متابعة' },
-        { id: 'ig', title: 'انستغرام', icon: 'fab fa-instagram', desc: 'معرض الأعمال والتصاميم.', link: 'https://www.instagram.com/mazin_hassan09?igsh=MXMyZHM4MGR4d2s3YQ==', btn: 'رؤية المعرض' },
-        { id: 'fb', title: 'فيسبوك', icon: 'fab fa-facebook-f', desc: 'عاشق للكلمات والمعاني، يؤمن بأن الصمت لغة الروح، وشغوف بالفكر والقراءة والفلسفة..', link: 'https://www.facebook.com/share/1Ackwo1Cbc/', btn: 'زيارة الصفحة' }
-    ];
+        <!-- عرض المنتجات -->
+        <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- سيتم ملؤها بالمنتجات عبر JS -->
+        </div>
 
-    const projects = [
-        { id: 'ph', title: 'صيدلتي', icon: 'fas fa-hand-holding-medical', desc: 'نموذج أولي لمنصة صيدلانية ذكية لربط المرضى بالصيدليات وتسهيل الوصول للأدوية.', link: 'https://mazinlastnam-stack.github.io/My-Pharmacy/#', btn: 'معاينة المشروع' },
-        { id: 'sg', title: 'سودان جيمز', icon: 'fas fa-gamepad', desc: 'متجرك الرقمي الأول في السودان لشحن الألعاب والخدمات عبر الإنترنت بكفاءة عالية.', link: 'https://mazinlastnam-stack.github.io/Sudan_games/', btn: 'زيارة المتجر' },
-        { id: 'tr', title: 'ترند الاناقة', icon: 'fas fa-tshirt', desc: 'منصة متخصصة في تجارة الملابس والإكسسوارات العصرية داخل السودان.', link: 'https://mazinlastnam-stack.github.io/Fashion_trend/#', btn: 'استكشاف الأناقة' },
-        { id: 'as', title: 'مطاعم الاسعد', icon: 'fas fa-utensils', desc: 'نظام إدارة وطلب طعام رقمي يهدف لتحسين تجربة العملاء في قطاع المطاعم.', link: 'https://mazinlastnam-stack.github.io/Sudan-games-2.0/', btn: 'زيارة النظام' }
-    ];
+        <!-- حالة عدم وجود منتجات -->
+        <div id="noProductsMsg" class="text-center py-12 text-gray-400 hidden">
+            <i class="fa-solid fa-box-open text-5xl mb-3"></i>
+            <p>لا توجد منتجات حالياً، تابعنا قريباً!</p>
+        </div>
+    </main>
 
-    function renderSystem() {
-        const socialGrid = document.getElementById('socialGrid');
-        const projectsWrapper = document.getElementById('projectsWrapper');
-        
-        socialLinks.forEach(item => {
-            socialGrid.innerHTML += `
-                <div onclick="openModal('social', '${item.id}')" class="custom-card flex flex-col items-center p-5 rounded-2xl group">
-                    <i class="${item.icon} text-2xl text-[var(--primary-blue)]"></i>
-                    <span class="mt-2 text-[10px] text-gray-400 font-bold">${item.title}</span>
+    <!-- سلة التسوق (مودال) -->
+    <div id="cartModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center z-[1000]">
+        <div class="bg-[#111] rounded-2xl w-11/12 max-w-lg p-6 border border-[#00e0ff]/30 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-black text-white"><i class="fa-solid fa-cart-shopping ml-2"></i>سلة التسوق</h3>
+                <button onclick="closeCart()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div id="cartItems" class="flex-1 overflow-y-auto space-y-3 mb-4">
+                <!-- عناصر السلة -->
+            </div>
+            <div class="border-t border-gray-800 pt-4">
+                <div class="flex justify-between text-lg font-bold mb-4">
+                    <span>الإجمالي:</span>
+                    <span id="cartTotal" class="text-[#00e0ff]">0 ج.س</span>
                 </div>
-            `;
-        });
+                <button onclick="checkout()" class="w-full btn-primary text-white py-3 rounded-xl font-bold">إتمام الشراء</button>
+                <button onclick="clearCart()" class="w-full mt-2 bg-red-600/20 text-red-400 py-2 rounded-xl text-sm hover:bg-red-600 hover:text-white transition">تفريغ السلة</button>
+            </div>
+        </div>
+    </div>
 
-        projects.forEach(item => {
-            projectsWrapper.innerHTML += `
-                <div onclick="openModal('project', '${item.id}')" class="project-item flex items-center justify-between p-4 rounded-xl cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <i class="${item.icon} text-sm text-[var(--primary-blue)]"></i>
-                        <span class="text-xs font-bold text-gray-300">${item.title}</span>
-                    </div>
-                    <i class="fas fa-plus text-[8px] text-[var(--primary-blue)] opacity-50"></i>
-                </div>
-            `;
-        });
-    }
+    <!-- رسالة تأكيد الطلب -->
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-black/90 border border-[#00e0ff] text-white px-6 py-3 rounded-full shadow-lg hidden z-[1100]">
+        <i class="fa-solid fa-check-circle text-[#00e0ff] ml-2"></i> تم إرسال طلبك بنجاح!
+    </div>
 
-    function toggleProjects() {
-        const wrapper = document.getElementById('projectsWrapper');
-        const chevron = document.getElementById('chevronIcon');
-        wrapper.classList.toggle('open');
-        chevron.classList.toggle('rotate-icon');
-    }
+    <script>
+        // البيانات من localStorage (نفس مفتاح لوحة التحكم)
+        let products = [];
+        let cart = JSON.parse(localStorage.getItem('sudangames_cart')) || [];
 
-    function openModal(type, id) {
-        const data = type === 'project' ? projects.find(p => p.id === id) : socialLinks.find(s => s.id === id);
-        if(!data) return;
-
-        const modal = document.getElementById('infoModal');
-        document.getElementById('modalIcon').innerHTML = `<i class="${data.icon}"></i>`;
-        document.getElementById('modalTitle').innerText = data.title;
-        document.getElementById('modalDesc').innerText = data.desc;
-        
-        const actionBtn = document.getElementById('modalActionBtn');
-        actionBtn.innerText = data.btn;
-        actionBtn.href = data.link;
-
-        modal.classList.add('active');
-    }
-
-    function closeModal(e) {
-        if (!e || e.target.id === 'infoModal') {
-            document.getElementById('infoModal').classList.remove('active');
+        // تحميل المنتجات
+        function loadProducts() {
+            const stored = localStorage.getItem('sudangames_products');
+            if (stored) {
+                products = JSON.parse(stored);
+            } else {
+                // بيانات تجريبية إذا لم توجد منتجات
+                products = [
+                    { id: 1, name: "PSN 10$", price: 4500, stock: 50, platform: "PlayStation", image: "https://via.placeholder.com/150?text=PSN" },
+                    { id: 2, name: "Xbox Live 3 أشهر", price: 3800, stock: 30, platform: "Xbox", image: "https://via.placeholder.com/150?text=Xbox" },
+                    { id: 3, name: "Steam Wallet 20$", price: 9000, stock: 20, platform: "Steam", image: "https://via.placeholder.com/150?text=Steam" },
+                    { id: 4, name: "Nintendo eShop 50$", price: 22000, stock: 10, platform: "Nintendo", image: "https://via.placeholder.com/150?text=Nintendo" }
+                ];
+                localStorage.setItem('sudangames_products', JSON.stringify(products));
+            }
+            renderProducts();
         }
-    }
 
-    window.onload = renderSystem;
-</script>
+        let currentFilter = "all";
 
+        function renderProducts() {
+            let filtered = currentFilter === "all" ? products : products.filter(p => p.platform === currentFilter);
+            const container = document.getElementById('productsContainer');
+            const noMsg = document.getElementById('noProductsMsg');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noMsg.classList.remove('hidden');
+                return;
+            }
+            noMsg.classList.add('hidden');
+            
+            container.innerHTML = filtered.map(product => `
+                <div class="product-card rounded-2xl overflow-hidden shadow-lg transition">
+                    <img src="${product.image || 'https://via.placeholder.com/300'}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300'">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">${escapeHtml(product.name)}</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm bg-gray-800 px-2 py-1 rounded-full">${product.platform}</span>
+                            <span class="text-[#00e0ff] font-bold">${Number(product.price).toLocaleString()} ج.س</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-3">المتاح: ${product.stock ?? 0}</div>
+                        <button onclick="addToCart(${product.id})" class="w-full btn-primary text-white py-2 rounded-xl text-sm font-bold transition" ${(product.stock ?? 0) <= 0 ? 'disabled' : ''}>
+                            ${(product.stock ?? 0) > 0 ? '<i class="fa-solid fa-cart-plus ml-1"></i> أضف إلى السلة' : 'غير متوفر'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || (product.stock ?? 0) <= 0) {
+                showToast("المنتج غير متوفر حالياً", "error");
+                return;
+            }
+            
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                if (existing.quantity + 1 > (product.stock ?? 0)) {
+                    showToast(`لا يمكن إضافة أكثر من الكمية المتاحة (${product.stock})`, "error");
+                    return;
+                }
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            saveCart();
+            updateCartBadge();
+            showToast(`تم إضافة ${product.name} إلى السلة`, "success");
+        }
+
+        function saveCart() {
+            localStorage.setItem('sudangames_cart', JSON.stringify(cart));
+        }
+
+        function updateCartBadge() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').innerText = count;
+        }
+
+        function renderCartModal() {
+            const container = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-8">السلة فارغة</div>';
+                document.getElementById('cartTotal').innerText = '0 ج.س';
+                return;
+            }
+            container.innerHTML = cart.map(item => `
+                <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                    <div class="flex-1">
+                        <h4 class="font-bold">${escapeHtml(item.name)}</h4>
+                        <div class="text-sm text-gray-300">${item.platform} | ${Number(item.price).toLocaleString()} ج.س</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-700 w-7 h-7 rounded-full"><i class="fa-solid fa-minus text-xs"></i></button>
+                        <span class="w-8 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" class="bg-gray-700 w-7 h-7 rounded-full"><i class="fa-solid fa-plus text-xs"></i></button>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-400 mr-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cartTotal').innerHTML = total.toLocaleString() + ' ج.س';
+        }
+
+        function updateQuantity(productId, delta) {
+            const index = cart.findIndex(item => item.id === productId);
+            if (index === -1) return;
+            const item = cart[index];
+            const product = products.find(p => p.id === productId);
+            const newQty = item.quantity + delta;
+            if (newQty < 1) {
+                removeFromCart(productId);
+                return;
+            }
+            if (product && newQty > (product.stock ?? 0)) {
+                showToast(`الكمية المطلوبة أكبر من المتاح (${product.stock})`, "error");
+                return;
+            }
+            item.quantity = newQty;
+            saveCart();
+            updateCartBadge();
+            renderCartModal();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            updateCartBadge();
+            renderCartModal();
+            if (cart.length === 0) closeCart();
+        }
+
+        function clearCart() {
+            if (confirm("هل أنت متأكد من تفريغ السلة بالكامل؟")) {
+                cart = [];
+                saveCart();
+                updateCartBadge();
+                renderCartModal();
+                if (cart.length === 0) closeCart();
+                showToast("تم تفريغ السلة", "info");
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast("السلة فارغة، أضف منتجات أولاً", "error");
+                return;
+            }
+            // محاكاة إرسال الطلب
+            showToast("جاري معالجة طلبك...", "info");
+            setTimeout(() => {
+                // هنا يمكن إرسال البيانات إلى الخادم لاحقاً
+                showToast("تم استلام طلبك بنجاح! سنتواصل معك قريباً", "success");
+                cart = [];
+                saveCart();
+                updateCartBadge();
+                closeCart();
+                renderProducts(); // تحديث لعرض المخزون (الافتراضي لا يتغير إلا بعد تحديث اللوحة)
+            }, 1000);
+        }
+
+        function openCart() {
+            renderCartModal();
+            document.getElementById('cartModal').classList.remove('hidden');
+            document.getElementById('cartModal').style.display = 'flex';
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').classList.add('hidden');
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        let toastTimeout;
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} text-[#00e0ff] ml-2"></i> ${message}`;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // إعداد الفلاتر
+        document.querySelectorAll('.platform-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.platform-filter').forEach(b => b.classList.remove('active', 'bg-[#00e0ff]', 'text-black'));
+                btn.classList.add('active', 'bg-[#00e0ff]', 'text-black');
+                currentFilter = btn.getAttribute('data-platform');
+                renderProducts();
+            });
+        });
+
+        // فتح وإغلاق السلة
+        document.getElementById('cartBtn').addEventListener('click', openCart);
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('cartModal')) closeCart();
+        });
+
+        // تحميل أولي
+        loadProducts();
+        updateCartBadge();
+
+        // استماع لتحديثات localStorage من لوحة التحكم (مزامنة تلقائية)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'sudangames_products') {
+                loadProducts();  // إعادة تحميل المنتجات
+            }
+        });
+    </script>
 </body>
 </html>
-
