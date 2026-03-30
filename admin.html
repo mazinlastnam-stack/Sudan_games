@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sudan Games | لوحة تحكم المتجر</title>
+    <title>Sudan Games | لوحة تحكم المسؤول المتكاملة - دعم الاستيراد</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,7 +12,6 @@
             --neon-blue: #00e0ff;
             --dark-bg: #0a0a0a;
             --card-bg: #111111;
-            --glow: 0 0 10px rgba(0, 224, 255, 0.3);
         }
         body {
             font-family: 'Tajawal', sans-serif;
@@ -37,16 +36,6 @@
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-blue);
-            border-radius: 10px;
-        }
         input, select, textarea {
             background-color: #1e1e1e !important;
             border: 1px solid #2c2c2c !important;
@@ -63,6 +52,29 @@
         }
         th, td {
             border-bottom: 1px solid #2a2a2a;
+        }
+        .status-pending {
+            background-color: #f59e0b20;
+            color: #f59e0b;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .status-completed {
+            background-color: #10b98120;
+            color: #10b981;
+        }
+        .status-rejected {
+            background-color: #ef444420;
+            color: #ef4444;
+        }
+        .import-btn {
+            transition: all 0.2s;
+        }
+        .import-btn:hover {
+            background-color: #00e0ff20;
+            border-color: #00e0ff;
         }
     </style>
 </head>
@@ -91,7 +103,7 @@
                     <div class="w-9 h-9 admin-gradient rounded-xl flex items-center justify-center shadow-md">
                         <i class="fa-solid fa-gamepad text-white text-sm"></i>
                     </div>
-                    <h1 class="text-xl font-black text-white">SUDAN GAMES <span class="text-sm font-normal text-gray-400">| نظام إدارة متجر الألعاب</span></h1>
+                    <h1 class="text-xl font-black text-white">SUDAN GAMES <span class="text-sm font-normal text-gray-400">| نظام إداري متكامل</span></h1>
                 </div>
                 <button onclick="logoutAdmin()" class="bg-red-600/20 text-red-400 px-5 py-2 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center gap-2">
                     <i class="fa-solid fa-right-from-bracket"></i> خروج
@@ -101,21 +113,25 @@
 
         <main class="max-w-7xl mx-auto px-4 py-6 space-y-10">
             <!-- بطاقات الإحصائيات -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
-                    <div><p class="text-gray-400 text-sm">إجمالي المنتجات</p><p id="statProducts" class="text-2xl font-black text-[#00e0ff]">0</p></div>
+                    <div><p class="text-gray-400 text-sm">المنتجات</p><p id="statProducts" class="text-2xl font-black text-[#00e0ff]">0</p></div>
                     <div class="w-12 h-12 bg-[#00e0ff]/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-cubes text-[#00e0ff] text-xl"></i></div>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
-                    <div><p class="text-gray-400 text-sm">فريق العمل</p><p id="statUsers" class="text-2xl font-black text-purple-400">0</p></div>
+                    <div><p class="text-gray-400 text-sm">العملاء</p><p id="statCustomers" class="text-2xl font-black text-purple-400">0</p></div>
                     <div class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-users text-purple-400 text-xl"></i></div>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
-                    <div><p class="text-gray-400 text-sm">إجمالي الإيرادات</p><p id="statIncome" class="text-2xl font-black text-green-400">0 ج.س</p></div>
+                    <div><p class="text-gray-400 text-sm">موظفين</p><p id="statUsers" class="text-2xl font-black text-indigo-400">0</p></div>
+                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-user-tie text-indigo-400 text-xl"></i></div>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">إيرادات</p><p id="statIncome" class="text-2xl font-black text-green-400">0 ج.س</p></div>
                     <div class="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-arrow-trend-up text-green-400 text-xl"></i></div>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
-                    <div><p class="text-gray-400 text-sm">إجمالي المصروفات</p><p id="statExpense" class="text-2xl font-black text-red-400">0 ج.س</p></div>
+                    <div><p class="text-gray-400 text-sm">مصروفات</p><p id="statExpense" class="text-2xl font-black text-red-400">0 ج.س</p></div>
                     <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-arrow-trend-down text-red-400 text-xl"></i></div>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
@@ -124,44 +140,93 @@
                 </div>
             </div>
 
-            <!-- قسم المنتجات (ألعاب / بطاقات) -->
+            <!-- ====================== قسم إدارة العملاء ====================== -->
             <section>
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-2 h-8 admin-gradient rounded-full"></span>
-                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-gamepad ml-2"></i>إدارة المنتجات (بطاقات / ألعاب)</h2>
+                    <span class="w-2 h-8 bg-purple-500 rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-users ml-2"></i>إدارة العملاء</h2>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <input type="text" id="pName" placeholder="اسم المنتج (مثال: PSN 10$)" class="border rounded-xl p-3">
-                        <input type="number" id="pPrice" placeholder="السعر (ج.س)" class="border rounded-xl p-3">
-                        <input type="number" id="pStock" placeholder="الكمية المتوفرة" class="border rounded-xl p-3">
-                        <select id="pPlatform" class="border rounded-xl p-3">
-                            <option> Free Fire</option><option> PUBG Mobile</option>
-                        </select>
-                        <input type="text" id="pImage" placeholder="رابط الصورة (URL)" class="border rounded-xl p-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="cName" placeholder="الاسم الكامل" class="border rounded-xl p-3">
+                        <input type="email" id="cEmail" placeholder="البريد الإلكتروني" class="border rounded-xl p-3">
+                        <input type="password" id="cPass" placeholder="كلمة المرور" class="border rounded-xl p-3">
                     </div>
-                    <button onclick="addNewProduct()" class="mt-4 w-full game-gradient text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition">➕ إضافة منتج جديد</button>
+                    <button onclick="addCustomer()" class="mt-4 w-full bg-purple-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-purple-700 transition">➕ إضافة عميل جديد</button>
                 </div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="flex flex-wrap justify-between items-center p-4 bg-black/40 border-b border-gray-800">
-                        <div class="font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> قائمة المنتجات</div>
-                        <div class="relative"><i class="fa-solid fa-search absolute right-3 top-3 text-gray-500"></i><input type="text" id="searchProduct" placeholder="بحث بالاسم..." class="pr-9 border rounded-xl p-2 w-64 text-sm bg-[#1a1a1a]"></div>
+                        <div class="font-bold text-gray-300"><i class="fa-regular fa-address-card ml-1"></i> قائمة العملاء المسجلين</div>
+                        <div class="flex gap-2">
+                            <button id="downloadCustomersTemplateBtn" class="bg-gray-600/20 text-gray-300 px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1 hover:bg-gray-600/40 transition"><i class="fa-regular fa-file-code"></i> نموذج JSON</button>
+                            <button id="importCustomersBtn" class="bg-blue-600/20 text-blue-400 px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1 hover:bg-blue-600/30 transition"><i class="fa-solid fa-upload"></i> استيراد عملاء (JSON)</button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right min-w-[700px]">
                             <thead class="bg-black/40 border-b border-gray-800 text-gray-400 text-sm">
-                                <tr><th class="p-4">المنتج</th><th>السعر</th><th>الكمية</th><th>المنصة</th><th class="text-center">إجراء</th></tr>
+                                <tr><th class="p-4">الاسم</th><th>البريد الإلكتروني</th><th>الرصيد (ج.س)</th><th>تاريخ التسجيل</th><th class="text-center">إجراء</th></tr>
                             </thead>
-                            <tbody id="productsTable"></tbody>
+                            <tbody id="customersTable"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- قسم إدارة فريق العمل -->
+            <!-- ====================== قسم طلبات الإيداع ====================== -->
             <section>
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-2 h-8 bg-purple-500 rounded-full"></span>
+                    <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-money-bill-transfer ml-2"></i>طلبات الإيداع</h2>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-clock ml-1"></i> الطلبات المعلقة</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right">
+                            <thead class="bg-black/40 border-b border-gray-800 text-gray-400 text-sm">
+                                <tr><th class="p-4">العميل</th><th>المبلغ (ج.س)</th><th>تاريخ الطلب</th><th>الحالة</th><th class="text-center">إجراء</th></tr>
+                            </thead>
+                            <tbody id="depositRequestsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================== إدارة المنتجات ====================== -->
+            <section>
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-2 h-8 admin-gradient rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-gamepad ml-2"></i>إدارة المنتجات</h2>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <input type="text" id="pName" placeholder="اسم المنتج" class="border rounded-xl p-3">
+                        <input type="number" id="pPrice" placeholder="السعر (ج.س)" class="border rounded-xl p-3">
+                        <input type="number" id="pStock" placeholder="الكمية" class="border rounded-xl p-3">
+                        <select id="pPlatform" class="border rounded-xl p-3">
+                            <option>Free_Fire</option><option>PUBG Mobile</option><option>PlayStation</option><option>Xbox</option><option>Steam</option>
+                        </select>
+                        <input type="text" id="pImage" placeholder="رابط الصورة" class="border rounded-xl p-3">
+                    </div>
+                    <button onclick="addNewProduct()" class="mt-4 w-full game-gradient text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition">➕ إضافة منتج جديد</button>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="flex flex-wrap justify-between items-center p-4 bg-black/40 border-b border-gray-800 gap-2">
+                        <div class="font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> قائمة المنتجات</div>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="downloadProductsTemplateBtn" class="bg-gray-600/20 text-gray-300 px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1 hover:bg-gray-600/40 transition"><i class="fa-regular fa-file-code"></i> نموذج JSON</button>
+                            <button id="importProductsBtn" class="bg-blue-600/20 text-blue-400 px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1 hover:bg-blue-600/30 transition"><i class="fa-solid fa-upload"></i> استيراد منتجات (JSON)</button>
+                            <div class="relative"><i class="fa-solid fa-search absolute right-3 top-3 text-gray-500"></i><input type="text" id="searchProduct" placeholder="بحث بالاسم..." class="pr-9 border rounded-xl p-2 w-64 text-sm bg-[#1a1a1a]"></div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-3">المنتج</th><th>السعر</th><th>الكمية</th><th>المنصة</th><th class="text-center">إجراءات</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- ====================== إدارة فريق العمل ====================== -->
+            <section>
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-2 h-8 bg-indigo-500 rounded-full"></span>
                     <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-user-tie ml-2"></i>إدارة فريق العمل</h2>
                 </div>
                 <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
@@ -170,17 +235,15 @@
                         <input type="text" id="uPhone" placeholder="رقم التواصل" class="border rounded-xl p-3">
                         <input type="password" id="uPass" placeholder="كلمة المرور" class="border rounded-xl p-3">
                     </div>
-                    <button onclick="addNewUser()" class="mt-4 w-full bg-purple-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-purple-700 transition">➕ إضافة موظف جديد</button>
+                    <button onclick="addNewUser()" class="mt-4 w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-indigo-700 transition">➕ إضافة موظف جديد</button>
                 </div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-address-card ml-1"></i> أعضاء الفريق</div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الموظف</th><th>الهاتف</th><th>كلمة السر</th><th class="text-center">إجراء</th></tr></thead><tbody id="usersTable"></tbody></table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الاسم</th><th>رقم الهاتف</th><th>كلمة المرور</th><th class="text-center">إجراء</th></tr></thead><tbody id="usersTable"></tbody></table></div>
                 </div>
             </section>
 
-            <!-- قسم السجلات المالية -->
+            <!-- ====================== السجلات المالية ====================== -->
             <section>
                 <div class="flex items-center gap-3 mb-5">
                     <span class="w-2 h-8 bg-green-500 rounded-full"></span>
@@ -188,7 +251,7 @@
                 </div>
                 <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="text" id="fDesc" placeholder="البيان (مثال: شراء بطاقات)" class="border rounded-xl p-3">
+                        <input type="text" id="fDesc" placeholder="البيان" class="border rounded-xl p-3">
                         <select id="fType" class="border rounded-xl p-3">
                             <option value="وارد">وارد (إيراد)</option>
                             <option value="صادر">صادر (مصروف)</option>
@@ -203,57 +266,44 @@
                         <div class="font-bold text-gray-300"><i class="fa-regular fa-calendar ml-1"></i> التقارير المالية</div>
                         <button onclick="exportFinanceCSV()" class="bg-green-600/20 text-green-400 px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-600 hover:text-white transition"><i class="fa-solid fa-file-csv ml-1"></i> تصدير CSV</button>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">البيان</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th class="text-center">إجراء</th></tr></thead><tbody id="financeTable"></tbody></table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">البيان</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th class="text-center">حذف</th></tr></thead><tbody id="financeTable"></tbody></table></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- مودال تعديل المنتج -->
-    <div id="editProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
-        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-[#00e0ff]/30 shadow-2xl"><h3 class="font-black text-xl mb-4 text-white">تعديل المنتج</h3>
-            <input type="hidden" id="editProdId"><input id="editProdName" class="w-full border p-3 rounded-xl mb-3" placeholder="اسم المنتج"><input id="editProdPrice" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="السعر"><input id="editProdStock" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="الكمية"><select id="editProdPlatform" class="w-full border p-3 rounded-xl mb-3"><option>PlayStation</option><option>Xbox</option><option>Nintendo</option><option>Steam</option><option>Apple</option><option>Google Play</option></select><input id="editProdImage" class="w-full border p-3 rounded-xl mb-4" placeholder="رابط الصورة">
-            <div class="flex gap-3"><button onclick="saveProductEdit()" class="bg-[#00e0ff] text-black font-bold px-5 py-2 rounded-xl w-full">حفظ التعديل</button><button onclick="closeModal('editProductModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
-        </div>
-    </div>
-    <!-- مودال تعديل الموظف -->
-    <div id="editUserModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
-        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-purple-500/30"><h3 class="font-black text-xl mb-4 text-white">تعديل بيانات الموظف</h3>
-            <input type="hidden" id="editUserId"><input id="editUserName" class="w-full border p-3 rounded-xl mb-3" placeholder="الاسم"><input id="editUserPhone" class="w-full border p-3 rounded-xl mb-3" placeholder="الهاتف"><input id="editUserPass" class="w-full border p-3 rounded-xl mb-4" placeholder="كلمة المرور">
-            <div class="flex gap-3"><button onclick="saveUserEdit()" class="bg-purple-600 text-white px-5 py-2 rounded-xl w-full">تحديث</button><button onclick="closeModal('editUserModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
-        </div>
-    </div>
-    <!-- مودال تعديل المالية -->
-    <div id="editFinanceModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
-        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-green-500/30"><h3 class="font-black text-xl mb-4 text-white">تعديل معاملة مالية</h3>
-            <input type="hidden" id="editFinanceId"><input id="editFinanceDesc" class="w-full border p-3 rounded-xl mb-3" placeholder="البيان"><select id="editFinanceType" class="w-full border p-3 rounded-xl mb-3"><option value="وارد">وارد</option><option value="صادر">صادر</option></select><input id="editFinanceAmount" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="المبلغ"><input id="editFinanceDate" type="date" class="w-full border p-3 rounded-xl mb-4">
-            <div class="flex gap-3"><button onclick="saveFinanceEdit()" class="bg-green-600 text-white px-5 py-2 rounded-xl w-full">حفظ</button><button onclick="closeModal('editFinanceModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
+    <!-- مودال تعديل الرصيد -->
+    <div id="editBalanceModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
+        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-purple-500/30">
+            <h3 class="font-black text-xl mb-4 text-white">تعديل رصيد العميل</h3>
+            <input type="hidden" id="editCustomerId">
+            <p id="editCustomerName" class="text-gray-300 mb-3"></p>
+            <input type="number" id="editBalanceAmount" placeholder="الرصيد الجديد" class="w-full border rounded-xl p-3 mb-4">
+            <div class="flex gap-3"><button onclick="saveBalanceEdit()" class="bg-purple-600 text-white px-5 py-2 rounded-xl w-full">حفظ</button><button onclick="closeModal('editBalanceModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
         </div>
     </div>
 
     <script>
-        const AUTH_CONFIG = { user: "Mazin Hassan", pass: "panda@2025" }; // يمكن تغييرها لاحقاً
-        
+        // بيانات الاعتماد
+        const AUTH_CONFIG = { user: "Mazin Hassan", pass: "panda@2025" };
+
         let products = JSON.parse(localStorage.getItem('sudangames_products')) || [];
         let users = JSON.parse(localStorage.getItem('sudangames_users')) || [];
         let finance = JSON.parse(localStorage.getItem('sudangames_finance')) || [];
-
-        function migrateData() {
-            products = products.map(p => ({ ...p, stock: p.stock !== undefined ? p.stock : 0, price: Number(p.price) || 0, platform: p.platform || p.category || 'PlayStation' }));
-            finance = finance.map(f => ({ ...f, amount: f.amount !== undefined ? f.amount : 0, date: f.date || new Date().toISOString().slice(0,10) }));
-            saveAll();
-        }
+        let customers = JSON.parse(localStorage.getItem('sudangames_customers')) || [];
+        let depositRequests = JSON.parse(localStorage.getItem('sudangames_deposit_requests')) || [];
 
         function saveAll() {
             localStorage.setItem('sudangames_products', JSON.stringify(products));
             localStorage.setItem('sudangames_users', JSON.stringify(users));
             localStorage.setItem('sudangames_finance', JSON.stringify(finance));
+            localStorage.setItem('sudangames_customers', JSON.stringify(customers));
+            localStorage.setItem('sudangames_deposit_requests', JSON.stringify(depositRequests));
         }
 
         function updateStats() {
             document.getElementById('statProducts').innerText = products.length;
+            document.getElementById('statCustomers').innerText = customers.length;
             document.getElementById('statUsers').innerText = users.length;
             let totalIncome = finance.filter(f => f.type === 'وارد').reduce((s, f) => s + (Number(f.amount) || 0), 0);
             let totalExpense = finance.filter(f => f.type === 'صادر').reduce((s, f) => s + (Number(f.amount) || 0), 0);
@@ -262,221 +312,157 @@
             document.getElementById('statNet').innerHTML = (totalIncome - totalExpense).toLocaleString() + ' ج.س';
         }
 
-        function renderAll() {
-            let searchTerm = document.getElementById('searchProduct')?.value.toLowerCase() || '';
-            let filtered = products.filter(p => p.name?.toLowerCase().includes(searchTerm));
-            document.getElementById('productsTable').innerHTML = filtered.map(p => `
-                <tr class="border-b border-gray-800 hover:bg-white/5">
-                    <td class="p-3 flex items-center gap-3"><img src="${p.image || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/50'"><div><b class="block text-white">${escapeHtml(p.name)}</b><span class="text-xs text-gray-400">${p.platform}</span></div></td>
-                    <td class="text-[#00e0ff] font-bold">${Number(p.price).toLocaleString()} ج.س</td>
-                    <td class="text-gray-300">${p.stock ?? 0}</td>
-                    <td><span class="bg-gray-800 px-2 py-1 rounded text-xs">${p.platform}</span></td>
-                    <td class="text-center"><button onclick="openEditProduct(${p.id})" class="text-[#00e0ff] ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${p.id}, 'p')" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('') || '<tr><td colspan="5" class="p-6 text-center text-gray-500">لا توجد منتجات</td></tr>';
-            
-            document.getElementById('usersTable').innerHTML = users.map(u => `
+        // ====================== العملاء ======================
+        function renderCustomers() {
+            document.getElementById('customersTable').innerHTML = customers.map(c => `
                 <tr class="border-b border-gray-800">
-                    <td class="p-4 font-bold text-white">${escapeHtml(u.name)}</td>
-                    <td class="text-gray-300">${escapeHtml(u.phone)}</td>
-                    <td class="text-xs text-gray-400 font-mono">${escapeHtml(u.pass)}</td>
-                    <td class="text-center"><button onclick="openEditUser(${u.id})" class="text-purple-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${u.id}, 'u')" class="text-red-400"><i class="fa-solid fa-user-xmark"></i></button></td>
+                    <td class="p-4 font-bold text-white">${escapeHtml(c.name)}</td>
+                    <td class="text-gray-300">${escapeHtml(c.email)}</td>
+                    <td class="text-[#00e0ff] font-bold">${Number(c.walletBalance || 0).toLocaleString()} ج.س</td>
+                    <td class="text-gray-400 text-sm">${new Date(c.createdAt).toLocaleDateString('ar-EG')}</td>
+                    <td class="text-center">
+                        <button onclick="openEditBalance(${c.id})" class="text-purple-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button onclick="deleteCustomer(${c.id})" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </td>
                 </tr>
-            `).join('') || '<tr><td colspan="4" class="p-6 text-center text-gray-500">لا يوجد موظفون</td></tr>';
-            
-            document.getElementById('financeTable').innerHTML = finance.map(f => `
-                <tr class="border-b border-gray-800">
-                    <td class="p-4 font-bold text-white">${escapeHtml(f.desc)}</td>
-                    <td><span class="${f.type === 'صادر' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'} px-3 py-1 rounded-full text-xs font-bold">${f.type}</span></td>
-                    <td class="font-mono text-gray-300">${Number(f.amount).toLocaleString()} ج.س</td>
-                    <td class="text-gray-400 text-sm">${f.date}</td>
-                    <td class="text-center"><button onclick="openEditFinance(${f.id})" class="text-green-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${f.id}, 'f')" class="text-red-400"><i class="fa-solid fa-circle-minus"></i></button></td>
-                </tr>
-            `).join('') || '<tr><td colspan="5" class="p-6 text-center text-gray-500">لا توجد معاملات مالية</td></tr>';
-            
-            updateStats();
+            `).join('') || '<tr><td colspan="5" class="p-6 text-center text-gray-500">لا يوجد عملاء</td></tr>';
         }
+
+        function addCustomer() {
+            let name = document.getElementById('cName').value.trim();
+            let email = document.getElementById('cEmail').value.trim();
+            let password = document.getElementById('cPass').value;
+            if (!name || !email || !password) return alert("جميع الحقول مطلوبة");
+            if (customers.some(c => c.email === email)) return alert("البريد الإلكتروني مسجل مسبقاً");
+            customers.push({
+                id: Date.now(),
+                name,
+                email,
+                password,
+                walletBalance: 0,
+                cart: [],
+                createdAt: new Date().toISOString()
+            });
+            saveAll();
+            renderCustomers();
+            updateStats();
+            document.getElementById('cName').value = '';
+            document.getElementById('cEmail').value = '';
+            document.getElementById('cPass').value = '';
+        }
+
+        function openEditBalance(customerId) { /* ... كما هو ... */ 
+            let customer = customers.find(c => c.id === customerId);
+            if (!customer) return;
+            document.getElementById('editCustomerId').value = customer.id;
+            document.getElementById('editCustomerName').innerText = `العميل: ${customer.name} | الرصيد الحالي: ${customer.walletBalance.toLocaleString()} ج.س`;
+            document.getElementById('editBalanceAmount').value = customer.walletBalance;
+            document.getElementById('editBalanceModal').classList.remove('hidden');
+            document.getElementById('editBalanceModal').style.display = 'flex';
+        }
+        function saveBalanceEdit() {
+            let id = parseInt(document.getElementById('editCustomerId').value);
+            let newBalance = parseFloat(document.getElementById('editBalanceAmount').value);
+            if (isNaN(newBalance)) return alert("أدخل رصيداً صحيحاً");
+            let idx = customers.findIndex(c => c.id === id);
+            if (idx !== -1) { customers[idx].walletBalance = newBalance; saveAll(); renderCustomers(); updateStats(); }
+            closeModal('editBalanceModal');
+        }
+        function deleteCustomer(id) { if (!confirm("حذف العميل سيؤدي إلى حذف جميع بياناته. هل أنت متأكد؟")) return; customers = customers.filter(c => c.id !== id); saveAll(); renderCustomers(); updateStats(); }
+
+        // طلبات الإيداع
+        function renderDepositRequests() { /* ... مختصر ... */
+            document.getElementById('depositRequestsTable').innerHTML = depositRequests.map(req => `<tr class="border-b border-gray-800"><td class="p-4 font-bold">${escapeHtml(req.customerName)}</td><td class="text-amber-400">${Number(req.amount).toLocaleString()} ج.س</td><td class="text-gray-400">${new Date(req.createdAt).toLocaleString('ar-EG')}</td><td><span class="status-pending">قيد الانتظار</span></td><td class="text-center"><button onclick="approveDeposit(${req.id})" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl ml-2">قبول</button><button onclick="rejectDeposit(${req.id})" class="bg-red-600/20 text-red-400 px-3 py-1 rounded-xl">رفض</button></td></tr>`).join('') || '<tr><td colspan="5" class="p-6 text-center">لا توجد طلبات</td></tr>';
+        }
+        function approveDeposit(requestId) { let request = depositRequests.find(r => r.id === requestId); if(request) { let customer = customers.find(c => c.id === request.customerId); if(customer) { customer.walletBalance += request.amount; finance.push({ id: Date.now(), desc: `إيداع من العميل ${customer.name}`, type: 'وارد', amount: request.amount, date: new Date().toISOString().slice(0,10) }); saveAll(); } depositRequests = depositRequests.filter(r => r.id !== requestId); saveAll(); renderDepositRequests(); renderCustomers(); updateStats(); showToast("تم قبول الإيداع", "success"); } }
+        function rejectDeposit(requestId) { if(confirm("رفض الطلب؟")) { depositRequests = depositRequests.filter(r => r.id !== requestId); saveAll(); renderDepositRequests(); showToast("تم الرفض", "info"); } }
 
         // المنتجات
-        function addNewProduct() {
-            let name = document.getElementById('pName').value.trim();
-            let price = parseFloat(document.getElementById('pPrice').value);
-            let stock = parseInt(document.getElementById('pStock').value) || 0;
-            let platform = document.getElementById('pPlatform').value;
-            let image = document.getElementById('pImage').value.trim() || 'https://via.placeholder.com/100';
-            if(!name || isNaN(price) || price<=0) return alert("يرجى إدخال اسم المنتج وسعر صحيح");
-            products.push({ id: Date.now(), name, price, stock, platform, image });
-            saveAndRender();
-            document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pStock').value = ''; document.getElementById('pImage').value = '';
-        }
-
-        // المستخدمين
-        function addNewUser() {
-            let name = document.getElementById('uName').value.trim();
-            let phone = document.getElementById('uPhone').value.trim();
-            let pass = document.getElementById('uPass').value.trim();
-            if(!name || !phone || !pass) return alert("أكمل بيانات الموظف");
-            users.push({ id: Date.now(), name, phone, pass });
-            saveAndRender();
-            document.getElementById('uName').value = ''; document.getElementById('uPhone').value = ''; document.getElementById('uPass').value = '';
-        }
-
+        function addNewProduct() { let name = document.getElementById('pName').value.trim(); let price = parseFloat(document.getElementById('pPrice').value); let stock = parseInt(document.getElementById('pStock').value) || 0; let platform = document.getElementById('pPlatform').value; let image = document.getElementById('pImage').value.trim() || 'https://via.placeholder.com/100'; if (!name || isNaN(price) || price <= 0) return alert("أدخل اسم وسعر صحيحين"); products.push({ id: Date.now(), name, price, stock, platform, image }); saveAll(); renderProducts(); updateStats(); document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pStock').value = ''; document.getElementById('pImage').value = ''; }
+        function renderProducts() { let search = (document.getElementById('searchProduct')?.value || '').toLowerCase(); let filtered = products.filter(p => p.name.toLowerCase().includes(search)); document.getElementById('productsTable').innerHTML = filtered.map(p => `<tr class="border-b border-gray-800"><td class="p-3 flex items-center gap-3"><img src="${p.image}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/50'"><div><b class="text-white">${escapeHtml(p.name)}</b><div class="text-xs text-gray-400">${p.platform}</div></div></td><td class="text-[#00e0ff] font-bold">${Number(p.price).toLocaleString()} ج.س</td><td>${p.stock}</td><td><span class="bg-gray-800 px-2 py-1 rounded text-xs">${p.platform === 'Free_Fire' ? 'Free Fire' : p.platform}</span></td><td class="text-center"><button onclick="openEditProduct(${p.id})" class="text-[#00e0ff] ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${p.id}, 'p')" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="p-6 text-center">لا توجد منتجات</td></tr>'; }
+        function openEditProduct(id) { let p = products.find(x=>x.id===id); if(p){ let newName=prompt("اسم جديد",p.name); if(newName) p.name=newName; let newPrice=prompt("سعر جديد",p.price); if(newPrice && !isNaN(parseFloat(newPrice))) p.price=parseFloat(newPrice); let newStock=prompt("كمية جديدة",p.stock); if(newStock && !isNaN(parseInt(newStock))) p.stock=parseInt(newStock); saveAll(); renderProducts(); } }
+        
+        // فريق العمل
+        function addNewUser() { let name = document.getElementById('uName').value.trim(); let phone = document.getElementById('uPhone').value.trim(); let pass = document.getElementById('uPass').value.trim(); if (!name || !phone || !pass) return alert("أكمل بيانات الموظف"); users.push({ id: Date.now(), name, phone, pass }); saveAll(); renderUsers(); updateStats(); document.getElementById('uName').value = ''; document.getElementById('uPhone').value = ''; document.getElementById('uPass').value = ''; }
+        function renderUsers() { document.getElementById('usersTable').innerHTML = users.map(u => `<tr class="border-b border-gray-800"><td class="p-4 font-bold">${escapeHtml(u.name)}</td><td>${escapeHtml(u.phone)}</td><td class="font-mono text-xs">${escapeHtml(u.pass)}</td><td class="text-center"><button onclick="openEditUser(${u.id})" class="text-indigo-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${u.id}, 'u')" class="text-red-400"><i class="fa-solid fa-user-xmark"></i></button></td></tr>`).join('') || '<tr><td colspan="4" class="p-6 text-center">لا يوجد موظفون</td></tr>'; }
+        function openEditUser(id) { let u = users.find(x=>x.id===id); if(u){ let newName=prompt("اسم جديد",u.name); if(newName) u.name=newName; let newPhone=prompt("هاتف جديد",u.phone); if(newPhone) u.phone=newPhone; let newPass=prompt("كلمة مرور جديدة",u.pass); if(newPass) u.pass=newPass; saveAll(); renderUsers(); } }
+        
         // المالية
-        function addNewFinance() {
-            let desc = document.getElementById('fDesc').value.trim();
-            let type = document.getElementById('fType').value;
-            let amount = parseFloat(document.getElementById('fAmount').value);
-            let date = document.getElementById('fDate').value;
-            if(!desc) return alert("أدخل البيان");
-            if(isNaN(amount) || amount<=0) return alert("أدخل مبلغاً صحيحاً");
-            if(!date) return alert("اختر التاريخ");
-            finance.push({ id: Date.now(), desc, type, amount, date });
-            saveAndRender();
-            document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; document.getElementById('fDate').value = '';
+        function addNewFinance() { let desc = document.getElementById('fDesc').value.trim(); let type = document.getElementById('fType').value; let amount = parseFloat(document.getElementById('fAmount').value); let date = document.getElementById('fDate').value; if (!desc) return alert("أدخل البيان"); if (isNaN(amount) || amount <= 0) return alert("أدخل مبلغاً صحيحاً"); if (!date) return alert("اختر التاريخ"); finance.push({ id: Date.now(), desc, type, amount, date }); saveAll(); renderFinance(); updateStats(); document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; document.getElementById('fDate').value = ''; }
+        function renderFinance() { document.getElementById('financeTable').innerHTML = finance.map(f => `<tr class="border-b border-gray-800"><td class="p-4 font-bold">${escapeHtml(f.desc)}</td><td><span class="${f.type === 'صادر' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'} px-3 py-1 rounded-full text-xs">${f.type}</span></td><td class="font-mono">${Number(f.amount).toLocaleString()} ج.س</td><td class="text-gray-400">${f.date}</td><td class="text-center"><button onclick="deleteItem(${f.id}, 'f')" class="text-red-400"><i class="fa-solid fa-circle-minus"></i></button></td></tr>`).join('') || '<tr><td colspan="5" class="p-6 text-center">لا توجد معاملات</td></tr>'; }
+        
+        function deleteItem(id, type) { if (!confirm("حذف نهائي؟")) return; if (type === 'p') products = products.filter(x => x.id !== id); if (type === 'u') users = users.filter(x => x.id !== id); if (type === 'f') finance = finance.filter(x => x.id !== id); saveAll(); if (type === 'p') renderProducts(); if (type === 'u') renderUsers(); if (type === 'f') renderFinance(); updateStats(); }
+        function exportFinanceCSV() { if (finance.length===0) return alert("لا توجد بيانات"); let headers = ["البيان","النوع","المبلغ","التاريخ"]; let rows = finance.map(f => [f.desc,f.type,f.amount,f.date]); let csv = headers.join(",")+"\n"+rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n"); let blob = new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download="sudangames_finance.csv"; link.click(); URL.revokeObjectURL(link.href); }
+        function closeModal(modalId) { let modal = document.getElementById(modalId); modal.classList.add('hidden'); modal.style.display = 'none'; }
+        function showToast(msg) { alert(msg); }
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        
+        // ========== استيراد المنتجات والعملاء (JSON) ==========
+        function importFromJSON(file, type, existingArray, validateAndTransform, updateRender) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) throw new Error("الملف يجب أن يحتوي على مصفوفة JSON");
+                    let added = 0, skipped = 0, errors = [];
+                    for (let item of data) {
+                        try {
+                            const transformed = validateAndTransform(item);
+                            if (transformed) {
+                                existingArray.push(transformed);
+                                added++;
+                            } else skipped++;
+                        } catch(err) { errors.push(err.message); skipped++; }
+                    }
+                    saveAll();
+                    updateRender();
+                    updateStats();
+                    alert(`✅ اكتمل الاستيراد:\nتمت الإضافة: ${added}\nتم تخطي: ${skipped}\n${errors.length ? 'أخطاء: '+errors.join('; ') : ''}`);
+                } catch(err) { alert("خطأ في قراءة الملف: "+err.message); }
+            };
+            reader.readAsText(file);
         }
-
-        function deleteItem(id, type) {
-            if(!confirm("هل أنت متأكد من الحذف نهائياً؟")) return;
-            if(type === 'p') products = products.filter(x => x.id !== id);
-            if(type === 'u') users = users.filter(x => x.id !== id);
-            if(type === 'f') finance = finance.filter(x => x.id !== id);
-            saveAndRender();
+        function validateProduct(item) {
+            if (!item.name || typeof item.name !== 'string') throw new Error("المنتج يفتقر لاسم صالح");
+            let price = parseFloat(item.price);
+            if (isNaN(price) || price <= 0) throw new Error(`سعر غير صالح للمنتج ${item.name}`);
+            let stock = parseInt(item.stock) || 0;
+            let platform = item.platform || "Free_Fire";
+            let image = (typeof item.image === 'string' && item.image.startsWith('http')) ? item.image : 'https://via.placeholder.com/100';
+            return { id: Date.now() + Math.random()*10000, name: item.name.trim(), price, stock, platform, image };
         }
-
-        // Edit functions
-        function openEditProduct(id) {
-            let prod = products.find(p => p.id === id);
-            if(!prod) return;
-            document.getElementById('editProdId').value = prod.id;
-            document.getElementById('editProdName').value = prod.name;
-            document.getElementById('editProdPrice').value = prod.price;
-            document.getElementById('editProdStock').value = prod.stock;
-            document.getElementById('editProdPlatform').value = prod.platform;
-            document.getElementById('editProdImage').value = prod.image || '';
-            document.getElementById('editProductModal').classList.remove('hidden');
-            document.getElementById('editProductModal').style.display = 'flex';
+        function validateCustomer(item) {
+            if (!item.name || !item.email || !item.password) throw new Error("البيانات الأساسية مفقودة (الاسم، البريد، كلمة المرور)");
+            if (customers.some(c => c.email === item.email)) throw new Error(`البريد ${item.email} موجود مسبقاً`);
+            let walletBalance = !isNaN(parseFloat(item.walletBalance)) ? parseFloat(item.walletBalance) : 0;
+            return { id: Date.now() + Math.random()*10000, name: item.name.trim(), email: item.email.trim(), password: item.password, walletBalance, cart: [], createdAt: new Date().toISOString() };
         }
-        function saveProductEdit() {
-            let id = Number(document.getElementById('editProdId').value);
-            let index = products.findIndex(p => p.id === id);
-            if(index === -1) return;
-            let newName = document.getElementById('editProdName').value.trim();
-            let newPrice = parseFloat(document.getElementById('editProdPrice').value);
-            let newStock = parseInt(document.getElementById('editProdStock').value);
-            let newPlatform = document.getElementById('editProdPlatform').value;
-            let newImg = document.getElementById('editProdImage').value.trim();
-            if(!newName || isNaN(newPrice) || newPrice<=0) return alert("الاسم والسعر مطلوبان بقيمة صحيحة");
-            products[index] = { ...products[index], name: newName, price: newPrice, stock: newStock, platform: newPlatform, image: newImg || products[index].image };
-            saveAndRender();
-            closeModal('editProductModal');
+        // ربط الاستيراد
+        function setupImport() {
+            const importProductsBtn = document.getElementById('importProductsBtn');
+            const importCustomersBtn = document.getElementById('importCustomersBtn');
+            const downloadProductsBtn = document.getElementById('downloadProductsTemplateBtn');
+            const downloadCustomersBtn = document.getElementById('downloadCustomersTemplateBtn');
+            let productFileInput = document.createElement('input'); productFileInput.type = 'file'; productFileInput.accept = '.json'; productFileInput.style.display = 'none';
+            let customerFileInput = document.createElement('input'); customerFileInput.type = 'file'; customerFileInput.accept = '.json'; customerFileInput.style.display = 'none';
+            document.body.appendChild(productFileInput); document.body.appendChild(customerFileInput);
+            importProductsBtn.onclick = () => productFileInput.click();
+            importCustomersBtn.onclick = () => customerFileInput.click();
+            productFileInput.onchange = (e) => { if(e.target.files.length) importFromJSON(e.target.files[0], 'product', products, validateProduct, () => { renderProducts(); }); productFileInput.value = ''; };
+            customerFileInput.onchange = (e) => { if(e.target.files.length) importFromJSON(e.target.files[0], 'customer', customers, validateCustomer, () => { renderCustomers(); }); customerFileInput.value = ''; };
+            // تنزيل نماذج
+            downloadProductsBtn.onclick = () => { let sample = [{ name: "Battle Pass", price: 299, stock: 50, platform: "Free_Fire", image: "https://example.com/bp.jpg" }, { name: "UC 1000", price: 150, stock: 200, platform: "Free_Fire" }]; downloadJSON(sample, "products_template.json"); };
+            downloadCustomersBtn.onclick = () => { let sample = [{ name: "أحمد محمد", email: "ahmed@example.com", password: "123456", walletBalance: 500 }, { name: "سارة علي", email: "sara@example.com", password: "pass123", walletBalance: 0 }]; downloadJSON(sample, "customers_template.json"); };
         }
-
-        function openEditUser(id) {
-            let user = users.find(u => u.id === id);
-            if(!user) return;
-            document.getElementById('editUserId').value = user.id;
-            document.getElementById('editUserName').value = user.name;
-            document.getElementById('editUserPhone').value = user.phone;
-            document.getElementById('editUserPass').value = user.pass;
-            document.getElementById('editUserModal').classList.remove('hidden');
-            document.getElementById('editUserModal').style.display = 'flex';
-        }
-        function saveUserEdit() {
-            let id = Number(document.getElementById('editUserId').value);
-            let idx = users.findIndex(u => u.id === id);
-            if(idx === -1) return;
-            let newName = document.getElementById('editUserName').value.trim();
-            let newPhone = document.getElementById('editUserPhone').value.trim();
-            let newPass = document.getElementById('editUserPass').value.trim();
-            if(!newName || !newPhone || !newPass) return alert("جميع الحقول مطلوبة");
-            users[idx] = { ...users[idx], name: newName, phone: newPhone, pass: newPass };
-            saveAndRender();
-            closeModal('editUserModal');
-        }
-
-        function openEditFinance(id) {
-            let fin = finance.find(f => f.id === id);
-            if(!fin) return;
-            document.getElementById('editFinanceId').value = fin.id;
-            document.getElementById('editFinanceDesc').value = fin.desc;
-            document.getElementById('editFinanceType').value = fin.type;
-            document.getElementById('editFinanceAmount').value = fin.amount;
-            document.getElementById('editFinanceDate').value = fin.date;
-            document.getElementById('editFinanceModal').classList.remove('hidden');
-            document.getElementById('editFinanceModal').style.display = 'flex';
-        }
-        function saveFinanceEdit() {
-            let id = Number(document.getElementById('editFinanceId').value);
-            let idx = finance.findIndex(f => f.id === id);
-            if(idx === -1) return;
-            let newDesc = document.getElementById('editFinanceDesc').value.trim();
-            let newType = document.getElementById('editFinanceType').value;
-            let newAmount = parseFloat(document.getElementById('editFinanceAmount').value);
-            let newDate = document.getElementById('editFinanceDate').value;
-            if(!newDesc) return alert("البيان مطلوب");
-            if(isNaN(newAmount) || newAmount<=0) return alert("أدخل مبلغاً صحيحاً");
-            if(!newDate) return alert("اختر التاريخ");
-            finance[idx] = { ...finance[idx], desc: newDesc, type: newType, amount: newAmount, date: newDate };
-            saveAndRender();
-            closeModal('editFinanceModal');
-        }
-
-        function closeModal(modalId) {
-            let modal = document.getElementById(modalId);
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-        }
-
-        function saveAndRender() {
-            saveAll();
-            renderAll();
-        }
-
-        function exportFinanceCSV() {
-            if(finance.length === 0) return alert("لا توجد بيانات لتصديرها");
-            let headers = ["البيان", "النوع", "المبلغ", "التاريخ"];
-            let rows = finance.map(f => [f.desc, f.type, f.amount, f.date]);
-            let csvContent = headers.join(",") + "\n" + rows.map(row => row.map(cell => `"${cell}"`).join(",")).join("\n");
-            let blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-            let link = document.createElement("a");
-            let url = URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute("download", "sudangames_finance.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        function checkAdminAuth() {
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPass').value;
-            if(u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
-                document.getElementById('adminLogin').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                migrateData();
-                renderAll();
-            } else {
-                document.getElementById('errorMsg').classList.remove('hidden');
-                setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
-            }
-        }
-
-        function logoutAdmin() {
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('adminLogin').classList.remove('hidden');
-            document.getElementById('adminUser').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('errorMsg').classList.add('hidden');
-        }
-
-        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            let searchInput = document.getElementById('searchProduct');
-            if(searchInput) searchInput.addEventListener('input', () => renderAll());
-            if(localStorage.getItem('sudangames_products')) migrateData();
-        });
+        function downloadJSON(data, filename) { const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"}); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename; link.click(); URL.revokeObjectURL(link.href); }
+        
+        // تسجيل الدخول والعرض
+        function checkAdminAuth() { let u = document.getElementById('adminUser').value; let p = document.getElementById('adminPass').value; if (u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) { document.getElementById('adminLogin').classList.add('hidden'); document.getElementById('adminDashboard').classList.remove('hidden'); renderAll(); setupImport(); } else { document.getElementById('errorMsg').classList.remove('hidden'); setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000); } }
+        function logoutAdmin() { document.getElementById('adminDashboard').classList.add('hidden'); document.getElementById('adminLogin').classList.remove('hidden'); document.getElementById('adminUser').value = ''; document.getElementById('adminPass').value = ''; }
+        function renderAll() { renderCustomers(); renderDepositRequests(); renderProducts(); renderUsers(); renderFinance(); updateStats(); }
+        document.getElementById('searchProduct')?.addEventListener('input', () => renderProducts());
+        renderAll();
+        window.checkAdminAuth = checkAdminAuth; window.logoutAdmin = logoutAdmin; window.addCustomer = addCustomer; window.openEditBalance = openEditBalance; window.saveBalanceEdit = saveBalanceEdit; window.deleteCustomer = deleteCustomer; window.approveDeposit = approveDeposit; window.rejectDeposit = rejectDeposit; window.addNewProduct = addNewProduct; window.openEditProduct = openEditProduct; window.deleteItem = deleteItem; window.addNewUser = addNewUser; window.openEditUser = openEditUser; window.addNewFinance = addNewFinance; window.exportFinanceCSV = exportFinanceCSV; window.closeModal = closeModal;
     </script>
 </body>
 </html>
