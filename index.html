@@ -90,7 +90,6 @@
                 <h1 class="text-xl font-black text-white">SUDAN GAMES</h1>
             </div>
             <div class="flex items-center gap-4">
-                <!-- منطقة المستخدم (تظهر بعد تسجيل الدخول) -->
                 <div id="userArea" class="hidden items-center gap-3">
                     <span id="userName" class="text-sm text-gray-300"></span>
                     <button id="walletBtn" class="bg-[#1e1e1e] px-3 py-2 rounded-xl text-[#00e0ff] text-sm font-bold hover:bg-[#2a2a2a] transition">
@@ -101,7 +100,6 @@
                     </button>
                     <button id="logoutBtn" class="text-red-400 hover:text-red-300 text-sm">خروج</button>
                 </div>
-                <!-- زر تسجيل الدخول (قبل الدخول) -->
                 <button id="loginBtn" class="bg-[#00e0ff] text-black px-4 py-2 rounded-xl font-bold hover:opacity-90 transition">
                     <i class="fa-solid fa-user ml-1"></i> دخول
                 </button>
@@ -114,32 +112,24 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Banner ترحيبي -->
         <div class="bg-gradient-to-r from-[#00e0ff]/20 to-transparent rounded-2xl p-6 mb-8 border border-[#00e0ff]/30 text-center">
             <h2 class="text-2xl font-black">أهلاً بك في متجر سودان جيمز</h2>
             <p class="text-gray-300">أسرع طريقة لشحن حسابات الألعاب والبطاقات الرقمية بأفضل الأسعار</p>
         </div>
 
-        <!-- فلتر المنصات -->
         <div class="flex flex-wrap gap-3 mb-6">
             <button data-platform="all" class="platform-filter active bg-[#00e0ff] text-black px-4 py-2 rounded-full font-bold text-sm">الكل</button>
             <button data-platform="Free_Fire" class="platform-filter bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm">Free Fire</button>
             <button data-platform="PUBG Mobile" class="platform-filter bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm">PUBG Mobile</button>
         </div>
 
-        <!-- عرض المنتجات -->
-        <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- سيتم ملؤها بالمنتجات عبر JS -->
-        </div>
-
-        <!-- حالة عدم وجود منتجات -->
+        <div id="productsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
         <div id="noProductsMsg" class="text-center py-12 text-gray-400 hidden">
-            <i class="fa-solid fa-box-open text-5xl mb-3"></i>
-            <p>لا توجد منتجات حالياً، تابعنا قريباً!</p>
+            <i class="fa-solid fa-box-open text-5xl mb-3"></i><p>لا توجد منتجات حالياً، تابعنا قريباً!</p>
         </div>
     </main>
 
-    <!-- مودال تسجيل الدخول / التسجيل (مع طلب تسجيل للمسؤول) -->
+    <!-- مودال تسجيل الدخول / التسجيل -->
     <div id="authModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
         <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-[#00e0ff]/30">
             <div class="flex justify-between items-center mb-4">
@@ -196,9 +186,7 @@
                 <h3 class="text-xl font-black text-white"><i class="fa-solid fa-cart-shopping ml-2"></i>سلة التسوق</h3>
                 <button onclick="closeCart()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
-            <div id="cartItems" class="flex-1 overflow-y-auto space-y-3 mb-4">
-                <!-- عناصر السلة -->
-            </div>
+            <div id="cartItems" class="flex-1 overflow-y-auto space-y-3 mb-4"></div>
             <div class="border-t border-gray-800 pt-4">
                 <div class="flex justify-between text-lg font-bold mb-4">
                     <span>الإجمالي:</span>
@@ -216,35 +204,21 @@
     </div>
 
     <script>
-        // ========== بيانات ثابتة ==========
+        // ========== بيانات ==========
         let products = [];
-        let currentUser = null; // المستخدم الحالي (يحتوي: id, name, email, walletBalance, cart, status)
-        
-        // مستخدمين مخزنين في localStorage (للعملاء) - فقط المقبولين
+        let currentUser = null;
         let customers = JSON.parse(localStorage.getItem('sudangames_customers')) || [];
-        
-        // طلبات التسجيل الجديدة (تنتظر موافقة المسؤول)
         let registrationRequests = JSON.parse(localStorage.getItem('sudangames_registration_requests')) || [];
-        
-        // طلبات الإيداع
         let depositRequests = JSON.parse(localStorage.getItem('sudangames_deposit_requests')) || [];
 
+        // رقم واتساب الإداري (بدون +)
+        const ADMIN_WHATSAPP = "249115169965";
+
         // ========== مساعدات ==========
-        function saveCustomers() {
-            localStorage.setItem('sudangames_customers', JSON.stringify(customers));
-        }
-
-        function saveRegistrationRequests() {
-            localStorage.setItem('sudangames_registration_requests', JSON.stringify(registrationRequests));
-        }
-
-        function saveDepositRequests() {
-            localStorage.setItem('sudangames_deposit_requests', JSON.stringify(depositRequests));
-        }
-
-        function saveCurrentUser() {
-            localStorage.setItem('sudangames_current_user', JSON.stringify(currentUser));
-        }
+        function saveCustomers() { localStorage.setItem('sudangames_customers', JSON.stringify(customers)); }
+        function saveRegistrationRequests() { localStorage.setItem('sudangames_registration_requests', JSON.stringify(registrationRequests)); }
+        function saveDepositRequests() { localStorage.setItem('sudangames_deposit_requests', JSON.stringify(depositRequests)); }
+        function saveCurrentUser() { localStorage.setItem('sudangames_current_user', JSON.stringify(currentUser)); }
 
         function loadCurrentUser() {
             const saved = localStorage.getItem('sudangames_current_user');
@@ -274,30 +248,31 @@
         }
 
         function updateCartBadge() {
-            if (currentUser && currentUser.cart) {
-                const count = currentUser.cart.reduce((sum, item) => sum + item.quantity, 0);
-                document.getElementById('cartCount').innerText = count;
-            } else {
-                document.getElementById('cartCount').innerText = '0';
-            }
+            const count = currentUser?.cart?.reduce((s, i) => s + i.quantity, 0) || 0;
+            document.getElementById('cartCount').innerText = count;
         }
 
         function saveUserState() {
             if (!currentUser) return;
             const index = customers.findIndex(c => c.id === currentUser.id);
-            if (index !== -1) {
-                customers[index] = { ...currentUser };
-                saveCustomers();
-            }
+            if (index !== -1) customers[index] = { ...currentUser };
+            else customers.push({ ...currentUser });
+            saveCustomers();
             saveCurrentUser();
         }
 
-        // ========== إدارة المنتجات ==========
+        // ========== إرسال إشعار واتساب ==========
+        function sendWhatsAppNotification(message) {
+            const encodedMessage = encodeURIComponent(message);
+            const url = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodedMessage}`;
+            window.open(url, '_blank');
+        }
+
+        // ========== المنتجات ==========
         function loadProducts() {
             const stored = localStorage.getItem('sudangames_products');
-            if (stored) {
-                products = JSON.parse(stored);
-            } else {
+            if (stored) products = JSON.parse(stored);
+            else {
                 products = [
                     { id: 1, name: "شحن Free Fire 100 دايموند", price: 2500, stock: 100, platform: "Free_Fire", image: "https://via.placeholder.com/150?text=FreeFire" },
                     { id: 2, name: "UC PUBG 1000", price: 3500, stock: 80, platform: "PUBG Mobile", image: "https://via.placeholder.com/150?text=PUBG" },
@@ -310,22 +285,15 @@
         }
 
         let currentFilter = "all";
-
         function renderProducts() {
             let filtered = currentFilter === "all" ? products : products.filter(p => p.platform === currentFilter);
             const container = document.getElementById('productsContainer');
             const noMsg = document.getElementById('noProductsMsg');
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '';
-                noMsg.classList.remove('hidden');
-                return;
-            }
+            if (filtered.length === 0) { container.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
             noMsg.classList.add('hidden');
-            
             container.innerHTML = filtered.map(product => `
                 <div class="product-card rounded-2xl overflow-hidden shadow-lg transition">
-                    <img src="${product.image || 'https://via.placeholder.com/300'}" alt="${product.name}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300'">
+                    <img src="${product.image || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300'">
                     <div class="p-4">
                         <h3 class="font-bold text-lg mb-1">${escapeHtml(product.name)}</h3>
                         <div class="flex justify-between items-center mb-2">
@@ -343,24 +311,13 @@
 
         // ========== سلة المشتريات ==========
         function addToCart(productId) {
-            if (!currentUser) {
-                showToast("الرجاء تسجيل الدخول أولاً", "error");
-                openAuthModal('login');
-                return;
-            }
+            if (!currentUser) { showToast("الرجاء تسجيل الدخول أولاً", "error"); openAuthModal('login'); return; }
             const product = products.find(p => p.id === productId);
-            if (!product || (product.stock ?? 0) <= 0) {
-                showToast("المنتج غير متوفر حالياً", "error");
-                return;
-            }
-            
+            if (!product || (product.stock ?? 0) <= 0) { showToast("المنتج غير متوفر حالياً", "error"); return; }
             let cart = currentUser.cart || [];
             const existing = cart.find(item => item.id === productId);
             if (existing) {
-                if (existing.quantity + 1 > (product.stock ?? 0)) {
-                    showToast(`لا يمكن إضافة أكثر من الكمية المتاحة (${product.stock})`, "error");
-                    return;
-                }
+                if (existing.quantity + 1 > (product.stock ?? 0)) { showToast(`لا يمكن إضافة أكثر من الكمية المتاحة (${product.stock})`, "error"); return; }
                 existing.quantity += 1;
             } else {
                 cart.push({ ...product, quantity: 1 });
@@ -443,74 +400,66 @@
         }
 
         function checkout() {
-            if (!currentUser) {
-                showToast("الرجاء تسجيل الدخول أولاً", "error");
-                openAuthModal('login');
-                return;
-            }
+            if (!currentUser) { showToast("الرجاء تسجيل الدخول أولاً", "error"); openAuthModal('login'); return; }
             const cart = currentUser.cart || [];
-            if (cart.length === 0) {
-                showToast("السلة فارغة، أضف منتجات أولاً", "error");
-                return;
-            }
+            if (cart.length === 0) { showToast("السلة فارغة، أضف منتجات أولاً", "error"); return; }
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             if (currentUser.walletBalance < total) {
                 showToast(`رصيدك غير كافٍ. المطلوب: ${total.toLocaleString()} ج.س`, "error");
                 return;
             }
-            // خصم الرصيد
             currentUser.walletBalance -= total;
-            // هنا يمكن إضافة منطق لتقليل المخزون (اختياري)
-            // تفريغ السلة
             currentUser.cart = [];
             saveUserState();
             updateCartBadge();
             closeCart();
             updateUIForUser();
+
+            // إرسال إشعار واتساب بعملية الشراء
+            const message = `🛒 عملية شراء جديدة من العميل ${currentUser.name}\n📦 قيمة الطلب: ${total.toLocaleString()} ج.س\n💰 الرصيد المتبقي: ${currentUser.walletBalance.toLocaleString()} ج.س`;
+            sendWhatsAppNotification(message);
+
             showToast(`تم شراء الطلب بنجاح! رصيدك المتبقي: ${currentUser.walletBalance.toLocaleString()} ج.س`, "success");
         }
 
-        // ========== نظام طلبات الإيداع ==========
+        // ========== طلبات الإيداع ==========
         function openDepositRequestModal() {
-            if (!currentUser) {
-                showToast("الرجاء تسجيل الدخول أولاً", "error");
-                openAuthModal('login');
-                return;
-            }
+            if (!currentUser) { showToast("الرجاء تسجيل الدخول أولاً", "error"); openAuthModal('login'); return; }
             document.getElementById('depositRequestModal').classList.remove('hidden');
             document.getElementById('depositRequestModal').style.display = 'flex';
             document.getElementById('depositAmountRequest').value = '';
         }
-
         function closeDepositRequestModal() {
             document.getElementById('depositRequestModal').classList.add('hidden');
             document.getElementById('depositRequestModal').style.display = 'none';
         }
-
         function submitDepositRequest() {
             if (!currentUser) return;
             const amount = parseFloat(document.getElementById('depositAmountRequest').value);
-            if (isNaN(amount) || amount <= 0) {
-                showToast("أدخل مبلغاً صحيحاً أكبر من صفر", "error");
-                return;
-            }
-            // إنشاء طلب إيداع جديد
+            if (isNaN(amount) || amount <= 0) { showToast("أدخل مبلغاً صحيحاً أكبر من صفر", "error"); return; }
             const newRequest = {
                 id: Date.now(),
                 userId: currentUser.id,
+                customerId: currentUser.id,
                 userName: currentUser.name,
+                customerName: currentUser.name,
                 userEmail: currentUser.email,
                 amount: amount,
-                status: 'pending', // pending, approved, rejected
-                date: new Date().toISOString()
+                status: 'pending',
+                date: new Date().toISOString(),
+                createdAt: new Date().toISOString()
             };
             depositRequests.push(newRequest);
             saveDepositRequests();
             closeDepositRequestModal();
+
+            // إرسال إشعار واتساب بطلب الإيداع
+            const message = `💰 طلب إيداع جديد\n👤 العميل: ${currentUser.name}\n📧 البريد: ${currentUser.email}\n💵 المبلغ: ${amount.toLocaleString()} ج.س`;
+            sendWhatsAppNotification(message);
+
             showToast(`تم إرسال طلب إيداع بمبلغ ${amount.toLocaleString()} ج.س للمسؤول`, "success");
         }
 
-        // عرض طلبات الإيداع الخاصة بالمستخدم في نافذة المحفظة
         function loadUserDepositRequests() {
             if (!currentUser) return;
             const userRequests = depositRequests.filter(r => r.userId === currentUser.id);
@@ -532,9 +481,8 @@
             `).join('');
         }
 
-        // ========== نظام المصادقة مع طلب التسجيل ==========
-        let authMode = 'login'; // 'login' or 'register'
-
+        // ========== المصادقة ==========
+        let authMode = 'login';
         function openAuthModal(mode) {
             authMode = mode;
             const modal = document.getElementById('authModal');
@@ -543,7 +491,6 @@
             const submitBtn = document.getElementById('authSubmitBtn');
             const toggleText = document.getElementById('authToggleText');
             const registerInfo = document.getElementById('registerInfo');
-            
             if (mode === 'login') {
                 title.innerText = 'تسجيل الدخول';
                 nameField.classList.add('hidden');
@@ -560,7 +507,6 @@
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
         }
-
         function closeAuthModal() {
             document.getElementById('authModal').classList.add('hidden');
             document.getElementById('authModal').style.display = 'none';
@@ -568,16 +514,12 @@
             document.getElementById('authEmail').value = '';
             document.getElementById('authPassword').value = '';
         }
-
         function handleAuthSubmit() {
             const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
             if (authMode === 'login') {
                 const user = customers.find(c => c.email === email && c.password === password);
-                if (!user) {
-                    showToast("البريد الإلكتروني أو كلمة المرور غير صحيحة", "error");
-                    return;
-                }
+                if (!user) { showToast("البريد الإلكتروني أو كلمة المرور غير صحيحة", "error"); return; }
                 currentUser = { ...user };
                 if (!currentUser.cart) currentUser.cart = [];
                 saveCurrentUser();
@@ -585,32 +527,26 @@
                 closeAuthModal();
                 showToast(`مرحباً ${currentUser.name}`, "success");
             } else {
-                // طلب تسجيل جديد
                 const name = document.getElementById('authName').value.trim();
-                if (!name || !email || !password) {
-                    showToast("جميع الحقول مطلوبة", "error");
-                    return;
-                }
-                // التأكد من عدم وجود نفس البريد في العملاء المقبولين أو طلبات الانتظار
-                if (customers.some(c => c.email === email)) {
-                    showToast("البريد الإلكتروني مسجل مسبقاً", "error");
-                    return;
-                }
-                if (registrationRequests.some(r => r.email === email && r.status === 'pending')) {
-                    showToast("لديك طلب تسجيل قيد المراجعة بالفعل", "error");
-                    return;
-                }
-                // إنشاء طلب تسجيل جديد
+                if (!name || !email || !password) { showToast("جميع الحقول مطلوبة", "error"); return; }
+                if (customers.some(c => c.email === email)) { showToast("البريد الإلكتروني مسجل مسبقاً", "error"); return; }
+                if (registrationRequests.some(r => r.email === email && r.status === 'pending')) { showToast("لديك طلب تسجيل قيد المراجعة بالفعل", "error"); return; }
                 const newRequest = {
                     id: Date.now(),
                     name,
                     email,
                     password,
                     status: 'pending',
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
                 };
                 registrationRequests.push(newRequest);
                 saveRegistrationRequests();
+
+                // إرسال إشعار واتساب بطلب التسجيل
+                const message = `📝 طلب تسجيل جديد\n👤 الاسم: ${name}\n📧 البريد: ${email}`;
+                sendWhatsAppNotification(message);
+
                 closeAuthModal();
                 showToast("تم إرسال طلب التسجيل للمسؤول، سيتم تفعيل حسابك قريباً", "success");
             }
@@ -629,21 +565,15 @@
 
         // ========== فتح وإغلاق المودالات ==========
         function openCart() {
-            if (!currentUser) {
-                showToast("الرجاء تسجيل الدخول أولاً", "error");
-                openAuthModal('login');
-                return;
-            }
+            if (!currentUser) { showToast("الرجاء تسجيل الدخول أولاً", "error"); openAuthModal('login'); return; }
             renderCartModal();
             document.getElementById('cartModal').classList.remove('hidden');
             document.getElementById('cartModal').style.display = 'flex';
         }
-
         function closeCart() {
             document.getElementById('cartModal').classList.add('hidden');
             document.getElementById('cartModal').style.display = 'none';
         }
-
         function openWalletModal() {
             if (!currentUser) return;
             document.getElementById('currentBalance').innerText = currentUser.walletBalance.toLocaleString() + ' ج.س';
@@ -651,13 +581,12 @@
             document.getElementById('walletModal').classList.remove('hidden');
             document.getElementById('walletModal').style.display = 'flex';
         }
-
         function closeWalletModal() {
             document.getElementById('walletModal').classList.add('hidden');
             document.getElementById('walletModal').style.display = 'none';
         }
 
-        // ========== أدوات عامة ==========
+        // ========== أدوات ==========
         let toastTimeout;
         function showToast(message, type = "success") {
             const toast = document.getElementById('toast');
@@ -665,11 +594,8 @@
             document.getElementById('toastMsg').innerHTML = `<i class="fa-solid ${icon} text-[#00e0ff] ml-2"></i> ${message}`;
             toast.classList.remove('hidden');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            toastTimeout = setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
-
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>]/g, function(m) {
@@ -680,12 +606,11 @@
             });
         }
 
-        // ========== أحداث وأزرار ==========
+        // ========== الأحداث ==========
         document.addEventListener('DOMContentLoaded', () => {
             loadProducts();
             loadCurrentUser();
-            
-            // الفلاتر
+
             document.querySelectorAll('.platform-filter').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.platform-filter').forEach(b => b.classList.remove('active', 'bg-[#00e0ff]', 'text-black'));
@@ -694,8 +619,7 @@
                     renderProducts();
                 });
             });
-            
-            // أزرار
+
             document.getElementById('loginBtn').addEventListener('click', () => openAuthModal('login'));
             document.getElementById('logoutBtn').addEventListener('click', logout);
             document.getElementById('cartBtn').addEventListener('click', openCart);
@@ -707,33 +631,33 @@
                 authMode = authMode === 'login' ? 'register' : 'login';
                 openAuthModal(authMode);
             });
-            
-            // إغلاق المودالات عند النقر خارجها
+
             window.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('authModal')) closeAuthModal();
                 if (e.target === document.getElementById('walletModal')) closeWalletModal();
                 if (e.target === document.getElementById('cartModal')) closeCart();
                 if (e.target === document.getElementById('depositRequestModal')) closeDepositRequestModal();
             });
-            
-            // مزامنة المنتجات من لوحة التحكم
+
+            // تحديث فوري عند تغيير البيانات من أي نافذة
             window.addEventListener('storage', (e) => {
-                if (e.key === 'sudangames_products') {
-                    loadProducts();
-                }
-                if (e.key === 'sudangames_customers' || e.key === 'sudangames_deposit_requests') {
-                    // تحديث المستخدم الحالي إذا تغير رصيده أو تمت الموافقة على طلب
+                if (e.key === 'sudangames_products') { products = JSON.parse(e.newValue); renderProducts(); }
+                if (e.key === 'sudangames_customers') {
+                    customers = JSON.parse(e.newValue);
                     if (currentUser) {
                         const updated = customers.find(c => c.id === currentUser.id);
-                        if (updated) {
-                            currentUser = { ...updated, cart: currentUser.cart };
-                            saveCurrentUser();
-                            updateUIForUser();
-                        }
+                        if (updated) currentUser = { ...updated, cart: currentUser.cart };
+                        else { currentUser = null; localStorage.removeItem('sudangames_current_user'); }
+                        updateUIForUser();
                     }
                 }
+                if (e.key === 'sudangames_deposit_requests') {
+                    depositRequests = JSON.parse(e.newValue);
+                    if (currentUser && document.getElementById('walletModal').style.display === 'flex') loadUserDepositRequests();
+                }
+                if (e.key === 'sudangames_registration_requests') registrationRequests = JSON.parse(e.newValue);
             });
         });
     </script>
 </body>
-                </html>
+                                                                                                                                       </html>
