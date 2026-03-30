@@ -2,1555 +2,481 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sudan Games | لوحة الإدارة المتطورة</title>
-    <!-- Bootstrap RTL -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
-    <!-- Font Awesome 6 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sudan Games | لوحة تحكم المتجر</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts - Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js 4 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --neon-blue: #00e0ff;
+            --dark-bg: #0a0a0a;
+            --card-bg: #111111;
+            --glow: 0 0 10px rgba(0, 224, 255, 0.3);
         }
-
         body {
-            background-color: #f4f7fc;
+            font-family: 'Tajawal', sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0f0f0f, #020202);
+            color: #e5e5e5;
         }
-
-        /* شاشة تسجيل الدخول */
-        .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1e2b3a 0%, #0f1a24 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s;
+        .admin-gradient {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
         }
-
-        .login-card {
-            background: white;
-            border-radius: 30px;
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
+        .game-gradient {
+            background: linear-gradient(135deg, #00e0ff, #0066cc);
         }
-
-        .login-card .logo {
-            font-size: 40px;
-            color: #ffc107;
-            margin-bottom: 15px;
+        .card-glow {
+            transition: all 0.2s ease;
         }
-
-        .login-card h2 {
-            color: #1e2b3a;
-            font-weight: 700;
-            margin-bottom: 10px;
+        .card-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+            border-color: var(--neon-blue);
         }
-
-        .login-card p {
-            color: #6c757d;
-            margin-bottom: 30px;
+        .modal-backdrop {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
         }
-
-        .login-card .form-control {
-            border-radius: 50px;
-            padding: 12px 20px;
-            border: 1px solid #dee2e6;
-            margin-bottom: 20px;
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .login-card .btn-login {
-            background: #ffc107;
-            border: none;
-            border-radius: 50px;
-            padding: 12px;
-            font-weight: 600;
-            color: #1e2b3a;
-            width: 100%;
-            transition: all 0.3s;
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
         }
-
-        .login-card .btn-login:hover {
-            background: #e0a800;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
-        }
-
-        /* الواجهة الرئيسية بعد الدخول */
-        .admin-wrapper {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .sidebar {
-            background: linear-gradient(180deg, #1e2b3a 0%, #0f1a24 100%);
-            min-height: 100vh;
-            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s;
-        }
-
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 14px 20px;
-            margin: 5px 10px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .sidebar .nav-link:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            transform: translateX(-5px);
-        }
-
-        .sidebar .nav-link.active {
-            background: #ffc107;
-            color: #1e2b3a !important;
-            font-weight: 700;
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
-        }
-
-        .sidebar .nav-link i {
-            margin-left: 12px;
-            width: 24px;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-
-        .content {
-            padding: 25px 30px;
-            background-color: #f4f7fc;
-            min-height: 100vh;
-        }
-
-        .stat-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s;
-            background: white;
-            padding: 22px 18px;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-
-        .table-custom {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-        }
-
-        .table-custom th {
-            background-color: #f8fafd;
-            font-weight: 700;
-            color: #1e2b3a;
-            border-bottom: none;
-        }
-
-        .table-custom td {
-            vertical-align: middle;
-        }
-
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-cancelled {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-new {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .btn-action {
-            padding: 6px 10px;
-            margin: 0 3px;
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
             border-radius: 10px;
-            transition: all 0.2s;
         }
-
-        .btn-action:hover {
-            transform: scale(1.1);
+        input, select, textarea {
+            background-color: #1e1e1e !important;
+            border: 1px solid #2c2c2c !important;
+            color: #fff !important;
         }
-
-        .modal-content {
-            border-radius: 25px;
-            border: none;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        input:focus, select:focus {
+            border-color: var(--neon-blue) !important;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0,224,255,0.3);
         }
-
-        .modal-header {
-            background: #f8fafd;
-            border-radius: 25px 25px 0 0;
-            border-bottom: 1px solid #e9ecef;
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
         }
-
-        .chart-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-            margin-bottom: 25px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active-page {
-            display: block;
-            animation: fadeIn 0.4s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .notification-dropdown {
-            width: 320px;
-            padding: 0;
-            border: none;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .notification-dropdown .dropdown-header {
-            background: #f8fafd;
-            padding: 15px 20px;
-            font-weight: 700;
-        }
-
-        .notification-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f1f1f1;
-            transition: background 0.2s;
-        }
-
-        .notification-item:hover {
-            background: #f8f9fa;
-        }
-
-        .profile-dropdown .dropdown-item {
-            padding: 12px 20px;
-            font-weight: 500;
-        }
-
-        .profile-dropdown .dropdown-item i {
-            margin-left: 10px;
-            width: 20px;
-        }
-
-        .btn-outline-light:hover i {
-            color: #1e2b3a;
-        }
-
-        .search-box {
-            border-radius: 50px;
-            border: 1px solid #dee2e6;
-            padding: 8px 20px;
-            transition: all 0.3s;
-        }
-
-        .search-box:focus {
-            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
-            border-color: #ffc107;
-        }
-
-        .bg-soft-warning {
-            background-color: rgba(255, 193, 7, 0.15);
-        }
-
-        .bg-soft-success {
-            background-color: rgba(40, 167, 69, 0.15);
-        }
-
-        .bg-soft-info {
-            background-color: rgba(23, 162, 184, 0.15);
-        }
-
-        .bg-soft-primary {
-            background-color: rgba(0, 123, 255, 0.15);
-        }
-
-        .text-warning-dark {
-            color: #e0a800;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                min-height: auto;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .stat-card {
-                margin-bottom: 15px;
-            }
+        th, td {
+            border-bottom: 1px solid #2a2a2a;
         }
     </style>
 </head>
-
 <body>
+
     <!-- شاشة تسجيل الدخول -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-card">
-            <div class="logo"><i class="fas fa-gamepad"></i></div>
-            <h2>Sudan Games</h2>
-            <p>تسجيل الدخول إلى لوحة الإدارة</p>
-            <form id="loginForm">
-                <input type="text" class="form-control" placeholder="اسم المستخدم" id="username" value="admin">
-                <input type="password" class="form-control" placeholder="كلمة المرور" id="password" value="admin">
-                <button type="submit" class="btn-login">دخول <i class="fas fa-arrow-left me-2"></i></button>
-            </form>
-            <div class="mt-3 text-muted small">admin / admin</div>
+    <div id="adminLogin" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[2000] transition-all">
+        <div class="bg-[#111] rounded-3xl p-8 w-11/12 max-w-md text-center border border-[#00e0ff]/30 shadow-2xl">
+            <div class="w-20 h-20 admin-gradient rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-gamepad text-3xl text-white"></i>
+            </div>
+            <h2 class="text-2xl font-black mb-2 text-white">مرحباً بعودتك</h2>
+            <p class="text-gray-400 text-sm mb-6">سجل الدخول للوصول إلى لوحة تحكم المتجر</p>
+            <input type="text" id="adminUser" placeholder="اسم المسؤول" class="w-full rounded-xl p-4 mb-3 text-right outline-none">
+            <input type="password" id="adminPass" placeholder="كلمة المرور" class="w-full rounded-xl p-4 mb-6 text-right outline-none">
+            <button onclick="checkAdminAuth()" class="w-full admin-gradient text-white py-4 rounded-xl font-bold hover:shadow-lg transition duration-300">دخول <i class="fa-solid fa-arrow-left mr-2"></i></button>
+            <p id="errorMsg" class="text-red-500 mt-4 hidden text-sm font-bold">بيانات الدخول غير صحيحة!</p>
         </div>
     </div>
 
-    <!-- الغلاف الرئيسي للإدارة (يظهر بعد تسجيل الدخول) -->
-    <div id="adminWrapper" class="admin-wrapper">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- القائمة الجانبية -->
-                <nav class="col-lg-2 col-md-3 sidebar text-white p-0">
-                    <div class="p-4 text-center border-bottom border-secondary">
-                        <h4 class="mb-0"><i class="fas fa-gamepad ms-2"></i>Sudan Games</h4>
-                        <small class="text-white-50">الإدارة المتطورة</small>
+    <!-- لوحة التحكم الرئيسية -->
+    <div id="adminDashboard" class="hidden">
+        <nav class="bg-black/80 backdrop-blur-md border-b border-[#00e0ff]/30 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 admin-gradient rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-gamepad text-white text-sm"></i>
                     </div>
-                    <ul class="nav flex-column mt-3" id="sidebarMenu">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#" data-page="dashboard">
-                                <i class="fas fa-tachometer-alt"></i> الرئيسية
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="products">
-                                <i class="fas fa-box"></i> المنتجات
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="orders">
-                                <i class="fas fa-shopping-cart"></i> الطلبات
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="users">
-                                <i class="fas fa-users"></i> المستخدمون
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="coupons">
-                                <i class="fas fa-ticket"></i> الكوبونات
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="reports">
-                                <i class="fas fa-chart-line"></i> التقارير
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="settings">
-                                <i class="fas fa-cog"></i> الإعدادات
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="mt-auto p-3 border-top border-secondary">
-                        <div class="dropdown">
-                            <a href="#" class="text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle ms-2"></i> admin@sudangames
-                            </a>
-                            <ul class="dropdown-menu profile-dropdown">
-                                <li><a class="dropdown-item" href="#" data-page="profile"><i class="fas fa-id-card"></i> الملف الشخصي</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
-
-                <!-- المحتوى الرئيسي -->
-                <main class="col-lg-10 col-md-9 content">
-                    <!-- شريط البحث والإشعارات -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="mb-0" id="pageTitle">الرئيسية</h3>
-                        <div class="d-flex align-items-center">
-                            <div class="input-group me-3" style="width: 280px;">
-                                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control search-box" placeholder="بحث..." id="globalSearch">
-                            </div>
-                            <div class="dropdown me-2">
-                                <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-bell"></i>
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationsBadge">0</span>
-                                </button>
-                                <ul class="dropdown-menu notification-dropdown" aria-labelledby="dropdownNotification">
-                                    <li>
-                                        <h6 class="dropdown-header">الإشعارات</h6>
-                                    </li>
-                                    <li id="notificationsList">
-                                        <!-- تملأ ديناميكيا -->
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-flag"></i> العربية
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- الصفحات -->
-                    <!-- الرئيسية -->
-                    <div id="dashboard" class="page active-page">
-                        <!-- بطاقات إحصائية -->
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-3">
-                                <div class="stat-card d-flex align-items-center">
-                                    <div class="stat-icon bg-soft-warning text-warning ms-3">
-                                        <i class="fas fa-shopping-bag"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">الطلبات الجديدة</span>
-                                        <h3 class="mb-0 fw-bold" id="newOrdersCount">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card d-flex align-items-center">
-                                    <div class="stat-icon bg-soft-success text-success ms-3">
-                                        <i class="fas fa-boxes"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">إجمالي المنتجات</span>
-                                        <h3 class="mb-0 fw-bold" id="totalProductsCount">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card d-flex align-items-center">
-                                    <div class="stat-icon bg-soft-info text-info ms-3">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">المستخدمون النشطون</span>
-                                        <h3 class="mb-0 fw-bold" id="activeUsersCount">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card d-flex align-items-center">
-                                    <div class="stat-icon bg-soft-primary text-primary ms-3">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">إيرادات اليوم</span>
-                                        <h3 class="mb-0 fw-bold" id="todayRevenue">0 SDG</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- الرسوم البيانية -->
-                        <div class="row mb-4">
-                            <div class="col-md-8">
-                                <div class="chart-container">
-                                    <h5 class="mb-3"><i class="fas fa-chart-line ms-2"></i>حركة الطلبات (آخر 7 أيام)</h5>
-                                    <canvas id="ordersChart" style="max-height: 300px; width:100%;"></canvas>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="chart-container">
-                                    <h5 class="mb-3"><i class="fas fa-chart-pie ms-2"></i>توزيع حالات الطلبات</h5>
-                                    <canvas id="statusChart" style="max-height: 280px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- آخر الطلبات -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5><i class="fas fa-clock ms-2"></i>آخر 5 طلبات</h5>
-                            <button class="btn btn-sm btn-outline-primary" onclick="location.href='#'" data-page="orders"><i class="fas fa-eye"></i> عرض الكل</button>
-                        </div>
-                        <div class="table-responsive table-custom">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead>
-                                     <tr>
-                                        <th>رقم الطلب</th>
-                                        <th>العميل</th>
-                                        <th>المنتج</th>
-                                        <th>المبلغ</th>
-                                        <th>الحالة</th>
-                                        <th>الإجراءات</th>
-                                     </tr>
-                                </thead>
-                                <tbody id="recentOrdersTable">
-                                    <!-- ديناميكي -->
-                                </tbody>
-                             </table>
-                        </div>
-                    </div>
-
-                    <!-- صفحة المنتجات -->
-                    <div id="products" class="page">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4><i class="fas fa-box ms-2"></i>إدارة المنتجات</h4>
-                            <div>
-                                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                                    <i class="fas fa-plus"></i> إضافة منتج
-                                </button>
-                                <button class="btn btn-secondary" onclick="exportProducts()">
-                                    <i class="fas fa-download"></i> تصدير CSV
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-responsive table-custom">
-                            <table class="table table-hover align-middle" id="productsTable">
-                                <thead>
-                                     <tr>
-                                        <th>#</th>
-                                        <th>اسم المنتج</th>
-                                        <th>السعر (SDG)</th>
-                                        <th>الفئة</th>
-                                        <th>الحالة</th>
-                                        <th>الإجراءات</th>
-                                     </tr>
-                                </thead>
-                                <tbody id="productsTableBody">
-                                    <!-- ديناميكي -->
-                                </tbody>
-                             </table>
-                        </div>
-                    </div>
-
-                    <!-- صفحة الطلبات -->
-                    <div id="orders" class="page">
-                        <h4 class="mb-4"><i class="fas fa-shopping-cart ms-2"></i>جميع الطلبات</h4>
-                        <div class="table-responsive table-custom">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                     <tr>
-                                        <th>رقم الطلب</th>
-                                        <th>العميل</th>
-                                        <th>المنتج</th>
-                                        <th>المبلغ</th>
-                                        <th>التاريخ</th>
-                                        <th>الحالة</th>
-                                        <th>الإجراءات</th>
-                                     </tr>
-                                </thead>
-                                <tbody id="allOrdersTableBody">
-                                    <!-- ديناميكي -->
-                                </tbody>
-                             </table>
-                        </div>
-                    </div>
-
-                    <!-- صفحة المستخدمين (تم إضافة زر تحديث) -->
-                    <div id="users" class="page">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4><i class="fas fa-users ms-2"></i>إدارة المستخدمين (العملاء)</h4>
-                            <div>
-                                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                    <i class="fas fa-user-plus"></i> إضافة مستخدم
-                                </button>
-                                <button class="btn btn-info" onclick="refreshUsers()">
-                                    <i class="fas fa-sync-alt"></i> تحديث
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-responsive table-custom">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                     <tr>
-                                        <th>#</th>
-                                        <th>الاسم</th>
-                                        <th>رقم الجوال</th>
-                                        <th>معرف اللاعب</th>
-                                        <th>الرصيد (SDG)</th>
-                                        <th>الحالة</th>
-                                        <th>تاريخ التسجيل</th>
-                                        <th>الإجراءات</th>
-                                     </tr>
-                                </thead>
-                                <tbody id="usersTableBody">
-                                    <!-- ديناميكي -->
-                                </tbody>
-                             </table>
-                        </div>
-                    </div>
-
-                    <!-- صفحة الكوبونات -->
-                    <div id="coupons" class="page">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4><i class="fas fa-ticket ms-2"></i>إدارة كوبونات الخصم</h4>
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCouponModal">
-                                <i class="fas fa-plus"></i> إضافة كوبون
-                            </button>
-                        </div>
-                        <div class="table-responsive table-custom">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                     <tr>
-                                        <th>الكود</th>
-                                        <th>نسبة الخصم %</th>
-                                        <th>الحالة</th>
-                                        <th>الإجراءات</th>
-                                     </tr>
-                                </thead>
-                                <tbody id="couponsTableBody">
-                                    <!-- ديناميكي -->
-                                </tbody>
-                             </table>
-                        </div>
-                    </div>
-
-                    <!-- صفحة التقارير -->
-                    <div id="reports" class="page">
-                        <h4 class="mb-4"><i class="fas fa-chart-line ms-2"></i>التقارير</h4>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="chart-container">
-                                    <h5>الإيرادات اليومية (آخر 7 أيام)</h5>
-                                    <canvas id="revenueChart" style="max-height: 350px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <div class="chart-container">
-                                    <h5>أكثر الفئات مبيعًا</h5>
-                                    <canvas id="categoryChart" style="max-height: 300px;"></canvas>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="chart-container">
-                                    <h5>أداء الموظفين</h5>
-                                    <canvas id="staffChart" style="max-height: 300px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> طباعة التقرير</button>
-                        </div>
-                    </div>
-
-                    <!-- صفحة الإعدادات -->
-                    <div id="settings" class="page">
-                        <h4 class="mb-4"><i class="fas fa-cog ms-2"></i>الإعدادات</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header bg-white fw-bold">معلومات المتجر</div>
-                                    <div class="card-body">
-                                        <form id="settingsForm">
-                                            <div class="mb-3">
-                                                <label class="form-label">اسم المتجر</label>
-                                                <input type="text" class="form-control" id="storeName" value="Sudan Games">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">البريد الإلكتروني</label>
-                                                <input type="email" class="form-control" id="storeEmail" value="info@sudangames.sd">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">رقم الدعم</label>
-                                                <input type="text" class="form-control" id="storePhone" value="+249 123 456 789">
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header bg-white fw-bold">إعادة تعيين البيانات</div>
-                                    <div class="card-body">
-                                        <p>سيتم حذف جميع البيانات واستعادة البيانات الافتراضية.</p>
-                                        <button class="btn btn-danger" onclick="resetToDefault()">إعادة تعيين</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- صفحة الملف الشخصي -->
-                    <div id="profile" class="page">
-                        <h4 class="mb-4"><i class="fas fa-id-card ms-2"></i>الملف الشخصي</h4>
-                        <div class="card">
-                            <div class="card-body">
-                                <p><strong>اسم المستخدم:</strong> admin</p>
-                                <p><strong>البريد الإلكتروني:</strong> admin@sudangames.sd</p>
-                                <p><strong>الصلاحية:</strong> مدير عام</p>
-                                <p><strong>آخر دخول:</strong> اليوم 10:30 ص</p>
-                                <button class="btn btn-warning">تغيير كلمة المرور</button>
-                            </div>
-                        </div>
-                    </div>
-
-                </main>
+                    <h1 class="text-xl font-black text-white">SUDAN GAMES <span class="text-sm font-normal text-gray-400">| نظام إدارة متجر الألعاب</span></h1>
+                </div>
+                <button onclick="logoutAdmin()" class="bg-red-600/20 text-red-400 px-5 py-2 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center gap-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> خروج
+                </button>
             </div>
-        </div>
-    </div>
+        </nav>
 
-    <!-- مودال إضافة منتج -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">إضافة منتج جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <main class="max-w-7xl mx-auto px-4 py-6 space-y-10">
+            <!-- بطاقات الإحصائيات -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">إجمالي المنتجات</p><p id="statProducts" class="text-2xl font-black text-[#00e0ff]">0</p></div>
+                    <div class="w-12 h-12 bg-[#00e0ff]/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-cubes text-[#00e0ff] text-xl"></i></div>
                 </div>
-                <div class="modal-body">
-                    <form id="addProductForm">
-                        <div class="mb-3">
-                            <label class="form-label">اسم المنتج</label>
-                            <input type="text" class="form-control" id="productName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">السعر (SDG)</label>
-                            <input type="number" class="form-control" id="productPrice" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">الفئة</label>
-                            <select class="form-select" id="productCategory">
-                                <option>شحن فيفا</option>
-                                <option>شدات ببجي</option>
-                                <option>فري فاير</option>
-                                <option>كول أوف ديوتي</option>
-                            </select>
-                        </div>
-                    </form>
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">فريق العمل</p><p id="statUsers" class="text-2xl font-black text-purple-400">0</p></div>
+                    <div class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-users text-purple-400 text-xl"></i></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="addProduct()">حفظ</button>
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">إجمالي الإيرادات</p><p id="statIncome" class="text-2xl font-black text-green-400">0 ج.س</p></div>
+                    <div class="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-arrow-trend-up text-green-400 text-xl"></i></div>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">إجمالي المصروفات</p><p id="statExpense" class="text-2xl font-black text-red-400">0 ج.س</p></div>
+                    <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-arrow-trend-down text-red-400 text-xl"></i></div>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow">
+                    <div><p class="text-gray-400 text-sm">صافي الربح</p><p id="statNet" class="text-2xl font-black text-amber-400">0 ج.س</p></div>
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-coins text-amber-400 text-xl"></i></div>
                 </div>
             </div>
-        </div>
+
+            <!-- قسم المنتجات (ألعاب / بطاقات) -->
+            <section>
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-2 h-8 admin-gradient rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-gamepad ml-2"></i>إدارة المنتجات (بطاقات / ألعاب)</h2>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <input type="text" id="pName" placeholder="اسم المنتج (مثال: PSN 10$)" class="border rounded-xl p-3">
+                        <input type="number" id="pPrice" placeholder="السعر (ج.س)" class="border rounded-xl p-3">
+                        <input type="number" id="pStock" placeholder="الكمية المتوفرة" class="border rounded-xl p-3">
+                        <select id="pPlatform" class="border rounded-xl p-3">
+                            <option> Free Fire</option><option> PUBG Mobile</option>
+                        </select>
+                        <input type="text" id="pImage" placeholder="رابط الصورة (URL)" class="border rounded-xl p-3">
+                    </div>
+                    <button onclick="addNewProduct()" class="mt-4 w-full game-gradient text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition">➕ إضافة منتج جديد</button>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="flex flex-wrap justify-between items-center p-4 bg-black/40 border-b border-gray-800">
+                        <div class="font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> قائمة المنتجات</div>
+                        <div class="relative"><i class="fa-solid fa-search absolute right-3 top-3 text-gray-500"></i><input type="text" id="searchProduct" placeholder="بحث بالاسم..." class="pr-9 border rounded-xl p-2 w-64 text-sm bg-[#1a1a1a]"></div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right min-w-[700px]">
+                            <thead class="bg-black/40 border-b border-gray-800 text-gray-400 text-sm">
+                                <tr><th class="p-4">المنتج</th><th>السعر</th><th>الكمية</th><th>المنصة</th><th class="text-center">إجراء</th></tr>
+                            </thead>
+                            <tbody id="productsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم إدارة فريق العمل -->
+            <section>
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-2 h-8 bg-purple-500 rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-user-tie ml-2"></i>إدارة فريق العمل</h2>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="uName" placeholder="الاسم الكامل" class="border rounded-xl p-3">
+                        <input type="text" id="uPhone" placeholder="رقم التواصل" class="border rounded-xl p-3">
+                        <input type="password" id="uPass" placeholder="كلمة المرور" class="border rounded-xl p-3">
+                    </div>
+                    <button onclick="addNewUser()" class="mt-4 w-full bg-purple-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-purple-700 transition">➕ إضافة موظف جديد</button>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-address-card ml-1"></i> أعضاء الفريق</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الموظف</th><th>الهاتف</th><th>كلمة السر</th><th class="text-center">إجراء</th></tr></thead><tbody id="usersTable"></tbody></table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم السجلات المالية -->
+            <section>
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="w-2 h-8 bg-green-500 rounded-full"></span>
+                    <h2 class="text-2xl font-black text-white"><i class="fa-solid fa-chart-line ml-2"></i>السجلات المالية</h2>
+                </div>
+                <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="fDesc" placeholder="البيان (مثال: شراء بطاقات)" class="border rounded-xl p-3">
+                        <select id="fType" class="border rounded-xl p-3">
+                            <option value="وارد">وارد (إيراد)</option>
+                            <option value="صادر">صادر (مصروف)</option>
+                        </select>
+                        <input type="number" id="fAmount" placeholder="المبلغ (ج.س)" class="border rounded-xl p-3">
+                        <input type="date" id="fDate" class="border rounded-xl p-3">
+                    </div>
+                    <button onclick="addNewFinance()" class="mt-4 w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-green-700 transition">💰 تسجيل المعاملة المالية</button>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="flex flex-wrap justify-between items-center p-4 bg-black/40 border-b border-gray-800">
+                        <div class="font-bold text-gray-300"><i class="fa-regular fa-calendar ml-1"></i> التقارير المالية</div>
+                        <button onclick="exportFinanceCSV()" class="bg-green-600/20 text-green-400 px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-600 hover:text-white transition"><i class="fa-solid fa-file-csv ml-1"></i> تصدير CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">البيان</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th class="text-center">إجراء</th></tr></thead><tbody id="financeTable"></tbody></table>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- مودال تعديل المنتج -->
-    <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تعديل المنتج</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProductForm">
-                        <input type="hidden" id="editProductId">
-                        <div class="mb-3">
-                            <label class="form-label">اسم المنتج</label>
-                            <input type="text" class="form-control" id="editProductName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">السعر (SDG)</label>
-                            <input type="number" class="form-control" id="editProductPrice" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">الفئة</label>
-                            <select class="form-select" id="editProductCategory">
-                                <option>شحن فيفا</option>
-                                <option>شدات ببجي</option>
-                                <option>فري فاير</option>
-                                <option>كول أوف ديوتي</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">الحالة</label>
-                            <select class="form-select" id="editProductStatus">
-                                <option>متوفر</option>
-                                <option>غير متوفر</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="updateProduct()">تحديث</button>
-                </div>
-            </div>
+    <div id="editProductModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
+        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-[#00e0ff]/30 shadow-2xl"><h3 class="font-black text-xl mb-4 text-white">تعديل المنتج</h3>
+            <input type="hidden" id="editProdId"><input id="editProdName" class="w-full border p-3 rounded-xl mb-3" placeholder="اسم المنتج"><input id="editProdPrice" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="السعر"><input id="editProdStock" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="الكمية"><select id="editProdPlatform" class="w-full border p-3 rounded-xl mb-3"><option>PlayStation</option><option>Xbox</option><option>Nintendo</option><option>Steam</option><option>Apple</option><option>Google Play</option></select><input id="editProdImage" class="w-full border p-3 rounded-xl mb-4" placeholder="رابط الصورة">
+            <div class="flex gap-3"><button onclick="saveProductEdit()" class="bg-[#00e0ff] text-black font-bold px-5 py-2 rounded-xl w-full">حفظ التعديل</button><button onclick="closeModal('editProductModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
+        </div>
+    </div>
+    <!-- مودال تعديل الموظف -->
+    <div id="editUserModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
+        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-purple-500/30"><h3 class="font-black text-xl mb-4 text-white">تعديل بيانات الموظف</h3>
+            <input type="hidden" id="editUserId"><input id="editUserName" class="w-full border p-3 rounded-xl mb-3" placeholder="الاسم"><input id="editUserPhone" class="w-full border p-3 rounded-xl mb-3" placeholder="الهاتف"><input id="editUserPass" class="w-full border p-3 rounded-xl mb-4" placeholder="كلمة المرور">
+            <div class="flex gap-3"><button onclick="saveUserEdit()" class="bg-purple-600 text-white px-5 py-2 rounded-xl w-full">تحديث</button><button onclick="closeModal('editUserModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
+        </div>
+    </div>
+    <!-- مودال تعديل المالية -->
+    <div id="editFinanceModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[1000]">
+        <div class="bg-[#111] rounded-2xl w-11/12 max-w-md p-6 border border-green-500/30"><h3 class="font-black text-xl mb-4 text-white">تعديل معاملة مالية</h3>
+            <input type="hidden" id="editFinanceId"><input id="editFinanceDesc" class="w-full border p-3 rounded-xl mb-3" placeholder="البيان"><select id="editFinanceType" class="w-full border p-3 rounded-xl mb-3"><option value="وارد">وارد</option><option value="صادر">صادر</option></select><input id="editFinanceAmount" type="number" class="w-full border p-3 rounded-xl mb-3" placeholder="المبلغ"><input id="editFinanceDate" type="date" class="w-full border p-3 rounded-xl mb-4">
+            <div class="flex gap-3"><button onclick="saveFinanceEdit()" class="bg-green-600 text-white px-5 py-2 rounded-xl w-full">حفظ</button><button onclick="closeModal('editFinanceModal')" class="bg-gray-700 text-white px-5 py-2 rounded-xl w-full">إلغاء</button></div>
         </div>
     </div>
 
-    <!-- مودال إضافة مستخدم (للوحة الإدارة) -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">إضافة مستخدم جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addUserForm">
-                        <div class="mb-3">
-                            <label class="form-label">الاسم الكامل</label>
-                            <input type="text" class="form-control" id="userFullName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">رقم الجوال</label>
-                            <input type="text" class="form-control" id="userPhone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">معرف اللاعب (اختياري)</label>
-                            <input type="text" class="form-control" id="userPlayerId">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">كلمة المرور</label>
-                            <input type="password" class="form-control" id="userPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">الرصيد الافتتاحي</label>
-                            <input type="number" class="form-control" id="userWallet" value="0">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="addUser()">حفظ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال تعديل رصيد المستخدم -->
-    <div class="modal fade" id="editUserWalletModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تعديل رصيد المستخدم</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editUserWalletForm">
-                        <input type="hidden" id="editUserId">
-                        <div class="mb-3">
-                            <label class="form-label">الرصيد الجديد (SDG)</label>
-                            <input type="number" class="form-control" id="editUserWallet" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="updateUserWallet()">تحديث</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال إعادة تعيين كلمة المرور (اختياري) -->
-    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">إعادة تعيين كلمة المرور</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="resetPasswordForm">
-                        <input type="hidden" id="resetUserId">
-                        <div class="mb-3">
-                            <label class="form-label">كلمة المرور الجديدة</label>
-                            <input type="password" class="form-control" id="newPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">تأكيد كلمة المرور</label>
-                            <input type="password" class="form-control" id="confirmNewPassword" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmResetPassword()">تحديث كلمة المرور</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال إضافة كوبون -->
-    <div class="modal fade" id="addCouponModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">إضافة كوبون جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCouponForm">
-                        <div class="mb-3">
-                            <label class="form-label">كود الخصم</label>
-                            <input type="text" class="form-control" id="couponCode" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">نسبة الخصم (%)</label>
-                            <input type="number" class="form-control" id="couponDiscount" min="1" max="100" required>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="couponActive" checked>
-                            <label class="form-check-label">مفعل</label>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="addCoupon()">حفظ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ==============================
-        // بيانات افتراضية وهيكل التخزين
-        // ==============================
-        let products = [];
-        let orders = [];
-        let users = [];
-        let coupons = [];
+        const AUTH_CONFIG = { user: "Mazin Hassan", pass: "panda@2025" }; // يمكن تغييرها لاحقاً
+        
+        let products = JSON.parse(localStorage.getItem('sudangames_products')) || [];
+        let users = JSON.parse(localStorage.getItem('sudangames_users')) || [];
+        let finance = JSON.parse(localStorage.getItem('sudangames_finance')) || [];
 
-        // تحميل البيانات من localStorage أو تهيئة البيانات الافتراضية
-        function loadData() {
-            // المنتجات
-            products = JSON.parse(localStorage.getItem('sg_products')) || [
-                { id: 1, name: 'شحن فيفا 24', price: 15000, category: 'شحن فيفا', status: 'متوفر' },
-                { id: 2, name: 'شدات ببجي - 600 UC', price: 25000, category: 'شدات ببجي', status: 'متوفر' },
-                { id: 3, name: 'عملات FIFA', price: 8500, category: 'شحن فيفا', status: 'غير متوفر' },
-                { id: 4, name: 'شحن فري فاير - 1000 ماسة', price: 12000, category: 'فري فاير', status: 'متوفر' },
-                { id: 5, name: 'شدات كول أوف ديوتي', price: 30000, category: 'كول أوف ديوتي', status: 'متوفر' },
-            ];
-
-            // الطلبات (من index.html)
-            orders = JSON.parse(localStorage.getItem('sg_orders')) || [];
-
-            // المستخدمين (من index.html) - نقرأهم مباشرة
-            users = JSON.parse(localStorage.getItem('users')) || [];
-
-            // الكوبونات
-            coupons = JSON.parse(localStorage.getItem('sg_coupons')) || [
-                { code: 'RAMADAN10', discount: 10, active: true },
-                { code: 'SUDAN-RK', discount: 15, active: true },
-            ];
-
-            saveData();
+        function migrateData() {
+            products = products.map(p => ({ ...p, stock: p.stock !== undefined ? p.stock : 0, price: Number(p.price) || 0, platform: p.platform || p.category || 'PlayStation' }));
+            finance = finance.map(f => ({ ...f, amount: f.amount !== undefined ? f.amount : 0, date: f.date || new Date().toISOString().slice(0,10) }));
+            saveAll();
         }
 
-        function saveData() {
-            localStorage.setItem('sg_products', JSON.stringify(products));
-            localStorage.setItem('sg_orders', JSON.stringify(orders));
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('sg_coupons', JSON.stringify(coupons));
+        function saveAll() {
+            localStorage.setItem('sudangames_products', JSON.stringify(products));
+            localStorage.setItem('sudangames_users', JSON.stringify(users));
+            localStorage.setItem('sudangames_finance', JSON.stringify(finance));
         }
 
-        // ==============================
-        // تسجيل الدخول / الخروج (تم الإصلاح: admin/admin)
-        // ==============================
-        const loginScreen = document.getElementById('loginScreen');
-        const adminWrapper = document.getElementById('adminWrapper');
-
-        if (sessionStorage.getItem('sg_logged') === 'true') {
-            loginScreen.style.display = 'none';
-            adminWrapper.style.display = 'block';
-            setTimeout(() => adminWrapper.style.opacity = 1, 50);
-            loadData();
-            initAll();
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            // الإصلاح: قبول admin/admin
-            if (username === 'admin' && password === 'admin') {
-                sessionStorage.setItem('sg_logged', 'true');
-                loginScreen.style.opacity = 0;
-                setTimeout(() => {
-                    loginScreen.style.display = 'none';
-                    adminWrapper.style.display = 'block';
-                    setTimeout(() => adminWrapper.style.opacity = 1, 50);
-                    loadData();
-                    initAll();
-                }, 500);
-            } else {
-                alert('بيانات الدخول غير صحيحة (يجب admin/admin)');
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            sessionStorage.removeItem('sg_logged');
-            adminWrapper.style.opacity = 0;
-            setTimeout(() => {
-                adminWrapper.style.display = 'none';
-                loginScreen.style.display = 'flex';
-                setTimeout(() => loginScreen.style.opacity = 1, 50);
-            }, 500);
-        });
-
-        // ==============================
-        // تهيئة الصفحات والبيانات
-        // ==============================
-        function initAll() {
-            updateStats();
-            displayRecentOrders();
-            displayAllOrders();
-            displayProductsTable();
-            displayUsersTable();   // عرض المستخدمين
-            displayCouponsTable();
-            initCharts();
-            initRevenueChart();
-            initCategoryChart();
-            initStaffChart();
-            updateNotifications();
-            setupSearch();
-        }
-
-        // دالة لتحديث المستخدمين (يتم استدعاؤها عند النقر على زر التحديث أو عند الانتقال لصفحة المستخدمين)
-        function refreshUsers() {
-            loadData();           // إعادة قراءة جميع البيانات من localStorage
-            displayUsersTable();  // إعادة عرض جدول المستخدمين
-            updateStats();        // تحديث الإحصائيات (مثل عدد المستخدمين النشطين)
-        }
-
-        // تحديث الإحصائيات في الرئيسية
         function updateStats() {
-            const newOrders = orders.filter(o => o.status === 'جديد' || o.status === 'قيد التنفيذ').length;
-            document.getElementById('newOrdersCount').innerText = newOrders;
-            document.getElementById('totalProductsCount').innerText = products.length;
-            document.getElementById('activeUsersCount').innerText = users.filter(u => u.status === 'نشط').length;
-            const todayRevenue = orders.filter(o => o.status === 'مكتمل').reduce((acc, o) => acc + o.amount, 0);
-            document.getElementById('todayRevenue').innerText = todayRevenue.toLocaleString() + ' SDG';
+            document.getElementById('statProducts').innerText = products.length;
+            document.getElementById('statUsers').innerText = users.length;
+            let totalIncome = finance.filter(f => f.type === 'وارد').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+            let totalExpense = finance.filter(f => f.type === 'صادر').reduce((s, f) => s + (Number(f.amount) || 0), 0);
+            document.getElementById('statIncome').innerHTML = totalIncome.toLocaleString() + ' ج.س';
+            document.getElementById('statExpense').innerHTML = totalExpense.toLocaleString() + ' ج.س';
+            document.getElementById('statNet').innerHTML = (totalIncome - totalExpense).toLocaleString() + ' ج.س';
         }
 
-        // عرض آخر 5 طلبات في الرئيسية
-        function displayRecentOrders() {
-            const tbody = document.getElementById('recentOrdersTable');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            orders.slice(0, 5).forEach(order => {
-                const statusClass = order.status === 'مكتمل' ? 'status-completed' : (order.status === 'ملغي' ? 'status-cancelled' : (order.status === 'جديد' ? 'status-new' : 'status-pending'));
-                tbody.innerHTML += `<tr>
-                    <td><strong>${order.id}</strong></td>
-                    <td>${order.customer}</td>
-                    <td>${order.product}</td>
-                    <td>${order.amount.toLocaleString()} SDG</td>
-                    <td><span class="status-badge ${statusClass}">${order.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-success btn-action" onclick="updateOrderStatus('${order.id}', 'مكتمل')"><i class="fas fa-check"></i></button>
-                        <button class="btn btn-sm btn-outline-warning btn-action" onclick="updateOrderStatus('${order.id}', 'قيد التنفيذ')"><i class="fas fa-spinner"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-action" onclick="updateOrderStatus('${order.id}', 'ملغي')"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>`;
-            });
-        }
-
-        // عرض جميع الطلبات في صفحة الطلبات
-        function displayAllOrders() {
-            const tbody = document.getElementById('allOrdersTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            orders.forEach(order => {
-                const statusClass = order.status === 'مكتمل' ? 'status-completed' : (order.status === 'ملغي' ? 'status-cancelled' : (order.status === 'جديد' ? 'status-new' : 'status-pending'));
-                tbody.innerHTML += `<tr>
-                    <td><strong>${order.id}</strong></td>
-                    <td>${order.customer}</td>
-                    <td>${order.product}</td>
-                    <td>${order.amount.toLocaleString()} SDG</td>
-                    <td>${order.date || '2025-03-01'}</td>
-                    <td><span class="status-badge ${statusClass}">${order.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-success btn-action" onclick="updateOrderStatus('${order.id}', 'مكتمل')"><i class="fas fa-check"></i></button>
-                        <button class="btn btn-sm btn-outline-warning btn-action" onclick="updateOrderStatus('${order.id}', 'قيد التنفيذ')"><i class="fas fa-spinner"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-action" onclick="updateOrderStatus('${order.id}', 'ملغي')"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>`;
-            });
-        }
-
-        window.updateOrderStatus = function(orderId, newStatus) {
-            let order = orders.find(o => o.id === orderId);
-            if (!order && orderId.startsWith('#')) {
-                const idWithoutHash = orderId.substring(1);
-                order = orders.find(o => o.id === idWithoutHash || o.id === '#' + idWithoutHash);
-            }
-            if (order) {
-                order.status = newStatus;
-                saveData();
-                displayRecentOrders();
-                displayAllOrders();
-                updateStats();
-                updateCharts();
-                updateNotifications();
-            } else {
-                alert('الطلب غير موجود!');
-            }
-        };
-
-        // عرض المنتجات
-        function displayProductsTable() {
-            const tbody = document.getElementById('productsTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            products.forEach(prod => {
-                tbody.innerHTML += `<tr>
-                    <td>${prod.id}</td>
-                    <td>${prod.name}</td>
-                    <td>${prod.price.toLocaleString()} SDG</td>
-                    <td>${prod.category}</td>
-                    <td><span class="badge ${prod.status === 'متوفر' ? 'bg-success' : 'bg-secondary'}">${prod.status}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary btn-action" onclick="openEditProductModal(${prod.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteProduct(${prod.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
-        }
-
-        // إضافة منتج
-        window.addProduct = function() {
-            const name = document.getElementById('productName').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const category = document.getElementById('productCategory').value;
-            if (!name || !price) return alert('يرجى ملء جميع الحقول');
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            products.push({ id: newId, name, price, category, status: 'متوفر' });
-            saveData();
-            displayProductsTable();
+        function renderAll() {
+            let searchTerm = document.getElementById('searchProduct')?.value.toLowerCase() || '';
+            let filtered = products.filter(p => p.name?.toLowerCase().includes(searchTerm));
+            document.getElementById('productsTable').innerHTML = filtered.map(p => `
+                <tr class="border-b border-gray-800 hover:bg-white/5">
+                    <td class="p-3 flex items-center gap-3"><img src="${p.image || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/50'"><div><b class="block text-white">${escapeHtml(p.name)}</b><span class="text-xs text-gray-400">${p.platform}</span></div></td>
+                    <td class="text-[#00e0ff] font-bold">${Number(p.price).toLocaleString()} ج.س</td>
+                    <td class="text-gray-300">${p.stock ?? 0}</td>
+                    <td><span class="bg-gray-800 px-2 py-1 rounded text-xs">${p.platform}</span></td>
+                    <td class="text-center"><button onclick="openEditProduct(${p.id})" class="text-[#00e0ff] ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${p.id}, 'p')" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" class="p-6 text-center text-gray-500">لا توجد منتجات</td></tr>';
+            
+            document.getElementById('usersTable').innerHTML = users.map(u => `
+                <tr class="border-b border-gray-800">
+                    <td class="p-4 font-bold text-white">${escapeHtml(u.name)}</td>
+                    <td class="text-gray-300">${escapeHtml(u.phone)}</td>
+                    <td class="text-xs text-gray-400 font-mono">${escapeHtml(u.pass)}</td>
+                    <td class="text-center"><button onclick="openEditUser(${u.id})" class="text-purple-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${u.id}, 'u')" class="text-red-400"><i class="fa-solid fa-user-xmark"></i></button></td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" class="p-6 text-center text-gray-500">لا يوجد موظفون</td></tr>';
+            
+            document.getElementById('financeTable').innerHTML = finance.map(f => `
+                <tr class="border-b border-gray-800">
+                    <td class="p-4 font-bold text-white">${escapeHtml(f.desc)}</td>
+                    <td><span class="${f.type === 'صادر' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'} px-3 py-1 rounded-full text-xs font-bold">${f.type}</span></td>
+                    <td class="font-mono text-gray-300">${Number(f.amount).toLocaleString()} ج.س</td>
+                    <td class="text-gray-400 text-sm">${f.date}</td>
+                    <td class="text-center"><button onclick="openEditFinance(${f.id})" class="text-green-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${f.id}, 'f')" class="text-red-400"><i class="fa-solid fa-circle-minus"></i></button></td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" class="p-6 text-center text-gray-500">لا توجد معاملات مالية</td></tr>';
+            
             updateStats();
-            bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
-            document.getElementById('addProductForm').reset();
-        };
-
-        window.deleteProduct = function(id) {
-            if (confirm('هل أنت متأكد من الحذف؟')) {
-                products = products.filter(p => p.id !== id);
-                saveData();
-                displayProductsTable();
-                updateStats();
-            }
-        };
-
-        window.openEditProductModal = function(id) {
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-            document.getElementById('editProductId').value = product.id;
-            document.getElementById('editProductName').value = product.name;
-            document.getElementById('editProductPrice').value = product.price;
-            document.getElementById('editProductCategory').value = product.category;
-            document.getElementById('editProductStatus').value = product.status;
-            new bootstrap.Modal(document.getElementById('editProductModal')).show();
-        };
-
-        window.updateProduct = function() {
-            const id = parseInt(document.getElementById('editProductId').value);
-            const product = products.find(p => p.id === id);
-            if (product) {
-                product.name = document.getElementById('editProductName').value;
-                product.price = parseFloat(document.getElementById('editProductPrice').value);
-                product.category = document.getElementById('editProductCategory').value;
-                product.status = document.getElementById('editProductStatus').value;
-                saveData();
-                displayProductsTable();
-                bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
-            }
-        };
-
-        // عرض المستخدمين (يتم قراءة users من localStorage عند كل عرض)
-        function displayUsersTable() {
-            const tbody = document.getElementById('usersTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            users.forEach(user => {
-                tbody.innerHTML += `<tr>
-                    <td>${user.id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.phone || ''}</td>
-                    <td>${user.playerId || ''}</td>
-                    <td>${user.wallet?.toLocaleString() || 0} SDG</td>
-                    <td><span class="badge ${user.status === 'نشط' ? 'bg-success' : 'bg-secondary'}">${user.status || 'نشط'}</span></td>
-                    <td>${user.regDate || ''}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning btn-action" onclick="openEditWalletModal(${user.id}, ${user.wallet || 0})"><i class="fas fa-wallet"></i></button>
-                        <button class="btn btn-sm btn-outline-info btn-action" onclick="openResetPasswordModal(${user.id})"><i class="fas fa-key"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
         }
 
-        // إضافة مستخدم (من لوحة الإدارة)
-        window.addUser = function() {
-            const name = document.getElementById('userFullName').value;
-            const phone = document.getElementById('userPhone').value;
-            const playerId = document.getElementById('userPlayerId').value;
-            const password = document.getElementById('userPassword').value;
-            const wallet = parseFloat(document.getElementById('userWallet').value) || 0;
-            if (!name || !phone || !password) return alert('يرجى ملء جميع الحقول المطلوبة');
-            const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-            users.push({ 
-                id: newId, 
-                name, 
-                phone, 
-                playerId: playerId || 'غير محدد', 
-                password, 
-                wallet,
-                status: 'نشط', 
-                regDate: new Date().toISOString().split('T')[0] 
-            });
-            saveData();
-            displayUsersTable();
-            updateStats();
-            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-            document.getElementById('addUserForm').reset();
-        };
-
-        window.deleteUser = function(id) {
-            if (confirm('حذف المستخدم؟')) {
-                users = users.filter(u => u.id !== id);
-                saveData();
-                displayUsersTable();
-                updateStats();
-            }
-        };
-
-        window.openEditWalletModal = function(userId, currentWallet) {
-            document.getElementById('editUserId').value = userId;
-            document.getElementById('editUserWallet').value = currentWallet;
-            new bootstrap.Modal(document.getElementById('editUserWalletModal')).show();
-        };
-
-        window.updateUserWallet = function() {
-            const id = parseInt(document.getElementById('editUserId').value);
-            const newWallet = parseFloat(document.getElementById('editUserWallet').value);
-            const user = users.find(u => u.id === id);
-            if (user) {
-                user.wallet = newWallet;
-                saveData();
-                displayUsersTable();
-                bootstrap.Modal.getInstance(document.getElementById('editUserWalletModal')).hide();
-            }
-        };
-
-        // إعادة تعيين كلمة المرور
-        window.openResetPasswordModal = function(userId) {
-            document.getElementById('resetUserId').value = userId;
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmNewPassword').value = '';
-            new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
-        };
-
-        window.confirmResetPassword = function() {
-            const userId = parseInt(document.getElementById('resetUserId').value);
-            const newPass = document.getElementById('newPassword').value;
-            const confirmPass = document.getElementById('confirmNewPassword').value;
-            if (!newPass) return alert('الرجاء إدخال كلمة المرور الجديدة');
-            if (newPass !== confirmPass) return alert('كلمة المرور غير متطابقة');
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.password = newPass;
-                saveData();
-                alert(`تم إعادة تعيين كلمة مرور المستخدم ${user.name} بنجاح`);
-                bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
-            } else {
-                alert('المستخدم غير موجود');
-            }
-        };
-
-        // عرض الكوبونات
-        function displayCouponsTable() {
-            const tbody = document.getElementById('couponsTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            coupons.forEach((coupon, index) => {
-                tbody.innerHTML += `<tr>
-                    <td><strong>${coupon.code}</strong></td>
-                    <td>${coupon.discount}%</td>
-                    <td><span class="badge ${coupon.active ? 'bg-success' : 'bg-secondary'}">${coupon.active ? 'مفعل' : 'معطل'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-warning btn-action" onclick="toggleCouponStatus(${index})"><i class="fas fa-toggle-${coupon.active ? 'on' : 'off'}"></i></button>
-                        <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteCoupon(${index})"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
+        // المنتجات
+        function addNewProduct() {
+            let name = document.getElementById('pName').value.trim();
+            let price = parseFloat(document.getElementById('pPrice').value);
+            let stock = parseInt(document.getElementById('pStock').value) || 0;
+            let platform = document.getElementById('pPlatform').value;
+            let image = document.getElementById('pImage').value.trim() || 'https://via.placeholder.com/100';
+            if(!name || isNaN(price) || price<=0) return alert("يرجى إدخال اسم المنتج وسعر صحيح");
+            products.push({ id: Date.now(), name, price, stock, platform, image });
+            saveAndRender();
+            document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pStock').value = ''; document.getElementById('pImage').value = '';
         }
 
-        window.addCoupon = function() {
-            const code = document.getElementById('couponCode').value.trim().toUpperCase();
-            const discount = parseInt(document.getElementById('couponDiscount').value);
-            const active = document.getElementById('couponActive').checked;
-            if (!code || !discount) return alert('يرجى ملء جميع الحقول');
-            if (coupons.find(c => c.code === code)) return alert('الكود موجود مسبقاً');
-            coupons.push({ code, discount, active });
-            saveData();
-            displayCouponsTable();
-            bootstrap.Modal.getInstance(document.getElementById('addCouponModal')).hide();
-            document.getElementById('addCouponForm').reset();
-        };
+        // المستخدمين
+        function addNewUser() {
+            let name = document.getElementById('uName').value.trim();
+            let phone = document.getElementById('uPhone').value.trim();
+            let pass = document.getElementById('uPass').value.trim();
+            if(!name || !phone || !pass) return alert("أكمل بيانات الموظف");
+            users.push({ id: Date.now(), name, phone, pass });
+            saveAndRender();
+            document.getElementById('uName').value = ''; document.getElementById('uPhone').value = ''; document.getElementById('uPass').value = '';
+        }
 
-        window.toggleCouponStatus = function(index) {
-            coupons[index].active = !coupons[index].active;
-            saveData();
-            displayCouponsTable();
-        };
+        // المالية
+        function addNewFinance() {
+            let desc = document.getElementById('fDesc').value.trim();
+            let type = document.getElementById('fType').value;
+            let amount = parseFloat(document.getElementById('fAmount').value);
+            let date = document.getElementById('fDate').value;
+            if(!desc) return alert("أدخل البيان");
+            if(isNaN(amount) || amount<=0) return alert("أدخل مبلغاً صحيحاً");
+            if(!date) return alert("اختر التاريخ");
+            finance.push({ id: Date.now(), desc, type, amount, date });
+            saveAndRender();
+            document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; document.getElementById('fDate').value = '';
+        }
 
-        window.deleteCoupon = function(index) {
-            if (confirm('حذف الكوبون؟')) {
-                coupons.splice(index, 1);
-                saveData();
-                displayCouponsTable();
-            }
-        };
+        function deleteItem(id, type) {
+            if(!confirm("هل أنت متأكد من الحذف نهائياً؟")) return;
+            if(type === 'p') products = products.filter(x => x.id !== id);
+            if(type === 'u') users = users.filter(x => x.id !== id);
+            if(type === 'f') finance = finance.filter(x => x.id !== id);
+            saveAndRender();
+        }
 
-        window.exportProducts = function() {
-            let csv = "ID,الاسم,السعر,الفئة,الحالة\n";
-            products.forEach(p => {
-                csv += `${p.id},${p.name},${p.price},${p.category},${p.status}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'products.csv';
+        // Edit functions
+        function openEditProduct(id) {
+            let prod = products.find(p => p.id === id);
+            if(!prod) return;
+            document.getElementById('editProdId').value = prod.id;
+            document.getElementById('editProdName').value = prod.name;
+            document.getElementById('editProdPrice').value = prod.price;
+            document.getElementById('editProdStock').value = prod.stock;
+            document.getElementById('editProdPlatform').value = prod.platform;
+            document.getElementById('editProdImage').value = prod.image || '';
+            document.getElementById('editProductModal').classList.remove('hidden');
+            document.getElementById('editProductModal').style.display = 'flex';
+        }
+        function saveProductEdit() {
+            let id = Number(document.getElementById('editProdId').value);
+            let index = products.findIndex(p => p.id === id);
+            if(index === -1) return;
+            let newName = document.getElementById('editProdName').value.trim();
+            let newPrice = parseFloat(document.getElementById('editProdPrice').value);
+            let newStock = parseInt(document.getElementById('editProdStock').value);
+            let newPlatform = document.getElementById('editProdPlatform').value;
+            let newImg = document.getElementById('editProdImage').value.trim();
+            if(!newName || isNaN(newPrice) || newPrice<=0) return alert("الاسم والسعر مطلوبان بقيمة صحيحة");
+            products[index] = { ...products[index], name: newName, price: newPrice, stock: newStock, platform: newPlatform, image: newImg || products[index].image };
+            saveAndRender();
+            closeModal('editProductModal');
+        }
+
+        function openEditUser(id) {
+            let user = users.find(u => u.id === id);
+            if(!user) return;
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserName').value = user.name;
+            document.getElementById('editUserPhone').value = user.phone;
+            document.getElementById('editUserPass').value = user.pass;
+            document.getElementById('editUserModal').classList.remove('hidden');
+            document.getElementById('editUserModal').style.display = 'flex';
+        }
+        function saveUserEdit() {
+            let id = Number(document.getElementById('editUserId').value);
+            let idx = users.findIndex(u => u.id === id);
+            if(idx === -1) return;
+            let newName = document.getElementById('editUserName').value.trim();
+            let newPhone = document.getElementById('editUserPhone').value.trim();
+            let newPass = document.getElementById('editUserPass').value.trim();
+            if(!newName || !newPhone || !newPass) return alert("جميع الحقول مطلوبة");
+            users[idx] = { ...users[idx], name: newName, phone: newPhone, pass: newPass };
+            saveAndRender();
+            closeModal('editUserModal');
+        }
+
+        function openEditFinance(id) {
+            let fin = finance.find(f => f.id === id);
+            if(!fin) return;
+            document.getElementById('editFinanceId').value = fin.id;
+            document.getElementById('editFinanceDesc').value = fin.desc;
+            document.getElementById('editFinanceType').value = fin.type;
+            document.getElementById('editFinanceAmount').value = fin.amount;
+            document.getElementById('editFinanceDate').value = fin.date;
+            document.getElementById('editFinanceModal').classList.remove('hidden');
+            document.getElementById('editFinanceModal').style.display = 'flex';
+        }
+        function saveFinanceEdit() {
+            let id = Number(document.getElementById('editFinanceId').value);
+            let idx = finance.findIndex(f => f.id === id);
+            if(idx === -1) return;
+            let newDesc = document.getElementById('editFinanceDesc').value.trim();
+            let newType = document.getElementById('editFinanceType').value;
+            let newAmount = parseFloat(document.getElementById('editFinanceAmount').value);
+            let newDate = document.getElementById('editFinanceDate').value;
+            if(!newDesc) return alert("البيان مطلوب");
+            if(isNaN(newAmount) || newAmount<=0) return alert("أدخل مبلغاً صحيحاً");
+            if(!newDate) return alert("اختر التاريخ");
+            finance[idx] = { ...finance[idx], desc: newDesc, type: newType, amount: newAmount, date: newDate };
+            saveAndRender();
+            closeModal('editFinanceModal');
+        }
+
+        function closeModal(modalId) {
+            let modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+
+        function saveAndRender() {
+            saveAll();
+            renderAll();
+        }
+
+        function exportFinanceCSV() {
+            if(finance.length === 0) return alert("لا توجد بيانات لتصديرها");
+            let headers = ["البيان", "النوع", "المبلغ", "التاريخ"];
+            let rows = finance.map(f => [f.desc, f.type, f.amount, f.date]);
+            let csvContent = headers.join(",") + "\n" + rows.map(row => row.map(cell => `"${cell}"`).join(",")).join("\n");
+            let blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute("download", "sudangames_finance.csv");
+            document.body.appendChild(link);
             link.click();
-        };
-
-        // ==============================
-        // الرسوم البيانية
-        // ==============================
-        let ordersChart, statusChart, revenueChart, categoryChart, staffChart;
-
-        function initCharts() {
-            const ctx1 = document.getElementById('ordersChart')?.getContext('2d');
-            if (ctx1) {
-                ordersChart = new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
-                        datasets: [{
-                            label: 'عدد الطلبات',
-                            data: [5, 8, 12, 7, 9, 15, 10],
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            tension: 0.3,
-                            fill: true
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            }
-
-            const ctx2 = document.getElementById('statusChart')?.getContext('2d');
-            if (ctx2) {
-                const pending = orders.filter(o => o.status === 'قيد التنفيذ' || o.status === 'جديد').length;
-                const completed = orders.filter(o => o.status === 'مكتمل').length;
-                const cancelled = orders.filter(o => o.status === 'ملغي').length;
-                statusChart = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['قيد التنفيذ', 'مكتمل', 'ملغي'],
-                        datasets: [{
-                            data: [pending, completed, cancelled],
-                            backgroundColor: ['#ffc107', '#28a745', '#dc3545']
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            }
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
-        function updateCharts() {
-            if (statusChart) {
-                const pending = orders.filter(o => o.status === 'قيد التنفيذ' || o.status === 'جديد').length;
-                const completed = orders.filter(o => o.status === 'مكتمل').length;
-                const cancelled = orders.filter(o => o.status === 'ملغي').length;
-                statusChart.data.datasets[0].data = [pending, completed, cancelled];
-                statusChart.update();
-            }
-        }
-
-        function initRevenueChart() {
-            const ctx = document.getElementById('revenueChart')?.getContext('2d');
-            if (ctx) {
-                revenueChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
-                        datasets: [{
-                            label: 'الإيرادات (SDG)',
-                            data: [150000, 220000, 180000, 275000, 190000, 310000, 205000],
-                            backgroundColor: '#28a745'
-                        }]
-                    }
-                });
-            }
-        }
-
-        function initCategoryChart() {
-            const ctx = document.getElementById('categoryChart')?.getContext('2d');
-            if (ctx) {
-                categoryChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['شحن فيفا', 'شدات ببجي', 'فري فاير', 'كول أوف ديوتي'],
-                        datasets: [{
-                            data: [45, 30, 15, 10],
-                            backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545']
-                        }]
-                    }
-                });
-            }
-        }
-
-        function initStaffChart() {
-            const ctx = document.getElementById('staffChart')?.getContext('2d');
-            if (ctx) {
-                staffChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['أحمد', 'سارة', 'عمر', 'ندى', 'يوسف'],
-                        datasets: [{
-                            label: 'عدد الطلبات المنفذة',
-                            data: [22, 18, 25, 14, 20],
-                            backgroundColor: 'rgba(255, 193, 7, 0.2)',
-                            borderColor: '#ffc107'
-                        }]
-                    }
-                });
-            }
-        }
-
-        // ==============================
-        // الإشعارات
-        // ==============================
-        function updateNotifications() {
-            const newOrdersCount = orders.filter(o => o.status === 'جديد').length;
-            document.getElementById('notificationsBadge').innerText = newOrdersCount;
-            const list = document.getElementById('notificationsList');
-            list.innerHTML = '';
-            if (newOrdersCount === 0) {
-                list.innerHTML = '<li class="notification-item text-muted">لا توجد إشعارات جديدة</li>';
+        function checkAdminAuth() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+            if(u === AUTH_CONFIG.user && p === AUTH_CONFIG.pass) {
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                migrateData();
+                renderAll();
             } else {
-                orders.filter(o => o.status === 'جديد').forEach(order => {
-                    list.innerHTML += `<li class="notification-item">طلب جديد من ${order.customer} بمبلغ ${order.amount} SDG</li>`;
-                });
+                document.getElementById('errorMsg').classList.remove('hidden');
+                setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
             }
         }
 
-        // ==============================
-        // البحث الشامل
-        // ==============================
-        function setupSearch() {
-            const searchInput = document.getElementById('globalSearch');
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                const rows = document.querySelectorAll('#allOrdersTableBody tr, #usersTableBody tr, #productsTableBody tr');
-                rows.forEach(row => {
-                    const text = row.innerText.toLowerCase();
-                    row.style.display = text.includes(query) ? '' : 'none';
-                });
-            });
+        function logoutAdmin() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('adminLogin').classList.remove('hidden');
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+            document.getElementById('errorMsg').classList.add('hidden');
         }
 
-        // ==============================
-        // التنقل بين الصفحات (مع تحديث المستخدمين عند الضغط على رابط "المستخدمون")
-        // ==============================
-        document.querySelectorAll('#sidebarMenu .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const pageId = this.dataset.page;
-                document.querySelectorAll('#sidebarMenu .nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
-                const targetPage = document.getElementById(pageId);
-                if (targetPage) {
-                    targetPage.classList.add('active-page');
-                    document.getElementById('pageTitle').innerText = this.innerText.trim();
-                    
-                    // إذا كانت الصفحة هي "المستخدمون"، نقوم بتحديث البيانات
-                    if (pageId === 'users') {
-                        refreshUsers();
-                    }
-                }
-            });
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let searchInput = document.getElementById('searchProduct');
+            if(searchInput) searchInput.addEventListener('input', () => renderAll());
+            if(localStorage.getItem('sudangames_products')) migrateData();
         });
-
-        // إعادة تعيين البيانات الافتراضية
-        window.resetToDefault = function() {
-            if (confirm('سيتم فقدان جميع البيانات الحالية، هل أنت متأكد؟')) {
-                localStorage.removeItem('sg_products');
-                localStorage.removeItem('sg_orders');
-                localStorage.removeItem('users');
-                localStorage.removeItem('sg_coupons');
-                loadData(); // إعادة التحميل من القيم الافتراضية
-                initAll();
-            }
-        };
-
-        // تحميل البيانات عند بدء التشغيل (إذا كان مسجل الدخول)
-        if (sessionStorage.getItem('sg_logged') === 'true') {
-            loadData();
-            initAll();
-        }
     </script>
 </body>
 </html>
