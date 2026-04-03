@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sudan Games | لوحة تحكم المسؤول المتكاملة</title>
+    <title>Sudan Games | لوحة تحكم المسؤول المتكاملة - أكواد الخصم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,6 +21,8 @@
         .status-pending { background-color: #f59e0b20; color: #f59e0b; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: bold; }
         .status-approved { background-color: #10b98120; color: #10b981; }
         .status-rejected { background-color: #ef444420; color: #ef4444; }
+        .coupon-active { background-color: #10b98120; color: #10b981; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.7rem; }
+        .coupon-inactive { background-color: #ef444420; color: #ef4444; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -63,12 +65,12 @@
                 <div class="bg-[#111] rounded-2xl p-4 border border-gray-800 flex items-center justify-between card-glow"><div><p class="text-gray-400 text-sm">صافي الربح</p><p id="statNet" class="text-2xl font-black text-amber-400">0 ج.س</p></div><div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-coins text-amber-400 text-xl"></i></div></div>
             </div>
 
-            <!-- ========== طلبات شراء المنتجات (جديد) ========== -->
+            <!-- ========== طلبات شراء المنتجات ========== -->
             <section>
                 <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 bg-blue-500 rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-cart-shopping ml-2"></i>طلبات شراء المنتجات</h2></div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-clock ml-1"></i> الطلبات المعلقة</div>
-                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>الإجمالي</th><th>التاريخ</th><th class="text-center">إجراء</th></tr></thead><tbody id="purchaseRequestsTable"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>السعر الأصلي</th><th>كود الخصم</th><th>الخصم</th><th>الإجمالي بعد الخصم</th><th>التاريخ</th><th class="text-center">إجراء</th></tr></thead><tbody id="purchaseRequestsTable"></tbody></table></div>
                 </div>
             </section>
 
@@ -110,12 +112,43 @@
                 </div>
             </section>
 
+            <!-- ========== إدارة أكواد الخصم (جديد) ========== -->
+            <section>
+                <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 bg-pink-500 rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-ticket-alt ml-2"></i>إدارة أكواد الخصم</h2></div>
+                <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <input type="text" id="couponCode" placeholder="كود الخصم (مثل: SAVE20)" class="border rounded-xl p-3">
+                        <select id="couponType" class="border rounded-xl p-3">
+                            <option value="percentage">نسبة مئوية (%)</option>
+                            <option value="fixed">قيمة ثابتة (ج.س)</option>
+                        </select>
+                        <input type="number" id="couponValue" placeholder="القيمة" class="border rounded-xl p-3">
+                        <input type="date" id="couponExpiry" class="border rounded-xl p-3">
+                        <button onclick="addCoupon()" class="bg-pink-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-pink-700 transition">🎟️ إضافة كود خصم</button>
+                    </div>
+                </div>
+                <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
+                    <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> أكواد الخصم المتاحة</div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الكود</th><th>النوع</th><th>القيمة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th class="text-center">إجراء</th></tr></thead><tbody id="couponsTable"></tbody></table></div>
+                </div>
+            </section>
+
             <!-- ========== إدارة المنتجات ========== -->
             <section>
                 <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 admin-gradient rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-gamepad ml-2"></i>إدارة المنتجات</h2></div>
                 <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <input type="text" id="pName" placeholder="اسم المنتج" class="border rounded-xl p-3"><input type="number" id="pPrice" placeholder="السعر (ج.س)" class="border rounded-xl p-3"><input type="number" id="pStock" placeholder="الكمية" class="border rounded-xl p-3"><select id="pPlatform" class="border rounded-xl p-3"><option>Free_Fire</option><option>PUBG Mobile</option><option>PlayStation</option><option>Xbox</option><option>Steam</option></select><input type="text" id="pImage" placeholder="رابط الصورة" class="border rounded-xl p-3">
+                        <input type="text" id="pName" placeholder="اسم المنتج" class="border rounded-xl p-3">
+                        <input type="number" id="pPrice" placeholder="السعر (ج.س)" class="border rounded-xl p-3">
+                        <input type="number" id="pStock" placeholder="الكمية" class="border rounded-xl p-3">
+                        <select id="pPlatform" class="border rounded-xl p-3">
+                            <option>Free_Fire</option>
+                            <option>PUBG Mobile</option>
+                            <option>شحن عملات تيك توم</option>
+                            <option>eFOOTBALL شحن</option>
+                            <option>Clash of Clans</option>
+                        </select>
+                        <input type="text" id="pImage" placeholder="رابط الصورة" class="border rounded-xl p-3">
                     </div>
                     <button onclick="addNewProduct()" class="mt-4 w-full game-gradient text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition">➕ إضافة منتج جديد</button>
                 </div>
@@ -167,6 +200,7 @@
         let depositRequests = JSON.parse(localStorage.getItem('sudangames_deposit_requests')) || [];
         let registrationRequests = JSON.parse(localStorage.getItem('sudangames_registration_requests')) || [];
         let purchaseRequests = JSON.parse(localStorage.getItem('sudangames_purchase_requests')) || [];
+        let coupons = JSON.parse(localStorage.getItem('sudangames_coupons')) || [];
 
         function saveAll() {
             localStorage.setItem('sudangames_products', JSON.stringify(products));
@@ -176,6 +210,7 @@
             localStorage.setItem('sudangames_deposit_requests', JSON.stringify(depositRequests));
             localStorage.setItem('sudangames_registration_requests', JSON.stringify(registrationRequests));
             localStorage.setItem('sudangames_purchase_requests', JSON.stringify(purchaseRequests));
+            localStorage.setItem('sudangames_coupons', JSON.stringify(coupons));
         }
 
         function updateStats() {
@@ -189,19 +224,100 @@
             document.getElementById('statNet').innerHTML = (totalIncome - totalExpense).toLocaleString() + ' ج.س';
         }
 
-        // ========== طلبات شراء المنتجات ==========
+        // ========== إدارة أكواد الخصم ==========
+        function addCoupon() {
+            let code = document.getElementById('couponCode').value.trim().toUpperCase();
+            let type = document.getElementById('couponType').value;
+            let value = parseFloat(document.getElementById('couponValue').value);
+            let expiry = document.getElementById('couponExpiry').value;
+            if (!code || isNaN(value) || value <= 0) return alert("يرجى إدخال كود وقيمة صحيحة");
+            if (coupons.some(c => c.code === code)) return alert("هذا الكود موجود مسبقاً");
+            coupons.push({
+                id: Date.now(),
+                code: code,
+                type: type,
+                value: value,
+                expiry: expiry,
+                isActive: true,
+                createdAt: new Date().toISOString()
+            });
+            saveAll();
+            renderCoupons();
+            document.getElementById('couponCode').value = '';
+            document.getElementById('couponValue').value = '';
+            document.getElementById('couponExpiry').value = '';
+            alert("تمت إضافة كود الخصم بنجاح");
+        }
+
+        function deleteCoupon(id) {
+            if (!confirm("هل أنت متأكد من حذف كود الخصم؟")) return;
+            coupons = coupons.filter(c => c.id !== id);
+            saveAll();
+            renderCoupons();
+        }
+
+        function toggleCouponStatus(id) {
+            const coupon = coupons.find(c => c.id === id);
+            if (coupon) {
+                coupon.isActive = !coupon.isActive;
+                saveAll();
+                renderCoupons();
+            }
+        }
+
+        function validateCoupon(code, totalAmount) {
+            if (!code) return { valid: false, discount: 0, finalAmount: totalAmount };
+            const coupon = coupons.find(c => c.code === code.toUpperCase() && c.isActive === true);
+            if (!coupon) return { valid: false, discount: 0, finalAmount: totalAmount, error: "الكود غير صالح" };
+            if (coupon.expiry && new Date(coupon.expiry) < new Date()) return { valid: false, discount: 0, finalAmount: totalAmount, error: "انتهت صلاحية الكود" };
+            let discount = 0;
+            if (coupon.type === 'percentage') {
+                discount = (totalAmount * coupon.value) / 100;
+            } else {
+                discount = coupon.value;
+            }
+            if (discount > totalAmount) discount = totalAmount;
+            const finalAmount = totalAmount - discount;
+            return { valid: true, discount: discount, finalAmount: finalAmount, couponCode: coupon.code };
+        }
+
+        function renderCoupons() {
+            const tbody = document.getElementById('couponsTable');
+            if (!tbody) return;
+            tbody.innerHTML = coupons.map(c => `
+                <tr class="border-b border-gray-800">
+                    <td class="p-4 font-mono text-[#00e0ff]">${escapeHtml(c.code)}</td>
+                    <td>${c.type === 'percentage' ? 'نسبة مئوية' : 'قيمة ثابتة'}</td>
+                    <td class="font-bold">${c.type === 'percentage' ? c.value + '%' : c.value.toLocaleString() + ' ج.س'}</td>
+                    <td class="text-gray-400">${c.expiry || 'غير محدد'}</td>
+                    <td><span class="${c.isActive ? 'coupon-active' : 'coupon-inactive'}">${c.isActive ? 'مفعل' : 'معطل'}</span></td>
+                    <td class="text-center">
+                        <button onclick="toggleCouponStatus(${c.id})" class="text-amber-400 ml-3"><i class="fa-solid fa-power-off"></i></button>
+                        <button onclick="deleteCoupon(${c.id})" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-6 text-center text-gray-500">لا توجد أكواد خصم</td></tr>';
+        }
+
+        // ========== طلبات شراء المنتجات (مع دعم الخصم) ==========
         function renderPurchaseRequests() {
             const pending = purchaseRequests.filter(r => r.status === 'pending');
             document.getElementById('purchaseRequestsTable').innerHTML = pending.map(req => {
                 const product = products.find(p => p.id === req.productId);
                 const productName = product ? product.name : 'منتج محذوف';
-                const total = req.price * req.quantity;
+                const originalTotal = req.price * req.quantity;
+                let discountAmount = req.discountAmount || 0;
+                let finalTotal = req.finalAmount || originalTotal;
+                let couponDisplay = req.couponCode ? `<span class="text-pink-400 text-xs">${escapeHtml(req.couponCode)}</span>` : '—';
                 return `
                     <tr class="border-b border-gray-800">
                         <td class="p-4 font-bold text-white">${escapeHtml(req.customerName)}</td>
                         <td class="text-gray-300">${escapeHtml(productName)}</td>
                         <td class="text-gray-300">${req.quantity}</td>
-                        <td class="text-amber-400">${total.toLocaleString()} ج.س</td>
+                        <td class="text-gray-400">${originalTotal.toLocaleString()} ج.س</td>
+                        <td class="text-pink-400">${couponDisplay}</td>
+                        <td class="text-amber-400">${discountAmount.toLocaleString()} ج.س</td>
+                        <td class="text-green-400">${finalTotal.toLocaleString()} ج.س</td>
                         <td class="text-gray-400">${new Date(req.createdAt).toLocaleString('ar-EG')}</td>
                         <td class="text-center">
                             <button onclick="approvePurchase(${req.id})" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl ml-2">قبول</button>
@@ -209,7 +325,7 @@
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="6" class="p-6 text-center text-gray-500">لا توجد طلبات شراء معلقة</td></tr>';
+            }).join('') || '<tr><td colspan="9" class="p-6 text-center text-gray-500">لا توجد طلبات شراء معلقة</td></tr>';
         }
 
         function approvePurchase(requestId) {
@@ -224,9 +340,12 @@
                 renderPurchaseRequests();
                 return;
             }
-            const total = request.price * request.quantity;
-            if (customer.walletBalance < total) {
-                alert(`رصيد العميل غير كافٍ (${customer.walletBalance.toLocaleString()} ج.س) للمبلغ المطلوب ${total.toLocaleString()} ج.س`);
+            const originalTotal = request.price * request.quantity;
+            let finalTotal = request.finalAmount !== undefined ? request.finalAmount : originalTotal;
+            let discountAmount = request.discountAmount || 0;
+            
+            if (customer.walletBalance < finalTotal) {
+                alert(`رصيد العميل غير كافٍ (${customer.walletBalance.toLocaleString()} ج.س) للمبلغ المطلوب بعد الخصم ${finalTotal.toLocaleString()} ج.س`);
                 return;
             }
             if (product.stock < request.quantity) {
@@ -234,15 +353,17 @@
                 return;
             }
             // خصم الرصيد
-            customer.walletBalance -= total;
+            customer.walletBalance -= finalTotal;
             // تقليل المخزون
             product.stock -= request.quantity;
             // تسجيل معاملة مالية
+            let financeDesc = `شراء منتج: ${product.name} × ${request.quantity} بواسطة ${customer.name}`;
+            if (discountAmount > 0) financeDesc += ` (بعد خصم ${discountAmount.toLocaleString()} ج.س عبر كود ${request.couponCode})`;
             finance.push({
                 id: Date.now(),
-                desc: `شراء منتج: ${product.name} × ${request.quantity} بواسطة ${customer.name}`,
+                desc: financeDesc,
                 type: 'وارد',
-                amount: total,
+                amount: finalTotal,
                 date: new Date().toISOString().slice(0,10)
             });
             // حذف الطلب
@@ -253,7 +374,7 @@
             renderProducts();
             renderFinance();
             updateStats();
-            alert(`تم قبول الطلب: ${product.name} × ${request.quantity} للعميل ${customer.name}`);
+            alert(`تم قبول الطلب: ${product.name} × ${request.quantity} بمبلغ ${finalTotal.toLocaleString()} ج.س للعميل ${customer.name}`);
         }
 
         function rejectPurchase(requestId) {
@@ -617,6 +738,7 @@
             renderProducts();
             renderUsers();
             renderFinance();
+            renderCoupons();
             updateStats();
         }
 
@@ -648,6 +770,7 @@
             if (e.key === 'sudangames_purchase_requests') { purchaseRequests = JSON.parse(e.newValue); renderPurchaseRequests(); }
             if (e.key === 'sudangames_finance') { finance = JSON.parse(e.newValue); renderFinance(); updateStats(); }
             if (e.key === 'sudangames_users') { users = JSON.parse(e.newValue); renderUsers(); updateStats(); }
+            if (e.key === 'sudangames_coupons') { coupons = JSON.parse(e.newValue); renderCoupons(); }
         });
 
         document.getElementById('searchProduct')?.addEventListener('input', () => renderProducts());
@@ -671,6 +794,9 @@
         window.addNewFinance = addNewFinance;
         window.exportFinanceCSV = exportFinanceCSV;
         window.closeModal = closeModal;
+        window.addCoupon = addCoupon;
+        window.deleteCoupon = deleteCoupon;
+        window.toggleCouponStatus = toggleCouponStatus;
     </script>
 </body>
 </html>
