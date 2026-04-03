@@ -70,9 +70,15 @@
                 <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 bg-blue-500 rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-cart-shopping ml-2"></i>طلبات شراء المنتجات</h2></div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-clock ml-1"></i> الطلبات المعلقة</div>
-                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400">
-    <th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>السعر الأصلي</th><th>كود الخصم</th><th>الخصم</th><th>الإجمالي بعد الخصم</th><th>واتساب</th><th>رقم الأيدي</th><th>التاريخ</th><th class="text-center">إجراء</th>
-                    </thead>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right">
+                            <thead class="bg-black/40 border-b border-gray-800 text-gray-400">
+                                <th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>السعر الأصلي</th><th>كود الخصم</th><th>الخصم</th><th>الإجمالي بعد الخصم</th><th>واتساب</th><th>رقم الأيدي</th><th>التاريخ</th><th class="text-center">إجراء</th>
+                            </thead>
+                            <tbody id="purchaseRequestsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <!-- ========== إدارة العملاء ========== -->
@@ -113,7 +119,7 @@
                 </div>
             </section>
 
-            <!-- ========== إدارة أكواد الخصم (جديد) ========== -->
+            <!-- ========== إدارة أكواد الخصم ========== -->
             <section>
                 <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 bg-pink-500 rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-ticket-alt ml-2"></i>إدارة أكواد الخصم</h2></div>
                 <div class="bg-[#111] rounded-2xl p-6 border border-gray-800 mb-6">
@@ -130,7 +136,7 @@
                 </div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> أكواد الخصم المتاحة</div>
-                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الكود</th><th>النوع</th><th>القيمة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th class="text-center">إجراء</th></tr></thead><tbody id="couponsTable"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الكود</th><th>النوع</th><th>القيمة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th class="text-center">إجراء</th></tr></thead><tbody id="couponsTable"></tbody></tr></div>
                 </div>
             </section>
 
@@ -266,22 +272,6 @@
             }
         }
 
-        function validateCoupon(code, totalAmount) {
-            if (!code) return { valid: false, discount: 0, finalAmount: totalAmount };
-            const coupon = coupons.find(c => c.code === code.toUpperCase() && c.isActive === true);
-            if (!coupon) return { valid: false, discount: 0, finalAmount: totalAmount, error: "الكود غير صالح" };
-            if (coupon.expiry && new Date(coupon.expiry) < new Date()) return { valid: false, discount: 0, finalAmount: totalAmount, error: "انتهت صلاحية الكود" };
-            let discount = 0;
-            if (coupon.type === 'percentage') {
-                discount = (totalAmount * coupon.value) / 100;
-            } else {
-                discount = coupon.value;
-            }
-            if (discount > totalAmount) discount = totalAmount;
-            const finalAmount = totalAmount - discount;
-            return { valid: true, discount: discount, finalAmount: finalAmount, couponCode: coupon.code };
-        }
-
         function renderCoupons() {
             const tbody = document.getElementById('couponsTable');
             if (!tbody) return;
@@ -300,16 +290,20 @@
             `).join('') || '<tr><td colspan="6" class="p-6 text-center text-gray-500">لا توجد أكواد خصم</td></tr>';
         }
 
-        // ========== طلبات شراء المنتجات (مع دعم الخصم) ==========
+        // ========== طلبات شراء المنتجات (مع عرض واتساب ورقم الأيدي) ==========
         function renderPurchaseRequests() {
             const pending = purchaseRequests.filter(r => r.status === 'pending');
-            document.getElementById('purchaseRequestsTable').innerHTML = pending.map(req => {
+            const tbody = document.getElementById('purchaseRequestsTable');
+            if (!tbody) return;
+            tbody.innerHTML = pending.map(req => {
                 const product = products.find(p => p.id === req.productId);
                 const productName = product ? product.name : 'منتج محذوف';
                 const originalTotal = req.price * req.quantity;
                 let discountAmount = req.discountAmount || 0;
                 let finalTotal = req.finalAmount || originalTotal;
                 let couponDisplay = req.couponCode ? `<span class="text-pink-400 text-xs">${escapeHtml(req.couponCode)}</span>` : '—';
+                let whatsapp = req.whatsapp ? escapeHtml(req.whatsapp) : 'غير مدخل';
+                let gameUserId = req.gameUserId ? escapeHtml(req.gameUserId) : 'غير مدخل';
                 return `
                     <tr class="border-b border-gray-800">
                         <td class="p-4 font-bold text-white">${escapeHtml(req.customerName)}</td>
@@ -319,6 +313,8 @@
                         <td class="text-pink-400">${couponDisplay}</td>
                         <td class="text-amber-400">${discountAmount.toLocaleString()} ج.س</td>
                         <td class="text-green-400">${finalTotal.toLocaleString()} ج.س</td>
+                        <td class="text-blue-300 dir-ltr text-left">${whatsapp}</td>
+                        <td class="text-yellow-300">${gameUserId}</td>
                         <td class="text-gray-400">${new Date(req.createdAt).toLocaleString('ar-EG')}</td>
                         <td class="text-center">
                             <button onclick="approvePurchase(${req.id})" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl ml-2">قبول</button>
@@ -326,7 +322,7 @@
                         </td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="9" class="p-6 text-center text-gray-500">لا توجد طلبات شراء معلقة</td></tr>';
+            }).join('') || '<tr><td colspan="11" class="p-6 text-center text-gray-500">لا توجد طلبات شراء معلقة</td></tr>';
         }
 
         function approvePurchase(requestId) {
@@ -353,11 +349,8 @@
                 alert(`الكمية المتاحة من المنتج (${product.stock}) أقل من المطلوب (${request.quantity})`);
                 return;
             }
-            // خصم الرصيد
             customer.walletBalance -= finalTotal;
-            // تقليل المخزون
             product.stock -= request.quantity;
-            // تسجيل معاملة مالية
             let financeDesc = `شراء منتج: ${product.name} × ${request.quantity} بواسطة ${customer.name}`;
             if (discountAmount > 0) financeDesc += ` (بعد خصم ${discountAmount.toLocaleString()} ج.س عبر كود ${request.couponCode})`;
             finance.push({
@@ -367,7 +360,6 @@
                 amount: finalTotal,
                 date: new Date().toISOString().slice(0,10)
             });
-            // حذف الطلب
             purchaseRequests = purchaseRequests.filter(r => r.id !== requestId);
             saveAll();
             renderPurchaseRequests();
@@ -388,7 +380,9 @@
 
         // ========== العملاء ==========
         function renderCustomers() {
-            document.getElementById('customersTable').innerHTML = customers.map(c => `
+            const tbody = document.getElementById('customersTable');
+            if (!tbody) return;
+            tbody.innerHTML = customers.map(c => `
                 <tr class="border-b border-gray-800">
                     <td class="p-4 font-bold text-white">${escapeHtml(c.name)}</td>
                     <td class="text-gray-300">${escapeHtml(c.email)}</td>
@@ -440,7 +434,9 @@
         // ========== طلبات التسجيل ==========
         function renderRegistrationRequests() {
             const pending = registrationRequests.filter(r => r.status === 'pending');
-            document.getElementById('registrationRequestsTable').innerHTML = pending.map(req => `
+            const tbody = document.getElementById('registrationRequestsTable');
+            if (!tbody) return;
+            tbody.innerHTML = pending.map(req => `
                 <tr class="border-b border-gray-800">
                     <td class="p-4 font-bold text-white">${escapeHtml(req.name)}</td>
                     <td class="text-gray-300">${escapeHtml(req.email)}</td>
@@ -492,7 +488,9 @@
         // ========== طلبات الإيداع ==========
         function renderDepositRequests() {
             const pending = depositRequests.filter(r => r.status === 'pending');
-            document.getElementById('depositRequestsTable').innerHTML = pending.map(req => `
+            const tbody = document.getElementById('depositRequestsTable');
+            if (!tbody) return;
+            tbody.innerHTML = pending.map(req => `
                 <tr class="border-b border-gray-800">
                     <td class="p-4 font-bold text-white">${escapeHtml(req.customerName || req.userName)}</td>
                     <td class="text-amber-400">${Number(req.amount).toLocaleString()} ج.س</td>
@@ -550,7 +548,9 @@
         function renderProducts() {
             let search = (document.getElementById('searchProduct')?.value || '').toLowerCase();
             let filtered = products.filter(p => p.name.toLowerCase().includes(search));
-            document.getElementById('productsTable').innerHTML = filtered.map(p => `
+            const tbody = document.getElementById('productsTable');
+            if (!tbody) return;
+            tbody.innerHTML = filtered.map(p => `
                 <tr class="border-b border-gray-800">
                     <td class="p-3 flex items-center gap-3"><img src="${p.image}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/50'"><div><b class="text-white">${escapeHtml(p.name)}</b><div class="text-xs text-gray-400">${p.platform}</div></div></td>
                     <td class="text-[#00e0ff] font-bold">${Number(p.price).toLocaleString()} ج.س</td>
@@ -583,7 +583,9 @@
             document.getElementById('uName').value = ''; document.getElementById('uPhone').value = ''; document.getElementById('uPass').value = '';
         }
         function renderUsers() {
-            document.getElementById('usersTable').innerHTML = users.map(u => `
+            const tbody = document.getElementById('usersTable');
+            if (!tbody) return;
+            tbody.innerHTML = users.map(u => `
                 <tr class="border-b border-gray-800">
                     <td class="p-4 font-bold">${escapeHtml(u.name)}</td>
                     <td>${escapeHtml(u.phone)}</td>
@@ -618,7 +620,9 @@
             document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; document.getElementById('fDate').value = '';
         }
         function renderFinance() {
-            document.getElementById('financeTable').innerHTML = finance.map(f => `
+            const tbody = document.getElementById('financeTable');
+            if (!tbody) return;
+            tbody.innerHTML = finance.map(f => `
                 <tr class="border-b border-gray-800">
                     <td class="p-4 font-bold">${escapeHtml(f.desc)}</td>
                     <td><span class="${f.type === 'صادر' ? 'bg-red-600/20 text-red-400' : 'bg-green-600/20 text-green-400'} px-3 py-1 rounded-full text-xs">${f.type}</span></td>
