@@ -184,11 +184,7 @@
         let customers = JSON.parse(localStorage.getItem('sudangames_customers')) || [];
         let depositRequests = JSON.parse(localStorage.getItem('sudangames_deposit_requests')) || [];
         let purchaseRequests = JSON.parse(localStorage.getItem('sudangames_purchase_requests')) || [];
-        let activeCoupons = JSON.parse(localStorage.getItem('sudangames_coupons')) || [
-            { code: "SAVE10", type: "percentage", value: 10, description: "خصم 10%" },
-            { code: "FIXED20", type: "fixed", value: 20, description: "خصم 20 ج.س" },
-            { code: "WELCOME50", type: "fixed", value: 50, description: "خصم 50 ج.س للطلبات فوق 200", minCart: 200 }
-        ];
+        let activeCoupons = JSON.parse(localStorage.getItem('sudangames_coupons')) || [];
         let appliedCoupon = null;
 
         // ربط الدوال للنطاق العام
@@ -214,6 +210,12 @@
             const saved = localStorage.getItem('sudangames_current_user');
             if (saved) {
                 currentUser = JSON.parse(saved);
+                // تحديث بيانات المستخدم من قائمة العملاء (للتزامن مع تغييرات المسؤول)
+                const updatedCustomer = customers.find(c => c.id === currentUser.id);
+                if (updatedCustomer) {
+                    currentUser = { ...updatedCustomer, cart: currentUser.cart || [], depositHistory: currentUser.depositHistory || [] };
+                    saveCurrentUser();
+                }
                 if (!currentUser.cart) currentUser.cart = [];
                 if (!currentUser.depositHistory) currentUser.depositHistory = [];
                 updateUIForUser();
@@ -246,8 +248,17 @@
         function saveUserState() {
             if (!currentUser) return;
             const index = customers.findIndex(c => c.id === currentUser.id);
-            if (index !== -1) customers[index] = { ...currentUser };
-            else customers.push({ ...currentUser });
+            if (index !== -1) {
+                customers[index] = { ...currentUser };
+                // لا نكتب cart و depositHistory في التخزين الرئيسي للعملاء
+                delete customers[index].cart;
+                delete customers[index].depositHistory;
+            } else {
+                const newCustomer = { ...currentUser };
+                delete newCustomer.cart;
+                delete newCustomer.depositHistory;
+                customers.push(newCustomer);
+            }
             saveCustomers();
             saveCurrentUser();
         }
@@ -373,7 +384,7 @@
                 document.getElementById('discountRow').classList.add('hidden');
             }
             if (appliedCoupon) {
-                document.getElementById('appliedCouponInfo').innerHTML = `<i class="fa-solid fa-tag ml-1"></i> كود: ${appliedCoupon.code} - ${appliedCoupon.description}`;
+                document.getElementById('appliedCouponInfo').innerHTML = `<i class="fa-solid fa-tag ml-1"></i> كود: ${appliedCoupon.code} - ${appliedCoupon.description || (appliedCoupon.type === 'percentage' ? appliedCoupon.value + '%' : appliedCoupon.value + ' ج.س')}`;
                 document.getElementById('appliedCouponInfo').classList.remove('hidden');
             } else {
                 document.getElementById('appliedCouponInfo').classList.add('hidden');
@@ -383,9 +394,16 @@
         function applyCoupon() {
             const codeInput = document.getElementById('couponCodeInput').value.trim().toUpperCase();
             if (!codeInput) { showToast("أدخل كود الخصم", "error"); return; }
-            const coupon = activeCoupons.find(c => c.code === codeInput);
+            const coupon = activeCoupons.find(c => c.code === codeInput && c.isActive !== false);
             if (!coupon) {
                 document.getElementById('couponMessage').innerHTML = '<span class="text-red-400">كود غير صالح</span>';
+                appliedCoupon = null;
+                updateCartTotalsDisplay();
+                return;
+            }
+            // التحقق من صلاحية الكود
+            if (coupon.expiry && new Date(coupon.expiry) < new Date()) {
+                document.getElementById('couponMessage').innerHTML = '<span class="text-red-400">انتهت صلاحية الكود</span>';
                 appliedCoupon = null;
                 updateCartTotalsDisplay();
                 return;
@@ -398,7 +416,7 @@
                 return;
             }
             appliedCoupon = coupon;
-            document.getElementById('couponMessage').innerHTML = `<span class="text-green-400">تم تطبيق ${coupon.description}</span>`;
+            document.getElementById('couponMessage').innerHTML = `<span class="text-green-400">تم تطبيق ${coupon.type === 'percentage' ? 'خصم ' + coupon.value + '%' : 'خصم ' + coupon.value + ' ج.س'}</span>`;
             updateCartTotalsDisplay();
             showToast(`تم تطبيق كود الخصم ${coupon.code}`, "success");
         }
@@ -530,6 +548,7 @@
         function closeDepositRequestModal() { 
             document.getElementById('depositRequestModal').classList.add('hidden');
             document.getElementById('depositRequestModal').style.display = 'none';
+            document.getElementById('depositAmountRequest').value = '';
         }
         function submitDepositRequest() {
             if (!currentUser) return;
@@ -659,6 +678,13 @@
         }
         function openWalletModal() {
             if (!currentUser) return;
+            // تحديث الرصيد من localStorage قبل العرض
+            const updatedCustomer = customers.find(c => c.id === currentUser.id);
+            if (updatedCustomer && updatedCustomer.walletBalance !== currentUser.walletBalance) {
+                currentUser.walletBalance = updatedCustomer.walletBalance;
+                saveCurrentUser();
+                updateUIForUser();
+            }
             document.getElementById('currentBalance').innerText = currentUser.walletBalance.toLocaleString() + ' ج.س';
             loadUserDepositRequests();
             document.getElementById('walletModal').classList.remove('hidden');
@@ -689,62 +715,17 @@
             });
         }
 
-        // ========== أحداث التشغيل ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProducts();
-            loadCurrentUser();
-
-            document.querySelectorAll('.platform-filter').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.platform-filter').forEach(b => b.classList.remove('active', 'bg-[#00e0ff]', 'text-black'));
-                    btn.classList.add('active', 'bg-[#00e0ff]', 'text-black');
-                    currentFilter = btn.getAttribute('data-platform');
-                    renderProducts();
-                });
-            });
-
-            document.getElementById('loginBtn').addEventListener('click', () => openAuthModal('login'));
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('cartBtn').addEventListener('click', openCart);
-            document.getElementById('walletBtn').addEventListener('click', openWalletModal);
-            document.getElementById('depositRequestBtn').addEventListener('click', openDepositRequestModal);
-            document.getElementById('submitDepositRequest').addEventListener('click', submitDepositRequest);
-            document.getElementById('authSubmitBtn').addEventListener('click', handleAuthSubmit);
-            document.getElementById('authToggleText').addEventListener('click', () => {
-                authMode = authMode === 'login' ? 'register' : 'login';
-                openAuthModal(authMode);
-            });
-            document.getElementById('applyCouponBtn').addEventListener('click', applyCoupon);
-            document.getElementById('confirmPurchaseBtn').addEventListener('click', createPurchaseRequestWithContact);
-
-            window.addEventListener('click', (e) => {
-                if (e.target === document.getElementById('authModal')) closeAuthModal();
-                if (e.target === document.getElementById('walletModal')) closeWalletModal();
-                if (e.target === document.getElementById('cartModal')) closeCart();
-                if (e.target === document.getElementById('depositRequestModal')) closeDepositRequestModal();
-                if (e.target === document.getElementById('contactModal')) closeContactModal();
-            });
-
-            window.addEventListener('storage', (e) => {
-                if (e.key === 'sudangames_products') { products = JSON.parse(e.newValue); renderProducts(); }
-                if (e.key === 'sudangames_customers') {
-                    customers = JSON.parse(e.newValue);
-                    if (currentUser) {
-                        const updated = customers.find(c => c.id === currentUser.id);
-                        if (updated) currentUser = { ...updated, cart: currentUser.cart };
-                        else { currentUser = null; localStorage.removeItem('sudangames_current_user'); }
-                        updateUIForUser();
-                    }
-                }
-                if (e.key === 'sudangames_deposit_requests') {
-                    depositRequests = JSON.parse(e.newValue);
-                    if (currentUser && document.getElementById('walletModal').style.display === 'flex') loadUserDepositRequests();
-                }
-                if (e.key === 'sudangames_purchase_requests') {
-                    purchaseRequests = JSON.parse(e.newValue);
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+        // ========== الاستماع لتغييرات localStorage من المسؤول ==========
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'sudangames_products') { 
+                products = JSON.parse(e.newValue); 
+                renderProducts(); 
+            }
+            if (e.key === 'sudangames_customers') { 
+                customers = JSON.parse(e.newValue); 
+                if (currentUser) {
+                    const updated = customers.find(c => c.id === currentUser.id);
+                    if (updated) {
+                        // تحديث بيانات المستخدم الحالي مع الحفاظ على السلة
+                        const oldCart = currentUser.cart;
+                        currentUser = { ...updated, cart:
