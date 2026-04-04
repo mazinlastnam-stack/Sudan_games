@@ -70,14 +70,7 @@
                 <div class="flex items-center gap-3 mb-5"><span class="w-2 h-8 bg-blue-500 rounded-full"></span><h2 class="text-2xl font-black text-white"><i class="fa-solid fa-cart-shopping ml-2"></i>طلبات شراء المنتجات</h2></div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-clock ml-1"></i> الطلبات المعلقة</div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right">
-                            <thead class="bg-black/40 border-b border-gray-800 text-gray-400">
-                                <th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>السعر الأصلي</th><th>كود الخصم</th><th>الخصم</th><th>الإجمالي بعد الخصم</th><th>واتساب</th><th>رقم الأيدي</th><th>التاريخ</th><th class="text-center">إجراء</th>
-                            </thead>
-                            <tbody id="purchaseRequestsTable"></tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">العميل</th><th>المنتج</th><th>الكمية</th><th>السعر الأصلي</th><th>كود الخصم</th><th>الخصم</th><th>الإجمالي بعد الخصم</th><th>واتساب</th><th>رقم الأيدي</th><th>التاريخ</th><th class="text-center">إجراء</th></tr></thead><tbody id="purchaseRequestsTable"></tbody></table></div>
                 </div>
             </section>
 
@@ -136,7 +129,7 @@
                 </div>
                 <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden">
                     <div class="p-4 bg-black/40 border-b border-gray-800 font-bold text-gray-300"><i class="fa-regular fa-list-alt ml-1"></i> أكواد الخصم المتاحة</div>
-                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الكود</th><th>النوع</th><th>القيمة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th class="text-center">إجراء</th></tr></thead><tbody id="couponsTable"></tbody></tr></div>
+                    <div class="overflow-x-auto"><table class="w-full text-right"><thead class="bg-black/40 border-b border-gray-800 text-gray-400"><tr><th class="p-4">الكود</th><th>النوع</th><th>القيمة</th><th>تاريخ الانتهاء</th><th>الحالة</th><th class="text-center">إجراء</th></tr></thead><tbody id="couponsTable"></tbody></table></div>
                 </div>
             </section>
 
@@ -290,7 +283,7 @@
             `).join('') || '<tr><td colspan="6" class="p-6 text-center text-gray-500">لا توجد أكواد خصم</td></tr>';
         }
 
-        // ========== طلبات شراء المنتجات (مع عرض واتساب ورقم الأيدي) ==========
+        // ========== طلبات شراء المنتجات (مع دعم الخصم والتزامن الكامل) ==========
         function renderPurchaseRequests() {
             const pending = purchaseRequests.filter(r => r.status === 'pending');
             const tbody = document.getElementById('purchaseRequestsTable');
@@ -302,8 +295,6 @@
                 let discountAmount = req.discountAmount || 0;
                 let finalTotal = req.finalAmount || originalTotal;
                 let couponDisplay = req.couponCode ? `<span class="text-pink-400 text-xs">${escapeHtml(req.couponCode)}</span>` : '—';
-                let whatsapp = req.whatsapp ? escapeHtml(req.whatsapp) : 'غير مدخل';
-                let gameUserId = req.gameUserId ? escapeHtml(req.gameUserId) : 'غير مدخل';
                 return `
                     <tr class="border-b border-gray-800">
                         <td class="p-4 font-bold text-white">${escapeHtml(req.customerName)}</td>
@@ -313,8 +304,8 @@
                         <td class="text-pink-400">${couponDisplay}</td>
                         <td class="text-amber-400">${discountAmount.toLocaleString()} ج.س</td>
                         <td class="text-green-400">${finalTotal.toLocaleString()} ج.س</td>
-                        <td class="text-blue-300 dir-ltr text-left">${whatsapp}</td>
-                        <td class="text-yellow-300">${gameUserId}</td>
+                        <td class="text-gray-400">${escapeHtml(req.whatsapp || '—')}</td>
+                        <td class="text-gray-400">${escapeHtml(req.gameUserId || '—')}</td>
                         <td class="text-gray-400">${new Date(req.createdAt).toLocaleString('ar-EG')}</td>
                         <td class="text-center">
                             <button onclick="approvePurchase(${req.id})" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl ml-2">قبول</button>
@@ -325,11 +316,14 @@
             }).join('') || '<tr><td colspan="11" class="p-6 text-center text-gray-500">لا توجد طلبات شراء معلقة</td></tr>';
         }
 
+        // دالة قبول الطلب المعدلة - تضمن التزامن الكامل
         function approvePurchase(requestId) {
             const request = purchaseRequests.find(r => r.id === requestId);
             if (!request) return;
+            
             const customer = customers.find(c => c.id === request.customerId);
             const product = products.find(p => p.id === request.productId);
+            
             if (!customer || !product) {
                 alert("العميل أو المنتج غير موجود");
                 purchaseRequests = purchaseRequests.filter(r => r.id !== requestId);
@@ -337,10 +331,12 @@
                 renderPurchaseRequests();
                 return;
             }
+            
             const originalTotal = request.price * request.quantity;
             let finalTotal = request.finalAmount !== undefined ? request.finalAmount : originalTotal;
             let discountAmount = request.discountAmount || 0;
             
+            // التحقق من الرصيد والمخزون
             if (customer.walletBalance < finalTotal) {
                 alert(`رصيد العميل غير كافٍ (${customer.walletBalance.toLocaleString()} ج.س) للمبلغ المطلوب بعد الخصم ${finalTotal.toLocaleString()} ج.س`);
                 return;
@@ -349,8 +345,14 @@
                 alert(`الكمية المتاحة من المنتج (${product.stock}) أقل من المطلوب (${request.quantity})`);
                 return;
             }
+            
+            // خصم الرصيد
             customer.walletBalance -= finalTotal;
+            
+            // تقليل المخزون
             product.stock -= request.quantity;
+            
+            // تسجيل معاملة مالية
             let financeDesc = `شراء منتج: ${product.name} × ${request.quantity} بواسطة ${customer.name}`;
             if (discountAmount > 0) financeDesc += ` (بعد خصم ${discountAmount.toLocaleString()} ج.س عبر كود ${request.couponCode})`;
             finance.push({
@@ -360,14 +362,21 @@
                 amount: finalTotal,
                 date: new Date().toISOString().slice(0,10)
             });
+            
+            // حذف الطلب من قائمة الطلبات
             purchaseRequests = purchaseRequests.filter(r => r.id !== requestId);
+            
+            // حفظ جميع التغييرات في localStorage
             saveAll();
+            
+            // إعادة عرض جميع الجداول لتحديث الواجهة
             renderPurchaseRequests();
             renderCustomers();
             renderProducts();
             renderFinance();
             updateStats();
-            alert(`تم قبول الطلب: ${product.name} × ${request.quantity} بمبلغ ${finalTotal.toLocaleString()} ج.س للعميل ${customer.name}`);
+            
+            alert(`✅ تم قبول الطلب بنجاح:\nالمنتج: ${product.name} × ${request.quantity}\nالمبلغ: ${finalTotal.toLocaleString()} ج.س\nالعميل: ${customer.name}\nالرصيد المتبقي: ${customer.walletBalance.toLocaleString()} ج.س`);
         }
 
         function rejectPurchase(requestId) {
@@ -545,6 +554,7 @@
             updateStats();
             document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pStock').value = ''; document.getElementById('pImage').value = '';
         }
+        
         function renderProducts() {
             let search = (document.getElementById('searchProduct')?.value || '').toLowerCase();
             let filtered = products.filter(p => p.name.toLowerCase().includes(search));
@@ -557,9 +567,10 @@
                     <td>${p.stock}</td>
                     <td><span class="bg-gray-800 px-2 py-1 rounded text-xs">${p.platform === 'Free_Fire' ? 'Free Fire' : p.platform}</span></td>
                     <td class="text-center"><button onclick="openEditProduct(${p.id})" class="text-[#00e0ff] ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${p.id}, 'p')" class="text-red-400"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+                 </tr>
             `).join('') || '<tr><td colspan="5" class="p-6 text-center">لا توجد منتجات</td></tr>';
         }
+        
         function openEditProduct(id) {
             let p = products.find(x=>x.id===id);
             if(p){
@@ -582,6 +593,7 @@
             updateStats();
             document.getElementById('uName').value = ''; document.getElementById('uPhone').value = ''; document.getElementById('uPass').value = '';
         }
+        
         function renderUsers() {
             const tbody = document.getElementById('usersTable');
             if (!tbody) return;
@@ -591,9 +603,10 @@
                     <td>${escapeHtml(u.phone)}</td>
                     <td class="font-mono text-xs">${escapeHtml(u.pass)}</td>
                     <td class="text-center"><button onclick="openEditUser(${u.id})" class="text-indigo-400 ml-3"><i class="fa-regular fa-pen-to-square"></i></button><button onclick="deleteItem(${u.id}, 'u')" class="text-red-400"><i class="fa-solid fa-user-xmark"></i></button></td>
-                </tr>
+                 </tr>
             `).join('') || '<tr><td colspan="4" class="p-6 text-center">لا يوجد موظفون</td></tr>';
         }
+        
         function openEditUser(id) {
             let u = users.find(x=>x.id===id);
             if(u){
@@ -619,6 +632,7 @@
             updateStats();
             document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; document.getElementById('fDate').value = '';
         }
+        
         function renderFinance() {
             const tbody = document.getElementById('financeTable');
             if (!tbody) return;
@@ -629,7 +643,7 @@
                     <td class="font-mono">${Number(f.amount).toLocaleString()} ج.س</td>
                     <td class="text-gray-400">${f.date}</td>
                     <td class="text-center"><button onclick="deleteItem(${f.id}, 'f')" class="text-red-400"><i class="fa-solid fa-circle-minus"></i></button></td>
-                </tr>
+                 </tr>
             `).join('') || '<tr><td colspan="5" class="p-6 text-center">لا توجد معاملات</td></tr>';
         }
 
@@ -644,6 +658,7 @@
             if (type === 'f') renderFinance();
             updateStats();
         }
+        
         function exportFinanceCSV() {
             if (finance.length===0) return alert("لا توجد بيانات");
             let headers = ["البيان","النوع","المبلغ","التاريخ"];
@@ -656,11 +671,13 @@
             link.click();
             URL.revokeObjectURL(link.href);
         }
+        
         function closeModal(modalId) {
             let modal = document.getElementById(modalId);
             modal.classList.add('hidden');
             modal.style.display = 'none';
         }
+        
         function escapeHtml(str) {
             if(!str) return '';
             return str.replace(/[&<>]/g, function(m){
@@ -696,6 +713,7 @@
             };
             reader.readAsText(file);
         }
+        
         function validateProduct(item) {
             if (!item.name || typeof item.name !== 'string') throw new Error();
             let price = parseFloat(item.price);
@@ -705,12 +723,14 @@
             let image = (typeof item.image === 'string' && item.image.startsWith('http')) ? item.image : 'https://via.placeholder.com/100';
             return { id: Date.now() + Math.random()*10000, name: item.name.trim(), price, stock, platform, image };
         }
+        
         function validateCustomer(item) {
             if (!item.name || !item.email || !item.password) throw new Error();
             if (customers.some(c => c.email === item.email)) throw new Error();
             let walletBalance = !isNaN(parseFloat(item.walletBalance)) ? parseFloat(item.walletBalance) : 0;
             return { id: Date.now() + Math.random()*10000, name: item.name.trim(), email: item.email.trim(), password: item.password, walletBalance, cart: [], createdAt: new Date().toISOString() };
         }
+        
         function downloadJSON(data, filename) {
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
             const link = document.createElement("a");
@@ -719,6 +739,7 @@
             link.click();
             URL.revokeObjectURL(link.href);
         }
+        
         function setupImport() {
             const importProductsBtn = document.getElementById('importProductsBtn');
             const importCustomersBtn = document.getElementById('importCustomersBtn');
@@ -727,12 +748,12 @@
             let productFileInput = document.createElement('input'); productFileInput.type = 'file'; productFileInput.accept = '.json';
             let customerFileInput = document.createElement('input'); customerFileInput.type = 'file'; customerFileInput.accept = '.json';
             document.body.appendChild(productFileInput); document.body.appendChild(customerFileInput);
-            importProductsBtn.onclick = () => productFileInput.click();
-            importCustomersBtn.onclick = () => customerFileInput.click();
+            if(importProductsBtn) importProductsBtn.onclick = () => productFileInput.click();
+            if(importCustomersBtn) importCustomersBtn.onclick = () => customerFileInput.click();
             productFileInput.onchange = (e) => { if(e.target.files.length) importFromJSON(e.target.files[0], products, validateProduct, () => { renderProducts(); }); productFileInput.value = ''; };
             customerFileInput.onchange = (e) => { if(e.target.files.length) importFromJSON(e.target.files[0], customers, validateCustomer, () => { renderCustomers(); }); customerFileInput.value = ''; };
-            downloadProductsBtn.onclick = () => downloadJSON([{ name: "Battle Pass", price: 299, stock: 50, platform: "Free_Fire", image: "" }], "products_template.json");
-            downloadCustomersBtn.onclick = () => downloadJSON([{ name: "أحمد محمد", email: "ahmed@example.com", password: "123456", walletBalance: 500 }], "customers_template.json");
+            if(downloadProductsBtn) downloadProductsBtn.onclick = () => downloadJSON([{ name: "Battle Pass", price: 299, stock: 50, platform: "Free_Fire", image: "" }], "products_template.json");
+            if(downloadCustomersBtn) downloadCustomersBtn.onclick = () => downloadJSON([{ name: "أحمد محمد", email: "ahmed@example.com", password: "123456", walletBalance: 500 }], "customers_template.json");
         }
 
         function renderAll() {
@@ -760,6 +781,7 @@
                 setTimeout(() => document.getElementById('errorMsg').classList.add('hidden'), 2000);
             }
         }
+        
         function logoutAdmin() {
             document.getElementById('adminDashboard').classList.add('hidden');
             document.getElementById('adminLogin').classList.remove('hidden');
@@ -767,6 +789,7 @@
             document.getElementById('adminPass').value = '';
         }
 
+        // استماع لتغييرات localStorage من النوافذ الأخرى
         window.addEventListener('storage', (e) => {
             if (e.key === 'sudangames_products') { products = JSON.parse(e.newValue); renderProducts(); updateStats(); }
             if (e.key === 'sudangames_customers') { customers = JSON.parse(e.newValue); renderCustomers(); updateStats(); }
@@ -778,7 +801,11 @@
             if (e.key === 'sudangames_coupons') { coupons = JSON.parse(e.newValue); renderCoupons(); }
         });
 
-        document.getElementById('searchProduct')?.addEventListener('input', () => renderProducts());
+        if(document.getElementById('searchProduct')) {
+            document.getElementById('searchProduct').addEventListener('input', () => renderProducts());
+        }
+        
+        // ربط الدوال للنطاق العام
         window.checkAdminAuth = checkAdminAuth;
         window.logoutAdmin = logoutAdmin;
         window.addCustomer = addCustomer;
